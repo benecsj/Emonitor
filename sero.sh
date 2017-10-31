@@ -1,0 +1,1 @@
+sudo minicom -b 115200
