@@ -82,7 +82,7 @@ uint32 user_rf_cal_sector_set(void) {
 
 uint32 counter;
 
-//----------------- TASKS------------------------------------------------------
+//----------------- TASKS-------------------------------------------------------
 /*
  * this task will read the uart and echo back all characters entered
  */
