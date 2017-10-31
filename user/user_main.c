@@ -88,7 +88,7 @@ uint32 counter;
  */
 void read_task(void *pvParameters) {
 	for (;;) {
-		counter++;gg
+		counter++;
 		GPIO_OUTPUT_SET(2, counter % 2);
 		vTaskDelay(10 / portTICK_RATE_MS);
 	}
