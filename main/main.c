@@ -77,10 +77,10 @@ uint32 counter;
 /*
  * Fast task
  */
-void task_1ms(void *pvParameters) {
+void task_10ms(void *pvParameters) {
 	for (;;) {
-		Emonitor_Main_1ms();
-		vTaskDelay(1 / portTICK_RATE_MS);
+		//Emonitor_Main_1ms();
+		vTaskDelay(10 / portTICK_RATE_MS);
 	}
 }
 
@@ -117,7 +117,7 @@ void user_init(void) {
 	DBG("About to create task\r\n");
 	xTaskHandle t;
 	xTaskCreate(task_background, "bgnd", 256, NULL, 0, &t);
-	xTaskCreate(task_1ms, "1ms", 256, NULL, 2, &t);
+	xTaskCreate(task_10ms, "10ms", 256, NULL, 2, &t);
 	xTaskCreate(task_1000ms, "1000ms", 256, NULL, 3, &t);
 }
 

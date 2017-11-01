@@ -14,7 +14,7 @@
 ifndef PDIR
 UP_EXTRACT_DIR = ..
 GEN_LIBS = libs.a
-COMPONENTS_libs = folder1/libfolder1.a	\
+COMPONENTS_libs = hw_timer/hw_timer.a	\
                   folder2/libfolder2.a
 endif
 

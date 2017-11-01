@@ -12,7 +12,7 @@
 #     a generated lib/image xxx.a ()
 #
 ifndef PDIR
-GEN_LIBS = libfolder1.a
+GEN_LIBS = hw_timer.a
 endif
 
 

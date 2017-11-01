@@ -9,6 +9,7 @@
 #include "esp_common.h"
 #include "uart.h"
 #include "gpio.h"
+#include "hw_timer.h"
 
 /******************************************************************************
 * Defines
@@ -36,6 +37,10 @@ void Emonitor_Init(void) {
 	UART_SetBaudrate(UART0, BIT_RATE_115200);
 	//Init Status LED
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_GPIO2);
+	//Init timer for fast task
+    hw_timer_init();
+    hw_timer_set_func(Emonitor_Main_1ms);
+    hw_timer_arm(1000,1);
 }
 
 /******************************************************************************
@@ -45,8 +50,8 @@ void Emonitor_Init(void) {
  * Returns      : none
  *******************************************************************************/
 void Emonitor_Main_1ms(void) {
-	GPIO_OUTPUT_SET(2, Emonitor_statusCounter % 2);
-	Emonitor_statusCounter++;
+	GPIO_OUTPUT_SET(2, Emonitor_statusCounter);
+	Emonitor_statusCounter= (Emonitor_statusCounter+1)%2;
 }
 
 /******************************************************************************
