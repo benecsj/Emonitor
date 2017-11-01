@@ -1,36 +1,25 @@
-/*
- * ESPRSSIF MIT License
- *
- * Copyright (c) 2015 <ESPRESSIF SYSTEMS (SHANGHAI) PTE LTD>
- *
- * Permission is hereby granted for use on ESPRESSIF SYSTEMS ESP8266 only, in which case,
- * it is free of charge, to any person obtaining a copy of this software and associated
- * documentation files (the "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
- * to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
+/******************************************************************************
+* Includes
+\******************************************************************************/
 
+//Common
 #include "esp_common.h"
+#include "project_config.h"
 
+//OS
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "uart.h"
-#include "gpio.h"
+//Apps
+#include "Emonitor.h"
 
-#define DBG printf
+/******************************************************************************
+* Defines
+\******************************************************************************/
+
+/******************************************************************************
+* Implementations
+\******************************************************************************/
 
 /******************************************************************************
  * FunctionName : user_rf_cal_sector_set
@@ -82,14 +71,15 @@ uint32 user_rf_cal_sector_set(void) {
 
 uint32 counter;
 
-//----------------- TASKS-------------------------------------------------------
+/******************************************************************************
+* FreeRTOS Tasks
+\******************************************************************************/
 /*
  * this task will read the uart and echo back all characters entered
  */
-void read_task(void *pvParameters) {
+void task_10ms(void *pvParameters) {
 	for (;;) {
-		counter++;
-		GPIO_OUTPUT_SET(2, counter % 2);
+		Emonitor_Main_10ms();
 		vTaskDelay(10 / portTICK_RATE_MS);
 	}
 }
@@ -97,10 +87,9 @@ void read_task(void *pvParameters) {
 /*
  * Print some status info
  */
-void status_task(void *pvParameters) {
+void task_1000ms(void *pvParameters) {
 	for (;;) {
-		printf("Hello World!!!(%d)\n", counter);
-		counter = 0;
+		Emonitor_Main_1000ms();
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 }
@@ -112,15 +101,13 @@ void status_task(void *pvParameters) {
  * Returns      : none
  *******************************************************************************/
 void user_init(void) {
-	//Init UART
-	UART_SetBaudrate(UART0, BIT_RATE_115200);
-	//Init Status LED
-	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_GPIO2);
+	//Init application
+	Emonitor_Init();
 
-	printf("SDK version:%s\n", system_get_sdk_version());
+	DBG("SDK version:%s\n", system_get_sdk_version());
 	DBG("About to create task\r\n");
 	xTaskHandle t;
-	xTaskCreate(read_task, "rx", 256, NULL, 2, &t);
-	xTaskCreate(status_task, "st", 256, NULL, 3, &t);
+	xTaskCreate(task_10ms, "10ms", 256, NULL, 2, &t);
+	xTaskCreate(task_1000ms, "1000ms", 256, NULL, 3, &t);
 }
 

@@ -22,8 +22,15 @@
  *
  */
 
-#ifndef __USER_CONFIG_H__
-#define __USER_CONFIG_H__
+#ifndef __PROJECT_CONFIG_H__
+#define __PROJECT_CONFIG_H__
+
+/******************************************************************************
+* Defines
+\******************************************************************************/
+
+#define DBG printf
+
 
 #endif
 

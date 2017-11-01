@@ -12,7 +12,10 @@
 #     a generated lib/image xxx.a ()
 #
 ifndef PDIR
-GEN_LIBS = libuser.a
+UP_EXTRACT_DIR = ..
+GEN_LIBS = libs.a
+COMPONENTS_libs = folder1/libfolder1.a	\
+                  folder2/libfolder2.a
 endif
 
 

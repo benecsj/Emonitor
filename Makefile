@@ -22,8 +22,9 @@ GEN_IMAGES= eagle.app.v6.out
 GEN_BINS= eagle.app.v6.bin
 SPECIAL_MKTARGETS=$(APP_MKTARGETS)
 SUBDIRS=    \
-	user    \
-	sample_lib
+	main   \
+	apps   \
+    libs
 
 endif # } PDIR
 
@@ -46,8 +47,9 @@ ifeq ($(FLAVOR),release)
 endif
 
 COMPONENTS_eagle.app.v6 = \
-	user/libuser.a  \
-	sample_lib/libsample.a
+	main/main.a  \
+	libs/libs.a  \
+	apps/apps.a
 
 LINKFLAGS_eagle.app.v6 = \
 	-L$(SDK_PATH)/lib        \
@@ -126,7 +128,7 @@ DDEFINES +=				\
 # Required for each makefile to inherit from the parent
 #
 
-INCLUDES := $(INCLUDES) -I $(PDIR)include
+INCLUDES := $(INCLUDES) -I $(PDIR)include  -I $(PDIR)apps/emonitor
 sinclude $(SDK_PATH)/Makefile
 
 .PHONY: FORCE
