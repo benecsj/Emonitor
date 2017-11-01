@@ -18,7 +18,8 @@
 * Variables
 \******************************************************************************/
 
-uint32 Emonitor_counter;
+uint32 Emonitor_counter = 0;
+uint32 Emonitor_statusCounter = 0;
 
 /******************************************************************************
 * Implementations
@@ -38,19 +39,19 @@ void Emonitor_Init(void) {
 }
 
 /******************************************************************************
- * FunctionName : Emonitor_Main_10ms
- * Description  : Emonitor 10ms Main
+ * FunctionName : Emonitor_Main_1ms
+ * Description  : Emonitor Fast Main
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
-void Emonitor_Main_10ms(void) {
-	Emonitor_counter++;
-	GPIO_OUTPUT_SET(2, Emonitor_counter % 2);
+void Emonitor_Main_1ms(void) {
+	GPIO_OUTPUT_SET(2, Emonitor_statusCounter % 2);
+	Emonitor_statusCounter++;
 }
 
 /******************************************************************************
  * FunctionName : Emonitor_Main_1000ms
- * Description  : Emonitor 1000ms Main
+ * Description  : Emonitor Slow Main
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
@@ -59,5 +60,14 @@ void Emonitor_Main_1000ms(void) {
 	Emonitor_counter = 0;
 }
 
+/******************************************************************************
+ * FunctionName : Emonitor_Main_Background
+ * Description  : Emonitor Background Main
+ * Parameters   : none
+ * Returns      : none
+ *******************************************************************************/
+void Emonitor_Main_Background(void) {
+	Emonitor_counter++;
+}
 
 

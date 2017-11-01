@@ -7,8 +7,9 @@
 \******************************************************************************/
 
 extern void Emonitor_Init(void);
-extern void Emonitor_Main_10ms(void);
+extern void Emonitor_Main_1ms(void);
 extern void Emonitor_Main_1000ms(void);
+extern void Emonitor_Main_Background(void);
 
 
 #endif
