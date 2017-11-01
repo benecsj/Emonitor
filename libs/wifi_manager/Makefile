@@ -12,7 +12,7 @@
 #     a generated lib/image xxx.a ()
 #
 ifndef PDIR
-GEN_LIBS = libfolder2.a
+GEN_LIBS = wifi_manager.a
 endif
 
 

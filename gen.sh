@@ -139,7 +139,7 @@ echo "    8=8192KB(1024KB+1024KB)"
 echo "    9=16384KB(1024KB+1024KB)"
 echo "enter (0/2/3/4/5/6/7/8/9, default 0):"
 #read input
-input=6
+input=0
 if [ -z "$input" ]; then
     spi_size_map=0
     echo "spi size: 512KB"

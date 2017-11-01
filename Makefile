@@ -79,9 +79,11 @@ LINKFLAGS_eagle.app.v6 = \
 	-lpwm	\
 	-lsmartconfig	\
 	-lspiffs	\
-	-lssl	\
+	-lmbedtls               \
+    -lopenssl               \
 	-lwpa	\
 	-lwps		\
+	-lssl	\
 	-lupgrade\
 	-ldriver \
 	$(DEP_LIBS_eagle.app.v6)					\
@@ -105,7 +107,7 @@ DEPENDS_eagle.app.v6 = \
 #	-DTXRX_TXBUF_DEBUG
 #	-DTXRX_RXBUF_DEBUG
 #	-DWLAN_CONFIG_CCX
-CONFIGURATION_DEFINES =	-DICACHE_FLASH
+CONFIGURATION_DEFINES =	-DICACHE_FLASH -D__STDC_NO_ATOMICS__=1 -DESP8266_RTOS -D__STDC_VERSION__=201112L -DFREERTOS_ARCH_ESP8266 
 
 DEFINES +=				\
 	$(UNIVERSAL_TARGET_DEFINES)	\
@@ -128,7 +130,7 @@ DDEFINES +=				\
 # Required for each makefile to inherit from the parent
 #
 
-INCLUDES := $(INCLUDES) -I $(PDIR)include  -I $(PDIR)apps/emonitor
+INCLUDES := $(INCLUDES) -I $(PDIR)include  -I $(PDIR)apps/emonitor  -I $(PDIR)libs/wifi_manager
 sinclude $(SDK_PATH)/Makefile
 
 .PHONY: FORCE

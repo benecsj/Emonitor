@@ -10,6 +10,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+//Libs
+#include "Wifi_Manager.h"
+
 //Apps
 #include "Emonitor.h"
 
@@ -79,7 +82,7 @@ uint32 counter;
  */
 void task_10ms(void *pvParameters) {
 	for (;;) {
-		//Emonitor_Main_1ms();
+
 		vTaskDelay(10 / portTICK_RATE_MS);
 	}
 }
@@ -112,6 +115,9 @@ void task_background(void *pvParameters) {
 void user_init(void) {
 	//Init application
 	Emonitor_Init();
+
+	//Init Wifi
+	Wifi_Manager_Init();
 
 	DBG("SDK version:%s\n", system_get_sdk_version());
 	DBG("About to create task\r\n");
