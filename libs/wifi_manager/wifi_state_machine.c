@@ -153,7 +153,6 @@ WIFI_MODE ICACHE_FLASH_ATTR init_esp_wifi(){
 }
 
 bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){
-	os_printf("(Call)start_wifi_station\n");
     WIFI_MODE mode = wifi_get_opmode();
     if((mode & STATION_MODE) == 0){
         mode |= STATION_MODE;
