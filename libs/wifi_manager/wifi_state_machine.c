@@ -34,6 +34,8 @@
 #include "espressif/esp_softap.h"
 #include "wifi_state_machine.h"
 
+#include "user_config.h"
+
 typedef void (* wifi_state_cb_t)();
 
 wifi_state_cb_t on_station_first_connect = NULL;
@@ -214,8 +216,12 @@ bool ICACHE_FLASH_ATTR start_wifi_ap(const char * ssid, const char * pass){
     sprintf(config.ssid, ssid);
     if(pass){
         sprintf(config.password, pass);
+        config.authmode = AUTH_WPA_WPA2_PSK;
+        config.max_connection = 4;
     }
-    return wifi_softap_set_config(&config);
+    wifi_softap_set_config(&config);
+    wifi_set_opmode(STATIONAP_MODE);
+    return TRUE;
 }
 
 bool ICACHE_FLASH_ATTR stop_wifi_ap(){

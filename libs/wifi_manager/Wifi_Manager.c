@@ -20,6 +20,6 @@ void Wifi_Manager_Init(void)
     stop_wifi_ap();
     //start_wifi_station("BOCI", "fucking6");
     start_wifi_ap(SSID, PASSWORD);
-    //wifi_set_opmode(STATION_MODE);
+
 
 }

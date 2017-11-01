@@ -25,8 +25,8 @@
 #ifndef __USER_CONFIG_H__
 #define __USER_CONFIG_H__
 
-#define SSID "Emonitor"
-#define PASSWORD "admin"
+#define SSID "Emonitor_1234"
+#define PASSWORD "fucking6"
 
 #endif
 
