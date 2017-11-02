@@ -15,6 +15,7 @@
 
 //Apps
 #include "Emonitor.h"
+#include "remote_control.h"
 
 /******************************************************************************
 * Defines
@@ -93,6 +94,7 @@ void task_10ms(void *pvParameters) {
 void task_1000ms(void *pvParameters) {
 	for (;;) {
 		Emonitor_Main_1000ms();
+		Remote_Control_Main();
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 }
@@ -115,7 +117,7 @@ void task_background(void *pvParameters) {
 void user_init(void) {
 	//Init application
 	Emonitor_Init();
-
+    Remote_Control_Init();
 	//Init Wifi
 	Wifi_Manager_Init();
 
@@ -123,7 +125,7 @@ void user_init(void) {
 	DBG("About to create task\r\n");
 	xTaskHandle t;
 	xTaskCreate(task_background, "bgnd", 256, NULL, 0, &t);
-	xTaskCreate(task_10ms, "10ms", 256, NULL, 2, &t);
-	xTaskCreate(task_1000ms, "1000ms", 256, NULL, 3, &t);
+	xTaskCreate(task_10ms, "10ms", 1024, NULL, 2, &t);
+	xTaskCreate(task_1000ms, "1000ms", 1024, NULL, 3, &t);
 }
 

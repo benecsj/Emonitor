@@ -12,11 +12,7 @@
 #     a generated lib/image xxx.a ()
 #
 ifndef PDIR
-UP_EXTRACT_DIR = ..
-GEN_LIBS = apps.a
-COMPONENTS_apps = emonitor/emonitor.a	\
-                  remote_control/remote_control.a
-
+GEN_LIBS = remote_control.a
 endif
 
 
