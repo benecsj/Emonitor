@@ -78,6 +78,20 @@ uint32 counter;
 /******************************************************************************
 * FreeRTOS Tasks
 \******************************************************************************/
+
+/*
+ * Init task
+ */
+void task_Init(void *pvParameters) {
+	vTaskDelay(1000 / portTICK_RATE_MS);
+	//Init application
+    Remote_Control_Init();
+	//Init Wifi
+	Wifi_Manager_Init();
+	//Exit from the task
+	vTaskDelete( NULL );
+}
+
 /*
  * Fast task
  */
@@ -117,9 +131,6 @@ void task_background(void *pvParameters) {
 void user_init(void) {
 	//Init application
 	Emonitor_Init();
-    Remote_Control_Init();
-	//Init Wifi
-	Wifi_Manager_Init();
 
 	DBG("SDK version:%s\n", system_get_sdk_version());
 	DBG("About to create task\r\n");
@@ -127,5 +138,6 @@ void user_init(void) {
 	xTaskCreate(task_background, "bgnd", 256, NULL, 0, &t);
 	xTaskCreate(task_10ms, "10ms", 1024, NULL, 2, &t);
 	xTaskCreate(task_1000ms, "1000ms", 1024, NULL, 3, &t);
+	xTaskCreate(task_Init, "init", 1024, NULL, 3, &t);
 }
 

@@ -14,13 +14,28 @@ Global variables and functions
  ***********************************************************************************************************************/
 
 void Cpi_Test(uint8* params, uint8 lenght, uint8* response) {
+	char* text;
+	uint8 selection;
+
     // Process parameters
-    // No parameters
+	selection = params[0];
 
     //Do stuff
-
+	switch(selection)
+	{
+	case 0:
+		stop_wifi_station();
+		text="/stop_wifi_station/";
+		break;
+	case 1:
+		stop_wifi_ap();
+		text="/stop_wifi_ap/";
+		break;
+	default:
+		text="/NOT_OK/";
+	}
     //Generate response
-    lenght = sprintf((char*) response, "/OK/");
+    lenght = sprintf((char*) response, text);
     Cpi_SendResponseFrame(lenght, response);
 }
 

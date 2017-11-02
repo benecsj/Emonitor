@@ -150,7 +150,7 @@ bool ICACHE_FLASH_ATTR wifi_set_mode(WIFI_MODE mode){
 WIFI_MODE ICACHE_FLASH_ATTR init_esp_wifi(){
     wifi_set_event_handler_cb(wifi_event_handler_cb);
     WIFI_MODE mode = wifi_get_opmode_default();
-    wifi_set_mode(mode);
+    //wifi_set_mode(mode);
     return mode;
 }
 
@@ -218,9 +218,22 @@ bool ICACHE_FLASH_ATTR start_wifi_ap(const char * ssid, const char * pass){
         sprintf(config.password, pass);
         config.authmode = AUTH_WPA_WPA2_PSK;
         config.max_connection = 4;
+        config.ssid_hidden = FALSE;
+        config.beacon_interval = 1000;
     }
+
     wifi_softap_set_config(&config);
     wifi_set_opmode(STATIONAP_MODE);
+
+    wifi_softap_dhcps_stop();
+    struct ip_info info;
+
+    IP4_ADDR(&info.ip, 10, 10, 10, 1);
+    IP4_ADDR(&info.gw, 10, 10, 10, 1);
+    IP4_ADDR(&info.netmask, 255, 255, 255, 0);
+    wifi_set_ip_info(SOFTAP_IF, &info);
+    wifi_softap_dhcps_start();
+
     return TRUE;
 }
 
