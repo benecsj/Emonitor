@@ -12,6 +12,7 @@
 
 //Libs
 #include "Wifi_Manager.h"
+#include "NVM_NonVolatileMemory.h"
 
 //Apps
 #include "Emonitor.h"
@@ -109,6 +110,7 @@ void task_1000ms(void *pvParameters) {
 	for (;;) {
 		Emonitor_Main_1000ms();
 		Remote_Control_Main();
+		NVM_Main();
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 }
@@ -131,6 +133,7 @@ void task_background(void *pvParameters) {
 void user_init(void) {
 	//Init application
 	Emonitor_Init();
+	NVM_Init();
 
 	DBG("SDK version:%s\n", system_get_sdk_version());
 	DBG("About to create task\r\n");

@@ -28,5 +28,7 @@
 #define SSID "Emonitor_1234"
 #define PASSWORD "fucking6"
 
+#define EMONITOR_PARAM_START_SEC		0x3D
+
 #endif
 

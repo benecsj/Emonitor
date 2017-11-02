@@ -131,6 +131,7 @@ DDEFINES +=				\
 #
 
 INCLUDES := $(INCLUDES) -I $(PDIR)include  -I $(PDIR)apps/emonitor -I $(PDIR)apps/remote_control -I $(PDIR)libs/wifi_manager
+INCLUDES := $(INCLUDES) -I $(PDIR)libs/memory_manager
 sinclude $(SDK_PATH)/Makefile
 
 .PHONY: FORCE
