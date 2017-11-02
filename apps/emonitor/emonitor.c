@@ -63,7 +63,6 @@ void Emonitor_Main_1ms(void) {
  * Returns      : none
  *******************************************************************************/
 void Emonitor_Main_1000ms(void) {
-	DBG("(Emonitor) Main\n");
 	Emonitor_timing++;
 	if(Emonitor_timing == 10){
 		DBG("Hello World!!!(%d)\n", Emonitor_counter);

@@ -104,15 +104,18 @@ void Cpi_Main(void)
         Cpi_CommandTable_mas[Cpi_RecCommandId].FunctionPolling(Cpi_yRxParamBuffer_mau8,Cpi_yRxParamPos_mdu8,&Cpi_yTxBuffer_mau8[CPI_COMMAND_NAME_LENGHT+3]);
       }
   }
-  
+  DBG("(CPI) R:%d W:%d S:%d\n",Cpi_yRxBufferReadPos_mdu8,Cpi_yRxBufferWritePos_mdu8, Cpi_Status);
     #if (CPI_OPERATION_MODE == CPI_MODE_POLLING)
        Cpi_RxHandler(); //Read into Rx buffer received bytes
     #endif 
-       DBG("(CPI) Main\n");
+       //DBG("(CPI) Main\n");
 	   /* Process input */
            //Process bytes received into Rx buffer and Cpi state is not Process and SendResponse.
-	   while ((Cpi_yRxBufferReadPos_mdu8<Cpi_yRxBufferWritePos_mdu8)& (Cpi_Status != CPI_SENDRESPONE) &(Cpi_Status != CPI_PROCESS))
+	   while ((Cpi_yRxBufferReadPos_mdu8<Cpi_yRxBufferWritePos_mdu8) &&
+			   (Cpi_Status != CPI_SENDRESPONE) &&
+			   (Cpi_Status != CPI_PROCESS))
 	   {
+		   DBG("(CPI)||| R:%d W:%d S:%d C:%c\n",Cpi_yRxBufferReadPos_mdu8,Cpi_yRxBufferWritePos_mdu8, Cpi_Status,Cpi_yRxBuffer_mau8[Cpi_yRxBufferReadPos_mdu8]);
 		   switch(Cpi_Status)
 		   {
 		   case CPI_IDLE: //In idle state waiting for start token
@@ -253,12 +256,21 @@ void Cpi_Main(void)
 		   }
 	   }
 
-   #if (CPI_OPERATION_MODE == CPI_MODE_POLLING)
-  if (    Cpi_Status == CPI_SENDRESPONE)
+
+  if (Cpi_Status == CPI_SENDRESPONE)
   {
+#if (CPI_OPERATION_MODE == CPI_MODE_POLLING)
      Cpi_TxHandler();
+#endif
+     if (Cpi_yTxBufferReadPos_mdu8>=Cpi_yTxMessageSize_mdu8)
+     {
+       Cpi_Status = CPI_IDLE;
+       Cpi_yRxBufferWritePos_mdu8 = 0;
+       Cpi_yRxBufferReadPos_mdu8 = 0;
+       Cpi_yTxBufferReadPos_mdu8 = 0;
+     }
   }
-  #endif 
+
 }
 
 
@@ -373,13 +385,6 @@ void Cpi_TxHandler(void)
 #endif
    CPI_Send(Cpi_ySendSize,&Cpi_yTxBuffer_mau8[Cpi_yTxBufferReadPos_mdu8]);
    Cpi_yTxBufferReadPos_mdu8 = Cpi_yTxBufferReadPos_mdu8 + Cpi_ySendSize;
-  }
-  else
-  {
-    Cpi_Status = CPI_IDLE;
-    Cpi_yRxBufferWritePos_mdu8 = 0;
-    Cpi_yRxBufferReadPos_mdu8 = 0;
-    Cpi_yTxBufferReadPos_mdu8 = 0;
   }
       #if (CPI_OPERATION_MODE == CPI_MODE_INTERRUPT)
   }

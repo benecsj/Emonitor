@@ -83,6 +83,9 @@ void Remote_Control_Init(void) {
     UART_intr_handler_register(uart0_rx_intr_handler, NULL);
     ETS_UART_INTR_ENABLE();
 
+    //Init command processer
+    Cpi_Init();
+
 }
 
 /******************************************************************************
