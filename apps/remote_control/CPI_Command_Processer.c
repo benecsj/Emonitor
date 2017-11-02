@@ -104,7 +104,6 @@ void Cpi_Main(void)
         Cpi_CommandTable_mas[Cpi_RecCommandId].FunctionPolling(Cpi_yRxParamBuffer_mau8,Cpi_yRxParamPos_mdu8,&Cpi_yTxBuffer_mau8[CPI_COMMAND_NAME_LENGHT+3]);
       }
   }
-  DBG("(CPI) R:%d W:%d S:%d\n",Cpi_yRxBufferReadPos_mdu8,Cpi_yRxBufferWritePos_mdu8, Cpi_Status);
     #if (CPI_OPERATION_MODE == CPI_MODE_POLLING)
        Cpi_RxHandler(); //Read into Rx buffer received bytes
     #endif 
@@ -115,7 +114,6 @@ void Cpi_Main(void)
 			   (Cpi_Status != CPI_SENDRESPONE) &&
 			   (Cpi_Status != CPI_PROCESS))
 	   {
-		   DBG("(CPI)||| R:%d W:%d S:%d C:%c\n",Cpi_yRxBufferReadPos_mdu8,Cpi_yRxBufferWritePos_mdu8, Cpi_Status,Cpi_yRxBuffer_mau8[Cpi_yRxBufferReadPos_mdu8]);
 		   switch(Cpi_Status)
 		   {
 		   case CPI_IDLE: //In idle state waiting for start token
@@ -123,7 +121,6 @@ void Cpi_Main(void)
 			   if (Cpi_yRxBuffer_mau8[Cpi_yRxBufferReadPos_mdu8]== CPI_TOKEN_START_RX)
 			   {
 				   Cpi_Status = CPI_RECCMD;//Enter wait for command name state
-				   DBG("(CPI) Start Received\n");
 			   }
 			   else
 			   {// Not start token received, reseting receiver buffer
@@ -137,14 +134,12 @@ void Cpi_Main(void)
 			   /* Wait until command fully received*/
 			   if (Cpi_yRxBufferReadPos_mdu8== (CPI_COMMAND_NAME_LENGHT +1))
 			   {
-				   DBG("(CPI) Command Received\n");
 				   /* Check command validity*/
 				   uint8 Cpi_zCounter_ldu8;
 				   for (Cpi_zCounter_ldu8=0;Cpi_zCounter_ldu8<CPI_COMMANDS_COUNT;Cpi_zCounter_ldu8++)
 				   {//Check received command with command table
 					   if (Cpi_IsEqual(&Cpi_yRxBuffer_mau8[1],Cpi_CommandTable_mas[Cpi_zCounter_ldu8].Name,CPI_COMMAND_NAME_LENGHT) == OK)
 					   {//If command found stop search
-						   DBG("(CPI) Command found\n");
 						   break;
 					   }
 				   }

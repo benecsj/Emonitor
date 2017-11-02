@@ -17,8 +17,6 @@
 #define CPI_RX_MAX_FRAME_SIZE   50
 #define CPI_TX_MAX_FRAME_SIZE   150
 
-#define DBG printf
-
 /* Callbacks definitions */
 /* Command Events*/
 extern void Cpi_Test(uint8* params,uint8 lenght, uint8* response);
