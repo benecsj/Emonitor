@@ -432,8 +432,8 @@ uint8 Cpi_SendResponseFrame(uint8 length,uint8* buffer)
 {
   uint8 Cpi_temp;
         
-        Cpi_yTxBuffer_mau8[0]='\r';
-        Cpi_yTxBuffer_mau8[1]='\n';
+        Cpi_yTxBuffer_mau8[0]='>';  // \r
+        Cpi_yTxBuffer_mau8[1]='>';  // \n
         Cpi_yTxBuffer_mau8[2]=CPI_TOKEN_START_TX;
   
         for(Cpi_temp=0;Cpi_temp<CPI_COMMAND_NAME_LENGHT;Cpi_temp++)
@@ -446,12 +446,12 @@ uint8 Cpi_SendResponseFrame(uint8 length,uint8* buffer)
 	    Cpi_MemCopy(&Cpi_yTxBuffer_mau8[CPI_COMMAND_NAME_LENGHT+3],buffer,length);
         }
         
-        Cpi_yTxMessageSize_mdu8 = length + CPI_COMMAND_NAME_LENGHT + 3 + 3;
+        Cpi_yTxMessageSize_mdu8 = length + CPI_COMMAND_NAME_LENGHT + 3 + 4;
         
-        Cpi_yTxBuffer_mau8[Cpi_yTxMessageSize_mdu8-3]=CPI_TOKEN_STOP;
-        Cpi_yTxBuffer_mau8[Cpi_yTxMessageSize_mdu8-2]='\r';
-        Cpi_yTxBuffer_mau8[Cpi_yTxMessageSize_mdu8-1]='\n';
-        
+        Cpi_yTxBuffer_mau8[Cpi_yTxMessageSize_mdu8-4]=CPI_TOKEN_STOP;
+        Cpi_yTxBuffer_mau8[Cpi_yTxMessageSize_mdu8-3]='\r';
+        Cpi_yTxBuffer_mau8[Cpi_yTxMessageSize_mdu8-2]='\n';
+        Cpi_yTxBuffer_mau8[Cpi_yTxMessageSize_mdu8-1]=0;
         Cpi_Status = CPI_SENDRESPONE;
         
         #if (CPI_OPERATION_MODE == CPI_MODE_INTERRUPT)

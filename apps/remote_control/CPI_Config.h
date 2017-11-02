@@ -28,7 +28,7 @@ extern void Cpi_Test(uint8* params,uint8 lenght, uint8* response);
 /* Help: You can define variable lenght with CPI_VARIABLE_LENGHT token */
 #define CPI_COMMANDS_TABLE \
 	/* Name   Rec Bytes, Function Rec, Polling*/\
-        {"ctest"  ,1  ,Cpi_Test, NULL},\
+        {"ctest"  ,CPI_VARIABLE_LENGHT  ,Cpi_Test, NULL},\
 
 
 /* Communication protocol setup*/

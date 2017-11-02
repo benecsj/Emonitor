@@ -84,7 +84,9 @@ uint32 counter;
  * Init task
  */
 void task_Init(void *pvParameters) {
-	vTaskDelay(1000 / portTICK_RATE_MS);
+	vTaskDelay(100 / portTICK_RATE_MS);
+	//Init NvM
+	NVM_Init();
 	//Init application
     Remote_Control_Init();
 	//Init Wifi
@@ -97,6 +99,7 @@ void task_Init(void *pvParameters) {
  * Fast task
  */
 void task_10ms(void *pvParameters) {
+	vTaskDelay(1000 / portTICK_RATE_MS);
 	for (;;) {
 
 		vTaskDelay(10 / portTICK_RATE_MS);
@@ -107,6 +110,7 @@ void task_10ms(void *pvParameters) {
  * Slow task
  */
 void task_1000ms(void *pvParameters) {
+	vTaskDelay(1000 / portTICK_RATE_MS);
 	for (;;) {
 		Emonitor_Main_1000ms();
 		Remote_Control_Main();
@@ -133,7 +137,6 @@ void task_background(void *pvParameters) {
 void user_init(void) {
 	//Init application
 	Emonitor_Init();
-	NVM_Init();
 
 	DBG("SDK version:%s\n", system_get_sdk_version());
 	DBG("About to create task\r\n");
