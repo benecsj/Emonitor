@@ -21,5 +21,6 @@ void Wifi_Manager_Init(void)
     //start_wifi_station("BOCI2", "fucking6");
     start_wifi_ap(SSID, PASSWORD);
     stop_wifi_station();
+    stop_wifi_ap();
 
 }
