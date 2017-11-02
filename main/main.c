@@ -91,6 +91,8 @@ void task_Init(void *pvParameters) {
     Remote_Control_Init();
 	//Init Wifi
 	Wifi_Manager_Init();
+	//Finished
+	DBG("Init finished!!!\n-------------------------\n");
 	//Exit from the task
 	vTaskDelete( NULL );
 }

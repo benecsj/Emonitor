@@ -29,7 +29,9 @@ uint16 NvM_SaveTimer = 0;
 
 /*Function definitions*/
 void NvM_MemCopy(uint8* destination, uint8* source, uint16 length);
+void NvM_MemZero(uint8* destination, uint16 length);
 void NvM_Store(void);
+void NvM_Clear(void);
 void NvM_Restore(void);
 void NvM_StoreVariables(void);
 void NvM_RestoreVariables(void);
@@ -121,10 +123,20 @@ void NVM_Main(void)
 		NvM_SaveTimer = 0;
 #endif
 		//Restore from NvM
-		//NvM_Clear();
+		NvM_Clear();
 		//Clear request
 		NvM_Request = NVM_IDLE;
 	}
+}
+
+void NvM_Clear(void)
+{
+	NVM_DEBUG("(NVM)<<< Clear >>>\r\n");
+	//Clear buffer
+	NvM_MemZero((uint8*)&NVM_FrameBuffer,sizeof(NVM_FrameBuffer));
+	//Write buffer two times with zeros
+	system_param_save_with_protect(EMONITOR_PARAM_START_SEC, (void*)&NVM_FrameBuffer, sizeof(NVM_FrameBuffer));
+	system_param_save_with_protect(EMONITOR_PARAM_START_SEC, (void*)&NVM_FrameBuffer, sizeof(NVM_FrameBuffer));
 }
 
 void NvM_Store(void)
@@ -185,3 +197,15 @@ void NvM_MemCopy(uint8* destination, uint8* source, uint16 length)
 		destination[NvM_Counter]=source[NvM_Counter];
 	}
 }
+
+void NvM_MemZero(uint8* destination, uint16 length)
+{
+	uint16 NvM_Counter;
+	//Clear all bytes
+	for(NvM_Counter = 0;NvM_Counter<length;NvM_Counter++)
+	{
+		//Clear byte
+		destination[NvM_Counter]=0;
+	}
+}
+
