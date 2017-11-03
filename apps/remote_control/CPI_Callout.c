@@ -109,6 +109,18 @@ void Cpi_Spiffs(uint8* params, uint8 lenght, uint8* response) {
 		spiffs_status();
 		text="/spiffs_status/";
 		break;
+	case 'i':
+		spiffs_init();
+		text="/spiffs_init/";
+		break;
+	case 'r':
+		spiffs_test_read();
+		text="/spiffs_test_read/";
+		break;
+	case 'w':
+		spiffs_test_write();
+		text="/spiffs_test_write/";
+		break;
 
 	default:
 		text="/NOT_OK/"+0;

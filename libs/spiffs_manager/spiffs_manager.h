@@ -14,6 +14,7 @@
 
 extern void spiffs_init(void);
 extern void spiffs_format(void);
-
+extern void spiffs_test_read(void);
+extern void spiffs_test_write(void);
 #endif
 
