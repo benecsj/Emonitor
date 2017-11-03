@@ -19,8 +19,9 @@
 
 /* Callbacks definitions */
 /* Command Events*/
-extern void Cpi_Test(uint8* params,uint8 lenght, uint8* response);
-
+extern void Cpi_NvM(uint8* params,uint8 lenght, uint8* response);
+extern void Cpi_Wifi(uint8* params,uint8 lenght, uint8* response);
+extern void Cpi_Spiffs(uint8* params,uint8 lenght, uint8* response);
 /* Processing callout */
 
 
@@ -28,8 +29,9 @@ extern void Cpi_Test(uint8* params,uint8 lenght, uint8* response);
 /* Help: You can define variable lenght with CPI_VARIABLE_LENGHT token */
 #define CPI_COMMANDS_TABLE \
 	/* Name   Rec Bytes, Function Rec, Polling*/\
-        {"ctest"  ,CPI_VARIABLE_LENGHT  ,Cpi_Test, NULL},\
-
+        {"ctnvm"  ,CPI_VARIABLE_LENGHT  ,Cpi_NvM, NULL},\
+        {"cwifi"  ,CPI_VARIABLE_LENGHT  ,Cpi_Wifi, NULL},\
+        {"spifs"  ,CPI_VARIABLE_LENGHT  ,Cpi_Spiffs, NULL},\
 
 /* Communication protocol setup*/
 /* Tokens: */

@@ -13,6 +13,7 @@
 //Libs
 #include "Wifi_Manager.h"
 #include "NVM_NonVolatileMemory.h"
+#include "spiffs_manager.h"
 
 //Apps
 #include "Emonitor.h"
@@ -91,6 +92,8 @@ void task_Init(void *pvParameters) {
     Remote_Control_Init();
 	//Init Wifi
 	Wifi_Manager_Init();
+	//Spiffs init
+	spiffs_init();
 	//Finished
 	DBG("Init finished!!!\n-------------------------\n");
 	//Exit from the task

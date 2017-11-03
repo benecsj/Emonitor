@@ -5,6 +5,7 @@ Includes
 
 #include "esp_common.h"
 #include "NVM_NonVolatileMemory.h"
+#include "spiffs_manager.h"
 
 /***********************************************************************************************************************
 Defines
@@ -18,7 +19,7 @@ extern void NvM_RestoreVariables(void);
 Global variables and functions
  ***********************************************************************************************************************/
 
-void Cpi_Test(uint8* params, uint8 lenght, uint8* response) {
+void Cpi_NvM(uint8* params, uint8 lenght, uint8* response) {
 	char* text = "/OK/"+0;
 	uint8 selection;
 
@@ -28,15 +29,6 @@ void Cpi_Test(uint8* params, uint8 lenght, uint8* response) {
     //Do stuff
 	switch(selection)
 	{
-	case 0:
-		stop_wifi_station();
-		text="/stop_wifi_station/";
-		break;
-	case 1:
-		stop_wifi_ap();
-		text="/stop_wifi_ap/";
-		break;
-
 	case 'c':
 		NvM_RequestClear();
 		text="/NvM_RequestClear/";
@@ -60,6 +52,62 @@ void Cpi_Test(uint8* params, uint8 lenght, uint8* response) {
 
 	case 'p':
 		printf("(TEST) NVM_test_value: %d \n",NVM_test_value);
+		break;
+
+	default:
+		text="/NOT_OK/"+0;
+	}
+
+    //Generate response
+    lenght = sprintf((char*) response, text);
+    Cpi_SendResponseFrame(lenght, response);
+}
+
+void Cpi_Wifi(uint8* params, uint8 lenght, uint8* response) {
+	char* text = "/OK/"+0;
+	uint8 selection;
+
+    // Process parameters
+	selection = params[0];
+
+    //Do stuff
+	switch(selection)
+	{
+	case 0:
+		stop_wifi_station();
+		text="/stop_wifi_station/";
+		break;
+	case 1:
+		stop_wifi_ap();
+		text="/stop_wifi_ap/";
+		break;
+
+	default:
+		text="/NOT_OK/"+0;
+	}
+
+    //Generate response
+    lenght = sprintf((char*) response, text);
+    Cpi_SendResponseFrame(lenght, response);
+}
+
+void Cpi_Spiffs(uint8* params, uint8 lenght, uint8* response) {
+	char* text = "/OK/"+0;
+	uint8 selection;
+
+    // Process parameters
+	selection = params[0];
+
+    //Do stuff
+	switch(selection)
+	{
+	case 'f':
+		spiffs_format();
+		text="/spiffs_format/";
+		break;
+	case 's':
+		spiffs_status();
+		text="/spiffs_status/";
 		break;
 
 	default:
