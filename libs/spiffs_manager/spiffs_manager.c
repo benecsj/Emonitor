@@ -71,15 +71,16 @@ void spiffs_init(void) {
     i = 0;
     do
     {
+    	SPIFFSM_DBG("(SPIFFS) TEST WRITE \n");
 		spiffs_stat status;
 		result = SPIFFS_stat(fs, (char *)fileName, &status);
 		SPIFFSM_DBG("(SPIFFS) %d %d  %s %d \n",result, status.obj_id, status.name, status.size);
 		// create a file with some data in it
 		if(result != OK)
 		{
-			//spiffs_file fd = SPIFFS_open(fs, (char *)fileName, SPIFFS_CREAT | SPIFFS_RDWR, 0);
-			//result = SPIFFS_write(fs, fd, buf, 128);
-			//SPIFFS_close(fs, fd);
+			spiffs_file fd = SPIFFS_open(fs, (char *)fileName, SPIFFS_CREAT | SPIFFS_RDWR, 0);
+			result = SPIFFS_write(fs, fd, buf, 128);
+			SPIFFS_close(fs, fd);
 			created = TRUE;
 		}
 		i++;
@@ -88,22 +89,25 @@ void spiffs_init(void) {
     }while (created == FALSE);
     //--------------------TEST READ-----------------------------
     {
+    	SPIFFSM_DBG("(SPIFFS) TEST READ \n");
     	spiffs_stat status;
-    	result = SPIFFS_stat(fs, (char *)"test", &status);
+    	result = SPIFFS_stat(fs, (char *)"/test", &status);
 		if(result = OK)
 		{
 			SPIFFSM_DBG("(SPIFFS) %d %d  %s %d \n",result, status.obj_id, status.name, status.size);
 		}
     }
-
-    //List dir
-    spiffs_DIR spiffsDir;
-    SPIFFS_opendir(fs, "/", &spiffsDir);
-    struct spiffs_dirent spiffsDirEnt;
-    while(SPIFFS_readdir(&spiffsDir, &spiffsDirEnt) != 0) {
-      printf("Got a directory entry: %s\n", spiffsDirEnt.name);
+    //--------------------TEST LIST-----------------------------
+    {
+		SPIFFSM_DBG("(SPIFFS) TEST LIST DIR \n");
+		spiffs_DIR spiffsDir;
+		SPIFFS_opendir(fs, "/", &spiffsDir);
+		struct spiffs_dirent spiffsDirEnt;
+		while(SPIFFS_readdir(&spiffsDir, &spiffsDirEnt) != 0) {
+		  printf("Got a directory entry: %s\n", spiffsDirEnt.name);
+		}
+		SPIFFS_closedir(&spiffsDir);
     }
-    SPIFFS_closedir(&spiffsDir);
 
 }
 
