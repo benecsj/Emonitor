@@ -143,9 +143,9 @@ void user_init(void) {
 	DBG("SDK version:%s\n", system_get_sdk_version());
 	DBG("About to create task\r\n");
 	xTaskHandle t;
-	xTaskCreate(task_background, "bgnd", 256, NULL, 0, &t);
+	xTaskCreate(task_background, "bgnd", 1024, NULL, 0, &t);
 	xTaskCreate(task_10ms, "10ms", 1024, NULL, 2, &t);
-	xTaskCreate(task_1000ms, "1000ms", 1024, NULL, 3, &t);
-	xTaskCreate(task_Init, "init", 1024, NULL, 3, &t);
+	xTaskCreate(task_1000ms, "1000ms", 2048, NULL, 3, &t);
+	xTaskCreate(task_Init, "init", 2048, NULL, 3, &t);
 }
 

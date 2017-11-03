@@ -20,7 +20,7 @@ extern uint8 NVM_test_value;
 	NVM_DATA(NVM_test_value,       sizeof(NVM_test_value))\
 
 
-#define NVM_DATA_POS_DATA_START 0
+#define NVM_DATA_POS_DATA_START 16
 
 /*NVM PARAMETERS*/
 #define NVM_CFG_STORAGE_SIZE		(8000)

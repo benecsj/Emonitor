@@ -9,6 +9,7 @@
 /*Includes*/
 #include "NVM_NonVolatileMemory.h"
 #include "user_config.h"
+#include "md5.h"
 /*Defines*/
 
 
@@ -54,17 +55,49 @@ void NvM_Restore(void)
 	uint8 NVM_Crc;
 	uint16 NvM_Counter;
 	uint16 NvM_Restored = 0;
+	MD5_CTX mdContext;
+	uint8 hash[16];
+	BOOL valid;
+	uint8 retry = 0;
 
-	NVM_DEBUG("(NVM)<<< NvM_Restore>>>\r\n");
+	NVM_DEBUG("(NVM)<<< NvM_Restore>>>\n");
+
+	do
+	{
+		//Get datablock
+		system_param_load(EMONITOR_PARAM_START_SEC-retry, 0, (void*)&NVM_FrameBuffer, sizeof(NVM_FrameBuffer));
+
+		//Calculate hash for data
+		MD5Init(&mdContext);
+		MD5Update(&mdContext, (unsigned char *)&NVM_FrameBuffer[NVM_DATA_POS_DATA_START], sizeof(NVM_FrameBuffer)-NVM_DATA_POS_DATA_START);
+		MD5Final( (unsigned char*) &hash[0], &mdContext);
+
+		//Compare hash
+		NvM_Counter = 0;
+		valid = TRUE;
+		while(valid && NvM_Counter<16)
+		{
+			if(hash[NvM_Counter] != NVM_FrameBuffer[NvM_Counter])
+			{
+				valid = FALSE;
+				NVM_DEBUG("(NVM)<<<Hash check failed>>>\n");
+			}
+			NvM_Counter++;
+		}
+
+		//Increment retry counter
+		retry++;
+
+	}while((retry <2) && (valid == FALSE));
 
 	//Try to restore NvM from valid blocks
-	if(system_param_load(EMONITOR_PARAM_START_SEC, 0, (void*)&NVM_FrameBuffer, sizeof(NVM_FrameBuffer)))
+	if(valid == TRUE)
 	{
 		NvM_RestoreVariables();
 	}
 	else
 	{
-		NVM_DEBUG("(NVM) No valid block were found\r\n");
+		NVM_DEBUG("(NVM) No valid block were found\n");
 	}
 
 }
@@ -131,7 +164,7 @@ void NVM_Main(void)
 
 void NvM_Clear(void)
 {
-	NVM_DEBUG("(NVM)<<< Clear >>>\r\n");
+	NVM_DEBUG("(NVM)<<< Clear >>>\n");
 	//Clear buffer
 	NvM_MemZero((uint8*)&NVM_FrameBuffer,sizeof(NVM_FrameBuffer));
 	//Write buffer two times with zeros
@@ -141,11 +174,17 @@ void NvM_Clear(void)
 
 void NvM_Store(void)
 {
-
-	NVM_DEBUG("(NVM)<<< NvM_Store>>>\r\n");
+	MD5_CTX mdContext;
+	uint8 NvM_Counter = 0;
+	NVM_DEBUG("(NVM)<<< NvM_Store>>>\n");
 
 	//Store variables
 	NvM_StoreVariables();
+
+	//Calculate hash for data
+	MD5Init(&mdContext);
+	MD5Update(&mdContext, (unsigned char *)&NVM_FrameBuffer[NVM_DATA_POS_DATA_START], sizeof(NVM_FrameBuffer)-NVM_DATA_POS_DATA_START);
+	MD5Final( (unsigned char*) &NVM_FrameBuffer[0], &mdContext);
 
 	//Store complete datablock
 	system_param_save_with_protect(EMONITOR_PARAM_START_SEC, (void*)&NVM_FrameBuffer, sizeof(NVM_FrameBuffer));
@@ -157,7 +196,7 @@ void NvM_RestoreVariables(void)
 	uint16 NvM_Counter;
 	uint16 NvM_ReadPosition = NVM_DATA_POS_DATA_START;
 
-	NVM_DEBUG("(NVM) Restoring variables (%d)\r\n",NvM_DataBlockCount);
+	NVM_DEBUG("(NVM) Restoring variables (%d)\n",NvM_DataBlockCount);
 	//Restore all registered data blocks
 	for(NvM_Counter = 0; NvM_Counter<NvM_DataBlockCount;NvM_Counter++)
 	{
@@ -166,7 +205,7 @@ void NvM_RestoreVariables(void)
 		//Increment read position
 		NvM_ReadPosition+=NvM_DataInfoList[NvM_Counter].Size;
 	}
-	NVM_DEBUG("(NVM) Restore done\r\n");
+	NVM_DEBUG("(NVM) Restore done\n");
 }
 
 void NvM_StoreVariables(void)
@@ -174,7 +213,7 @@ void NvM_StoreVariables(void)
 	uint16 NvM_Counter;
 	uint16 NvM_WritePosition = NVM_DATA_POS_DATA_START;
 
-	NVM_DEBUG("(NVM) Storing variables\r\n");
+	NVM_DEBUG("(NVM) Storing variables\n");
 	//Store all registered variables
 	for(NvM_Counter = 0; NvM_Counter<NvM_DataBlockCount;NvM_Counter++)
 	{
@@ -183,7 +222,7 @@ void NvM_StoreVariables(void)
 		//Increment write position
 		NvM_WritePosition+=NvM_DataInfoList[NvM_Counter].Size;
 	}
-	NVM_DEBUG("(NVM) Store done\r\n");
+	NVM_DEBUG("(NVM) Store done\n");
 }
 
 
