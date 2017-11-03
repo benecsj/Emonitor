@@ -137,20 +137,20 @@ void ICACHE_FLASH_ATTR set_on_client_disconnect(wifi_state_cb_t cb){
 
 bool ICACHE_FLASH_ATTR wifi_set_mode(WIFI_MODE mode){
     if(!mode){
-        bool s = wifi_set_opmode(mode);
+        bool s = wifi_set_opmode_current(mode);
         wifi_fpm_open();
         wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
         wifi_fpm_do_sleep(0xFFFFFFFF);
         return s;
     }
     wifi_fpm_close();
-    return wifi_set_opmode(mode);
+    return wifi_set_opmode_current(mode);
 }
 
 WIFI_MODE ICACHE_FLASH_ATTR init_esp_wifi(){
     wifi_set_event_handler_cb(wifi_event_handler_cb);
-    WIFI_MODE mode = wifi_get_opmode_default();
-    //wifi_set_mode(mode);
+    WIFI_MODE mode = 0; //wifi_get_opmode_default();
+    wifi_set_mode(mode);
     return mode;
 }
 
@@ -173,7 +173,7 @@ bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){
     if(pass){
         strcpy(config.password, pass);
     }
-    if(!wifi_station_set_config(&config)){
+    if(!wifi_station_set_config_current(&config)){
         os_printf("Failed to set Station config!\n");
         return false;
     }
@@ -222,7 +222,7 @@ bool ICACHE_FLASH_ATTR start_wifi_ap(const char * ssid, const char * pass){
         config.beacon_interval = 1000;
     }
 
-    wifi_softap_set_config(&config);
+    wifi_softap_set_config_current(&config);
     wifi_set_opmode(STATIONAP_MODE);
 
     wifi_softap_dhcps_stop();

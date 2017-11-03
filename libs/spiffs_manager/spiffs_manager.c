@@ -149,6 +149,6 @@ void spiffs_status()
 	SPIFFS_closedir(&spiffsDir);
 
     SPIFFS_info(fs, &total, &used);
-	printf("\n(SPIFFS) Total: %d  Used: %d  Free: %d\n",total,used, total-used);
+	printf("(SPIFFS) Total: %d  Used: %d  Free: %d\n",total,used, total-used);
 
 }

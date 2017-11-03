@@ -4,8 +4,11 @@ Includes
 #include "CPI_Command_Processer.h"
 
 #include "esp_common.h"
+#include "user_config.h"
+
 #include "NVM_NonVolatileMemory.h"
 #include "spiffs_manager.h"
+#include "Wifi_Manager.h"
 
 /***********************************************************************************************************************
 Defines
@@ -73,13 +76,17 @@ void Cpi_Wifi(uint8* params, uint8 lenght, uint8* response) {
     //Do stuff
 	switch(selection)
 	{
-	case 0:
-		stop_wifi_station();
-		text="/stop_wifi_station/";
+	case 'i':
+		Wifi_Manager_Init();
+		text="/Wifi_Manager_Init/";
 		break;
-	case 1:
-		stop_wifi_ap();
-		text="/stop_wifi_ap/";
+	case 'a':
+		start_wifi_ap(AP_SSID, AP_PASSWORD);
+		text="/start_wifi_ap/";
+		break;
+	case 's':
+		start_wifi_station(STA_SSID, STA_PASSWORD);
+		text="/start_wifi_station/";
 		break;
 
 	default:

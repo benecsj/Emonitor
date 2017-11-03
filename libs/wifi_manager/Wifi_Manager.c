@@ -13,13 +13,13 @@ LOCAL void ICACHE_FLASH_ATTR on_wifi_disconnect(uint8 reason){
 
 void Wifi_Manager_Init(void)
 {
+	//Register eventhandlers
     set_on_station_connect(on_wifi_connect);
     set_on_station_disconnect(on_wifi_disconnect);
+    //Init Wifi
     init_esp_wifi();
-
-    //stop_wifi_ap();
-    //start_wifi_station("BOCI2", "fucking6");
-    start_wifi_ap(SSID, PASSWORD);
+    start_wifi_station(STA_SSID, STA_PASSWORD);
+    start_wifi_ap(AP_SSID, AP_PASSWORD);
     stop_wifi_station();
     stop_wifi_ap();
 

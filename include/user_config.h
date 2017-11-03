@@ -26,8 +26,11 @@
 #define __USER_CONFIG_H__
 
 //WIFI
-#define SSID "Emonitor_1234"
-#define PASSWORD "fucking6"
+#define STA_SSID "BOCI"
+#define STA_PASSWORD "fucking6"
+
+#define AP_SSID "Emonitor_1234"
+#define AP_PASSWORD "fucking6"
 
 //NvM
 #define EMONITOR_PARAM_START_SEC		0x8D
