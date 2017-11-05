@@ -20,6 +20,7 @@
 //Apps
 #include "Emonitor.h"
 #include "remote_control.h"
+#include "Sensor_Manager.h"
 
 /******************************************************************************
 * Defines
@@ -96,6 +97,8 @@ void task_Init(void *pvParameters) {
 	Wifi_Manager_Init();
 	//Spiffs init
 	spiffs_init();
+	//Sensor manager init
+	Sensor_Manager_Init();
 	//Finished
 	DBG("Init finished!!!\n-------------------------\n");
 	//Exit from the task
@@ -108,7 +111,7 @@ void task_Init(void *pvParameters) {
 void task_10ms(void *pvParameters) {
 	vTaskDelay(1000 / portTICK_RATE_MS);
 	for (;;) {
-
+		Sensor_Manager_Fast();
 		vTaskDelay(10 / portTICK_RATE_MS);
 	}
 }
@@ -119,14 +122,11 @@ void task_10ms(void *pvParameters) {
 void task_1000ms(void *pvParameters) {
 	vTaskDelay(1000 / portTICK_RATE_MS);
 	for (;;) {
+
 		Emonitor_Main_1000ms();
 		Remote_Control_Main();
 		NVM_Main();
-
-		uint8 diff;
-		uint8 id[8];
-		D18_DS18B20_FindSensor(&diff, &id);
-		DBG("(DS18B20) %d %x %x\n",diff,id[0],id[1]);
+		Sensor_Manager_Main();
 
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}

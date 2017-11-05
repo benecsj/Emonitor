@@ -30,6 +30,8 @@
 #define OWP_CONST_ROMCODE_SIZE 8
 
 /*Interfaces*/
+extern void OWP_Parasite_Enable(void);
+extern void OWP_Parasite_Disable(void);
 extern uint8 OWP_Reset(void);
 extern uint8 OWP_Bit_IO( uint8 b );
 extern uint8 OWP_Byte_Write( uint8 b );

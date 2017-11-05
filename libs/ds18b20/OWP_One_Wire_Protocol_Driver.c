@@ -22,6 +22,18 @@ void OWP_Delay_us(uint32 delay)
 	}while(delay>(currenTime-startTime));
 }
 
+void OWP_Parasite_Enable(void)
+{
+    OWP_OUT_HIGH();
+	OWP_DIR_OUT();
+}
+
+void OWP_Parasite_Disable(void)
+{
+    OWP_OUT_LOW();
+	OWP_DIR_IN();
+}
+
 uint8 OWP_Read_Bus(void)
 {
     return OWP_GET_IN();
