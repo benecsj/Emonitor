@@ -49,5 +49,9 @@
 #define FD_BUF_SIZE         32*4
 #define CACHE_BUF_SIZE      (LOG_PAGE + 32)*8
 
+#define LED_BUILTIN		D0
+#define LED2_BUILTIN	D4
+#define ONEWIRE_BUS		D1
+
 #endif
 

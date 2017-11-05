@@ -14,10 +14,8 @@ Includes
 Defines
  ***********************************************************************************************************************/
 
-
 uint8 NVM_test_value;
-extern uint8 NVM_FrameBuffer[NVM_CFG_BLOCK_SIZE];
-extern void NvM_RestoreVariables(void);
+
 /***********************************************************************************************************************
 Global variables and functions
  ***********************************************************************************************************************/
@@ -46,11 +44,6 @@ void Cpi_NvM(uint8* params, uint8 lenght, uint8* response) {
 	case 'l':
 		NvM_RequestLoad();
 		text="/NvM_RequestLoad/";
-		break;
-
-	case 't':
-		printf("WRITE: %h\n",params[1]);
-		system_param_save_with_protect(params[1], (void*)&NVM_FrameBuffer, sizeof(NVM_FrameBuffer));
 		break;
 
 	case 'p':

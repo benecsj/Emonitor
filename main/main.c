@@ -5,6 +5,7 @@
 //Common
 #include "esp_common.h"
 #include "project_config.h"
+#include "user_config.h"
 
 //OS
 #include "freertos/FreeRTOS.h"
@@ -14,6 +15,7 @@
 #include "Wifi_Manager.h"
 #include "NVM_NonVolatileMemory.h"
 #include "spiffs_manager.h"
+#include "pins.h"
 
 //Apps
 #include "Emonitor.h"
@@ -120,6 +122,12 @@ void task_1000ms(void *pvParameters) {
 		Emonitor_Main_1000ms();
 		Remote_Control_Main();
 		NVM_Main();
+
+		uint8 diff;
+		uint8 id[8];
+		D18_DS18B20_FindSensor(&diff, &id);
+		DBG("(DS18B20) %d %x %x\n",diff,id[0],id[1]);
+
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 }
