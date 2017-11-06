@@ -16,6 +16,7 @@
 #include "NVM_NonVolatileMemory.h"
 #include "spiffs_manager.h"
 #include "pins.h"
+#include "httpclient.h"
 
 //Apps
 #include "Emonitor.h"
@@ -100,6 +101,8 @@ void task_Init(void *pvParameters) {
 	spiffs_init();
 	//Sensor manager init
 	Sensor_Manager_Init();
+	//Http client init
+	httpclient_Init();
 	//Finished
 	DBG("Init finished!!!\n-------------------------\n");
 	//Exit from the task

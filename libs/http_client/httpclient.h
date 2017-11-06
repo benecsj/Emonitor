@@ -49,4 +49,6 @@ void ICACHE_FLASH_ATTR http_raw_request(const char * hostname, int port, const c
  */
 void ICACHE_FLASH_ATTR http_callback_example(char * response_body, int http_status, char * response_headers, int body_size);
 
+void ICACHE_FLASH_ATTR httpclient_Init(void);
+
 #endif

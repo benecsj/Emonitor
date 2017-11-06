@@ -225,8 +225,6 @@ static void ICACHE_FLASH_ATTR receive_callback(void * arg, char * buf, unsigned 
 	os_free(req->buffer);
 	req->buffer = new_buffer;
 	req->buffer_size = new_size;
-	espconn_disconnect(conn);
-	return; // The disconnect callback will be called.
 }
 
 static void ICACHE_FLASH_ATTR sent_callback(void * arg)
@@ -378,7 +376,7 @@ static void ICACHE_FLASH_ATTR dns_callback(const char * hostname, ip_addr_t * ad
 		espconn_regist_disconcb(conn, disconnect_callback);
 		espconn_regist_reconcb(conn, error_callback);
 		result = espconn_connect(conn);
-		PRINTF("TCP Connect (%d)\n",result);
+		PRINTF("TCP Connect Request (%d)\n",result);
 	}
 }
 
@@ -459,7 +457,7 @@ void ICACHE_FLASH_ATTR http_post(const char * url, const char * post_data, const
 	else {
 		port = atoi(colon + 1);
 		if (port == 0) {
-			printf("Port error %s\n", url);
+			printf("IP Port error %s\n", url);
 			return;
 		}
 
@@ -483,12 +481,17 @@ void ICACHE_FLASH_ATTR http_get(const char * url, const char * headers, http_cal
 	http_post(url, NULL, headers, user_callback);
 }
 
+void ICACHE_FLASH_ATTR httpclient_Init(void)
+{
+	espconn_init();
+}
+
 void ICACHE_FLASH_ATTR http_callback_example(char * response_body, int http_status, char * response_headers, int body_size)
 {
-	printf("http_status=%d\n", http_status);
+	printf("HTTP status=%d\n", http_status);
 	if (http_status != HTTP_STATUS_GENERIC_ERROR) {
-		printf("strlen(headers)=%d\n", strlen(response_headers));
-		printf("body_size=%d\n", body_size);
-		printf("body=%s<EOF>\n", response_body); // FIXME: this does not handle binary data.
+		printf("HTTP headers (%d)\n", strlen(response_headers));
+		printf("HTTP body (%d)\n", body_size);
+		printf("HTTP body=\"%s\"\n", response_body); // FIXME: this does not handle binary data.
 	}
 }
