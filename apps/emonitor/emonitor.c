@@ -12,6 +12,8 @@
 #include "hw_timer.h"
 #include "pins.h"
 
+#include "httpclient.h"
+
 /******************************************************************************
 * Defines
 \******************************************************************************/
@@ -66,9 +68,13 @@ void Emonitor_Main_1ms(void) {
 void Emonitor_Main_1000ms(void) {
 	Emonitor_timing++;
 	if(Emonitor_timing == 10){
-		DBG("Hello World!!!(%d)\n", Emonitor_counter);
+		DBG("CYCLE(%d) HEAP:(%d)\n", Emonitor_counter, system_get_free_heap_size());
 		Emonitor_counter = 0;
 		Emonitor_timing = 0;
+
+		DBG("----------------HTTP GET TEST-------------\n");
+		http_get("http://v9.emonitor.hu/input/post.json?node=1&json={power:200}&apikey=97d3e42a841ea6c219582211313d5051", "", http_callback_example);
+
 	}
 }
 

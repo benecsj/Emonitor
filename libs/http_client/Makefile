@@ -12,16 +12,7 @@
 #     a generated lib/image xxx.a ()
 #
 ifndef PDIR
-UP_EXTRACT_DIR = ..
-GEN_LIBS = libs.a
-COMPONENTS_libs = hw_timer/hw_timer.a	\
-                  wifi_manager/wifi_manager.a  \
-                  memory_manager/memory_manager.a \
-                  spiffs_manager/spiffs_manager.a \
-                  ds18b20/ds18b20.a \
-                  crc/crc.a  \
-                  pins/pins.a \
-                  http_client/http_client.a
+GEN_LIBS = http_client.a
 endif
 
 

@@ -41,7 +41,7 @@ uint8 OWP_Read_Bus(void)
 
 uint8 OWP_Reset(void)
 {
-        OWP_ENTER_CRITICAL();
+     OWP_ENTER_CRITICAL();
 
 	uint8 err;
 

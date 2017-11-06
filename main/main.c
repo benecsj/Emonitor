@@ -95,6 +95,7 @@ void task_Init(void *pvParameters) {
     Remote_Control_Init();
 	//Init Wifi
 	Wifi_Manager_Init();
+	start_wifi_station(STA_SSID, STA_PASSWORD);
 	//Spiffs init
 	spiffs_init();
 	//Sensor manager init
@@ -126,7 +127,7 @@ void task_1000ms(void *pvParameters) {
 		Emonitor_Main_1000ms();
 		Remote_Control_Main();
 		NVM_Main();
-		Sensor_Manager_Main();
+		//Sensor_Manager_Main();
 
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
