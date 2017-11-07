@@ -130,7 +130,7 @@ void task_1000ms(void *pvParameters) {
 		Emonitor_Main_1000ms();
 		Remote_Control_Main();
 		NVM_Main();
-		//Sensor_Manager_Main();
+		Sensor_Manager_Main();
 
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
@@ -159,8 +159,8 @@ void user_init(void) {
 	DBG("About to create task\r\n");
 	xTaskHandle t;
 	xTaskCreate(task_background, "bgnd", 1024, NULL, 0, &t);
-	xTaskCreate(task_10ms, "10ms", 1024, NULL, 2, &t);
-	xTaskCreate(task_1000ms, "1000ms", 2048, NULL, 3, &t);
-	xTaskCreate(task_Init, "init", 2048, NULL, 3, &t);
+	xTaskCreate(task_10ms, "10ms", 1024, NULL, 0, &t);
+	xTaskCreate(task_1000ms, "1000ms", 2048, NULL, 0, &t);
+	xTaskCreate(task_Init, "init", 2048, NULL, 1, &t);
 }
 

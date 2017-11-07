@@ -377,6 +377,20 @@ static void ICACHE_FLASH_ATTR dns_callback(const char * hostname, ip_addr_t * ad
 		espconn_regist_reconcb(conn, error_callback);
 		result = espconn_connect(conn);
 		PRINTF("TCP Connect Request (%d)\n",result);
+		if(result != 0)
+		{
+			espconn_delete(conn);
+			if(conn->proto.tcp != NULL) {
+				os_free(conn->proto.tcp);
+			}
+			os_free(conn);
+			os_free(req->buffer);
+			os_free(req->post_data);
+			os_free(req->headers);
+			os_free(req->path);
+			os_free(req->hostname);
+			os_free(req);
+		}
 	}
 }
 

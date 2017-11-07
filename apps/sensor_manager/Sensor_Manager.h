@@ -28,6 +28,8 @@ extern void Sensor_Manager_Init();
 extern void Sensor_Manager_Main();
 extern void Sensor_Manager_Fast();
 
+extern void Sensor_Manager_Get_TempSensorData(uint8* count, uint8** ids,sint16** temperatures );
+
 extern uint8 APP_SensMan_DS18B20Count;
 extern sint16 APP_SensMan_DS18B20TempList[];
 

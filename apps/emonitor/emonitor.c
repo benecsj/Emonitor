@@ -13,10 +13,14 @@
 #include "pins.h"
 
 #include "httpclient.h"
+#include "Sensor_Manager.h"
+
 
 /******************************************************************************
 * Defines
 \******************************************************************************/
+
+#define Append(length,buffer,format,...) length += sprintf(&buffer[length],format,__VA_ARGS__)
 
 /******************************************************************************
 * Variables
@@ -26,6 +30,8 @@ uint32 Emonitor_counter = 0;
 uint32 Emonitor_statusCounter = 0;
 
 uint32 Emonitor_timing = 0;
+
+uint32 Emonitor_uptime = 0;
 
 /******************************************************************************
 * Implementations
@@ -66,14 +72,49 @@ void Emonitor_Main_1ms(void) {
  * Returns      : none
  *******************************************************************************/
 void Emonitor_Main_1000ms(void) {
+	uint8 i;
+	uint16 length = 0;
+	char buffer[500];
+
+	uint8 nodeId = 1;
+	char url[100] = {"http://v9.emonitor.hu"};
+	char apyKey[33] = {"97d3e42a841ea6c219582211313d5051"};
+
+	uint8 tempCount;
+	uint8* ids;
+	sint16* temperatures;
+
+	//Uptime counter
+	Emonitor_uptime++;
+	//Free ram
+	uint32 freeRam = system_get_free_heap_size();
+
+
 	Emonitor_timing++;
 	if(Emonitor_timing == 10){
-		DBG("CYCLE(%d) HEAP:(%d)\n", Emonitor_counter, system_get_free_heap_size());
+		DBG("CYCLE(%d) HEAP:(%d)\n", Emonitor_counter,freeRam);
 		Emonitor_counter = 0;
 		Emonitor_timing = 0;
 
-		DBG("----------------HTTP GET TEST-------------\n");
-		http_get("http://v9.emonitor.hu/input/post.json?node=1&json={power:200}&apikey=97d3e42a841ea6c219582211313d5051", "", http_callback_example);
+		DBG("----------------Emonitor Send Data-------------\n");
+
+		Sensor_Manager_Get_TempSensorData(&tempCount,&ids,&temperatures);
+	    //Start of Emoncsm send Url
+	    Append(length,buffer,"%s/input/post.json?node=%d&json={",url,nodeId);
+	    //Add freeram
+	    Append(length,buffer,"freeram:%d,",freeRam);
+	    //Add temperatures
+	    for(i=0;i<tempCount;i++)
+	    {
+	    	 Append(length,buffer,"Temp_%02X%02X%02X%02X%02X:%d.%d,",ids[(i*8)+1],ids[(i*8)+2],ids[(i*8)+3],ids[(i*8)+4],ids[(i*8)+7],temperatures[i]/10,abs(temperatures[i]%10));
+	    }
+	    //Add Uptime
+	    Append(length,buffer,"uptime:%d",Emonitor_uptime);
+	    //End of Emoncsm send Url
+	    Append(length,buffer,"}&apikey=%s",apyKey);
+
+	    //Send out Emoncsm Data
+		http_get(buffer, "", http_callback_example);
 
 	}
 }

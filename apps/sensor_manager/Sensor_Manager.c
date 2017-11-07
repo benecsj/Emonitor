@@ -33,7 +33,8 @@
 #define Sensor_Manager_INVALID_TEMP 0
 #define Sensor_Manager_MAX_RETRY_COUNT 2   //6
 
-#define DBG_SENSOR printf
+//#define DBG_SENSOR(...) printf(__VA_ARGS__)
+#define DBG_SENSOR(...)
 
 /**********************************************************************************
  * Variables
@@ -253,3 +254,11 @@ void SENSOR_MANAGER_DS18B20Measure() {
         }
     }
 }
+
+void Sensor_Manager_Get_TempSensorData(uint8* count, uint8** ids,sint16** temperatures )
+{
+	(*count) = SENSOR_MANAGER_DS18B20Count;
+	(*ids) = (uint8*) &Sensor_Manager_sensorIDs;
+	(*temperatures) = (sint16*) &SENSOR_MANAGER_DS18B20TempList;
+}
+

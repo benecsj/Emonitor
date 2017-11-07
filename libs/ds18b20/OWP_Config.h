@@ -18,8 +18,10 @@
 #include "freertos/task.h"
 
 /*Critical session*/
-#define OWP_ENTER_CRITICAL  taskENTER_CRITICAL
-#define OWP_EXIT_CRITICAL	taskEXIT_CRITICAL
+#define OWP_ENTER_CRITICAL()  taskENTER_CRITICAL()
+#define OWP_EXIT_CRITICAL()	taskEXIT_CRITICAL()
+//#define OWP_ENTER_CRITICAL()
+//#define OWP_EXIT_CRITICAL()
 /*Port config*/
 
 #define OWP_GET_IN()   digitalRead(ONEWIRE_BUS)
