@@ -16,6 +16,8 @@ Defines
 
 uint8 NVM_test_value;
 
+extern uint8 Emonitor_ledControl;
+
 /***********************************************************************************************************************
 Global variables and functions
  ***********************************************************************************************************************/
@@ -48,6 +50,11 @@ void Cpi_NvM(uint8* params, uint8 lenght, uint8* response) {
 
 	case 'p':
 		printf("(TEST) NVM_test_value: %d \n",NVM_test_value);
+		break;
+
+	case 's':
+		Emonitor_ledControl = params[1];
+		text="/Emonitor_ledControl update/";
 		break;
 
 	default:

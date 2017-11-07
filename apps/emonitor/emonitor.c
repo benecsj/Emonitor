@@ -33,6 +33,8 @@ uint32 Emonitor_timing = 0;
 
 uint32 Emonitor_uptime = 0;
 
+uint8 Emonitor_ledControl = 0;
+
 /******************************************************************************
 * Implementations
 \******************************************************************************/
@@ -61,7 +63,7 @@ void Emonitor_Init(void) {
  * Returns      : none
  *******************************************************************************/
 void Emonitor_Main_1ms(void) {
-	digitalWrite(LED2_BUILTIN, Emonitor_statusCounter);
+	digitalWrite(LED2_BUILTIN, (Emonitor_statusCounter | Emonitor_ledControl));
 	Emonitor_statusCounter= (Emonitor_statusCounter+1)%2;
 }
 
