@@ -53,7 +53,6 @@ void Cpi_ProcessParamArray(void);
 void Cpi_ProcessDecimalValue(void);
 void Cpi_ProcessString(void);
 
-extern void Cpi_MainCallout(void);
 extern void Cpi_UnsupportedFunctionResponse(uint8* params,uint8 lenght, uint8* response);
 /**************************************************************************************************
 @brief         Cpi_Init 

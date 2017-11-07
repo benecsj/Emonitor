@@ -78,7 +78,7 @@ void Emonitor_Main_1000ms(void) {
 	uint16 length = 0;
 	char buffer[500];
 
-	uint8 nodeId = 1;
+	uint8 nodeId = 2;
 	char url[100] = {"http://v9.emonitor.hu"};
 	char apyKey[33] = {"97d3e42a841ea6c219582211313d5051"};
 
