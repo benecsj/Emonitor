@@ -90,6 +90,8 @@ uint32 counter;
  */
 void task_Init(void *pvParameters) {
 	vTaskDelay(100 / portTICK_RATE_MS);
+	//Init pins handler
+	Init_Pins();
 	//Init NvM
 	NVM_Init();
 	//Init application

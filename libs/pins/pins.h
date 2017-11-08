@@ -26,6 +26,8 @@
 
 typedef void (*voidFuncPtr)(void);
 
+extern void Init_Pins(void);
+
 extern void pinMode(uint8 pin, uint8 mode);
 extern void digitalWrite(uint8 pin, uint8 val);
 extern int  digitalRead(uint8 pin);

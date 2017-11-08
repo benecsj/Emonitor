@@ -2,7 +2,8 @@
 #include "esp_common.h"
 #include "gpio.h"
 #include "pins.h"
-
+#include "esp8266/ets_sys.h"
+#include "freertos/FreeRTOS.h"
 
 #define MODIFY_PERI_REG(reg, mask, val) WRITE_PERI_REG(reg, (READ_PERI_REG(reg) & (~mask)) | (uint32) val)
 
@@ -190,18 +191,8 @@ extern void detachInterrupt(uint8 pin)
     gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_DISABLE);
 }
 
-void initPins()
+void Init_Pins(void)
 {
-	int i;
-    gpio_init();
-    for (i = 0; i < PINCOUNT; ++i)
-    {
-        uint32 mux = g_pin_muxes[i];
-        if (mux)
-        {
-            uint32 func = g_pin_funcs[i];
-            PIN_FUNC_SELECT(mux, func);
-        }
-    }
-    ETS_GPIO_INTR_ATTACH(&interrupt_handler, NULL);
+	gpio_intr_handler_register(&interrupt_handler, NULL);
+	_xt_isr_unmask(1<<ETS_GPIO_INUM);
 }

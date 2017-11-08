@@ -11,6 +11,8 @@
 #include "uart.h"
 #include "hw_timer.h"
 #include "pins.h"
+#include "pwm.h"
+#include "gpio.h"
 
 #include "httpclient.h"
 #include "Sensor_Manager.h"
@@ -22,9 +24,23 @@
 
 #define Append(length,buffer,format,...) length += sprintf(&buffer[length],format,__VA_ARGS__)
 
+#define PWM_0_OUT_IO_MUX PERIPHS_IO_MUX_MTDI_U
+#define PWM_0_OUT_IO_NUM 12
+#define PWM_0_OUT_IO_FUNC FUNC_GPIO12
+
+#define PWM_1_OUT_IO_MUX PERIPHS_IO_MUX_MTDO_U
+#define PWM_1_OUT_IO_NUM 15
+#define PWM_1_OUT_IO_FUNC FUNC_GPIO15
+
+#define PWM_2_OUT_IO_MUX PERIPHS_IO_MUX_MTCK_U
+#define PWM_2_OUT_IO_NUM 13
+#define PWM_2_OUT_IO_FUNC FUNC_GPIO13
+
 /******************************************************************************
 * Variables
 \******************************************************************************/
+
+uint32 pulse_Counter = 0;
 
 uint32 Emonitor_counter = 0;
 uint32 Emonitor_statusCounter = 0;
@@ -35,10 +51,18 @@ uint32 Emonitor_uptime = 0;
 
 uint8 Emonitor_ledControl = 0;
 
+uint32 pwm_info[][3] = {   {PWM_0_OUT_IO_MUX,PWM_0_OUT_IO_FUNC,PWM_0_OUT_IO_NUM}   };
+
+u32 pwm_duty[1] = {500};
+
 /******************************************************************************
 * Implementations
 \******************************************************************************/
 
+void pulseCounter(void)
+{
+	pulse_Counter++;
+}
 /******************************************************************************
  * FunctionName : Emonitor_init
  * Description  : Init emonitor application
@@ -46,10 +70,18 @@ uint8 Emonitor_ledControl = 0;
  * Returns      : none
  *******************************************************************************/
 void Emonitor_Init(void) {
+
 	//Init UART
 	UART_SetBaudrate(UART0, BIT_RATE_115200);
 	//Init Status LED
 	pinMode(LED2_BUILTIN,OUTPUT);
+	//Init Pwm out
+	pwm_init(10000, pwm_duty, 1, pwm_info);
+	pwm_start();
+	//Pulse counter input
+	pinMode(D2,INPUT);
+	attachInterrupt(D2,pulseCounter,RISING);
+
 	//Init timer for fast task
     hw_timer_init();
     hw_timer_set_func(Emonitor_Main_1ms);
@@ -94,8 +126,11 @@ void Emonitor_Main_1000ms(void) {
 
 	Emonitor_timing++;
 	if(Emonitor_timing == 10){
-		DBG("CYCLE(%d) HEAP:(%d)\n", Emonitor_counter,freeRam);
+		DBG("CYCLE(%d) PULSE(%d) HEAP:(%d)\n", Emonitor_counter,pulse_Counter,freeRam);
+		taskENTER_CRITICAL();
 		Emonitor_counter = 0;
+		pulse_Counter = 0;
+		taskEXIT_CRITICAL();
 		Emonitor_timing = 0;
 
 		DBG("----------------Emonitor Send Data-------------\n");
@@ -115,6 +150,7 @@ void Emonitor_Main_1000ms(void) {
 	    //End of Emoncsm send Url
 	    Append(length,buffer,"}&apikey=%s",apyKey);
 
+
 	    //Send out Emoncsm Data
 		http_get(buffer, "", http_callback_example);
 
@@ -128,7 +164,9 @@ void Emonitor_Main_1000ms(void) {
  * Returns      : none
  *******************************************************************************/
 void Emonitor_Main_Background(void) {
+	taskENTER_CRITICAL();
 	Emonitor_counter++;
+	taskEXIT_CRITICAL();
 }
 
 
