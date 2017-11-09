@@ -52,6 +52,7 @@
 #define LED_BUILTIN		D0
 #define LED2_BUILTIN	D4
 #define ONEWIRE_BUS		D1
+#define PULSE_INPUT0    D2
 
 #endif
 

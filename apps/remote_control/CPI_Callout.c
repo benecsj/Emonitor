@@ -9,6 +9,7 @@ Includes
 #include "NVM_NonVolatileMemory.h"
 #include "spiffs_manager.h"
 #include "Wifi_Manager.h"
+#include "Sensor_Manager.h"
 
 /***********************************************************************************************************************
 Defines
@@ -138,5 +139,29 @@ void Cpi_Spiffs(uint8* params, uint8 lenght, uint8* response) {
     Cpi_SendResponseFrame(lenght, response);
 }
 
+
+void Cpi_Sensor(uint8* params,uint8 lenght, uint8* response) {
+	char* text = "/OK/"+0;
+	uint8 selection;
+
+    // Process parameters
+	selection = params[0];
+
+    //Do stuff
+	switch(selection)
+	{
+	case 'r':
+		Sensor_Manager_ResetPulseCounters();
+		text="/Counter Reset/";
+		break;
+
+	default:
+		text="/NOT_OK/"+0;
+	}
+
+    //Generate response
+    lenght = sprintf((char*) response, text);
+    Cpi_SendResponseFrame(lenght, response);
+}
 
 //Process pending operation

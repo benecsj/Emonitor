@@ -34,6 +34,6 @@ extern int  digitalRead(uint8 pin);
 extern void analogWrite(uint8 pin, int val);
 extern void attachInterrupt(uint8 pin, voidFuncPtr handler, int mode);
 extern void detachInterrupt(uint8 pin);
-
+extern void pins_pwm_init(uint32 pin_number,uint32 period, uint32 duty);
 
 #endif

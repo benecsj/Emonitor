@@ -2,6 +2,7 @@
 #include "esp_common.h"
 #include "gpio.h"
 #include "pins.h"
+#include "pwm.h"
 #include "esp8266/ets_sys.h"
 #include "freertos/FreeRTOS.h"
 
@@ -195,4 +196,18 @@ void Init_Pins(void)
 {
 	gpio_intr_handler_register(&interrupt_handler, NULL);
 	_xt_isr_unmask(1<<ETS_GPIO_INUM);
+}
+
+void pins_pwm_init(uint32 pin_number,uint32 period, uint32 duty)
+{
+	uint32 pwm_info[1][3] = {   {0,0,0}   };
+	u32 pwm_duty[1];
+
+	pwm_duty[0] = duty;
+	pwm_info[0][0] = g_pin_muxes[pin_number];
+	pwm_info[0][1] = 3;
+	pwm_info[0][2] = pin_number;
+
+	pwm_init(period, pwm_duty, 1, pwm_info);
+	pwm_start();
 }

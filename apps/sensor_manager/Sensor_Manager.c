@@ -50,18 +50,27 @@ sint16 SENSOR_MANAGER_DS18B20TempList[SENSOR_MANAGER_DS18B20MAXCOUNT];
 
 uint16 APP_PortMon_analogValues[SENSOR_MANAGER_ANALOGCHANNELS_COUNT];
 
+uint32 Sensor_Manager_PulseCounters[SENSOR_MANAGER_PULSE_COUNTERS] = {};
+
 /**********************************************************************************
  * Function defines
  **********************************************************************************/
 uint8 SENSOR_MANAGER_DS18B20_Search(void);
 void SENSOR_MANAGER_DS18B20Measure(void);
 void Sensor_Manager_UpdateSensors(void);
-
+void Sensor_Manager_PulseCounter0(void);
 /**********************************************************************************
  * Functions
  **********************************************************************************/
 
 void Sensor_Manager_Init() {
+	//Pulse counter input
+	pinMode(PULSE_INPUT0,INPUT);
+	attachInterrupt(PULSE_INPUT0,Sensor_Manager_PulseCounter0,RISING);
+	//Init pulse counters
+	Sensor_Manager_ResetPulseCounters();
+
+	//Init temp sensors
     /*Load default invalid temp values*/
     uint8 CS_i;
     for (CS_i = 0; CS_i < SENSOR_MANAGER_DS18B20MAXCOUNT; CS_i++) {
@@ -103,6 +112,29 @@ void Sensor_Manager_Main() {
     	DBG_SENSOR("(SensMan)%d- %d.%dC - %x%x%x%x%x%x%x%x\n",i,SENSOR_MANAGER_DS18B20TempList[i]/10,SENSOR_MANAGER_DS18B20TempList[i]%10,Sensor_Manager_sensorIDs[(i*8)+0],Sensor_Manager_sensorIDs[(i*8)+1],Sensor_Manager_sensorIDs[(i*8)+2],Sensor_Manager_sensorIDs[(i*8)+3],Sensor_Manager_sensorIDs[(i*8)+4],Sensor_Manager_sensorIDs[(i*8)+5],Sensor_Manager_sensorIDs[(i*8)+6],Sensor_Manager_sensorIDs[(i*8)+7]);
     }
 
+}
+
+void Sensor_Manager_PulseCounter0(void)
+{
+	Sensor_Manager_PulseCounters[0]++;
+}
+
+uint32 Sensor_Manager_GetPulseCount(uint8 id)
+{
+	taskENTER_CRITICAL();
+	uint32 tempValue = Sensor_Manager_PulseCounters[id];
+	taskEXIT_CRITICAL();
+	return tempValue;
+}
+
+void Sensor_Manager_ResetPulseCounters(void)
+{
+	uint8 i;
+	//Init pulse counters
+	for(i=0;i<SENSOR_MANAGER_PULSE_COUNTERS;i++)
+	{
+		Sensor_Manager_PulseCounters[i] = 0;
+	}
 }
 
 void Sensor_Manager_UpdateSensors(void) {
