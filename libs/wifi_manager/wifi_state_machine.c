@@ -264,3 +264,24 @@ bool ICACHE_FLASH_ATTR wifi_ap_enabled(){
     return !!(wifi_get_opmode() & SOFTAP_MODE);
 }
 
+void wifi_get_ip_address(uint8 ip[4]){
+	bool returnValue;
+	struct ip_info data;
+	returnValue = wifi_get_ip_info(0x00, &data); // 0x00 for STATION_IF, 0x01 for SOFTAP_IF.
+	//If succesfully get ip then extract it
+	if(returnValue)
+	{
+		ip[0] = (data.ip.addr) & 0xFF;
+		ip[1] = (data.ip.addr>>8) & 0xFF;;
+		ip[2] = (data.ip.addr>>16) & 0xFF;;
+		ip[3] = (data.ip.addr>>24) & 0xFF;;
+	}
+	else
+	{
+		ip[0] = 0;
+		ip[1] = 0;
+		ip[2] = 0;
+		ip[3] = 0;
+	}
+}
+

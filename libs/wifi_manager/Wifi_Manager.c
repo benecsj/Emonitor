@@ -4,6 +4,8 @@
 
 LOCAL void ICACHE_FLASH_ATTR on_wifi_connect(){
     os_printf("Connected\n");
+    //Store current ip address
+
 }
 
 LOCAL void ICACHE_FLASH_ATTR on_wifi_disconnect(uint8 reason){
@@ -23,4 +25,10 @@ void Wifi_Manager_Init(void)
     stop_wifi_station();
     stop_wifi_ap();
 
+}
+
+
+void Wifi_Manager_GetIp(uint8 ip[4])
+{
+	wifi_get_ip_address(ip);
 }

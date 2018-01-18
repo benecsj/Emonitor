@@ -70,7 +70,7 @@ void Cpi_NvM(uint8* params, uint8 lenght, uint8* response) {
 void Cpi_Wifi(uint8* params, uint8 lenght, uint8* response) {
 	char* text = "/OK/"+0;
 	uint8 selection;
-
+    uint8 temp[4];
     // Process parameters
 	selection = params[0];
 
@@ -88,6 +88,10 @@ void Cpi_Wifi(uint8* params, uint8 lenght, uint8* response) {
 	case 's':
 		start_wifi_station(STA_SSID, STA_PASSWORD);
 		text="/start_wifi_station/";
+		break;
+	case 't':
+		Wifi_Manager_GetIp(temp);
+		sprintf(text,"/IP:%d.%d.%d.%d/",temp[0],temp[1],temp[2],temp[3]);
 		break;
 
 	default:

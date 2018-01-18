@@ -47,4 +47,7 @@ bool stop_wifi_ap();
 bool wifi_station_connected();
 bool wifi_ap_enabled();
 
+
+void wifi_get_ip_address(uint8 ip[4]);
+
 #endif /* _WIFI_STATE_MACHINE_H_ */
