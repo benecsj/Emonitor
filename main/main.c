@@ -101,7 +101,7 @@ void task_Init(void *pvParameters) {
 	//Init Wifi
 	Wifi_Manager_Init();
     start_wifi_station(STA_SSID, STA_PASSWORD);
-    //start_wifi_ap(AP_SSID, AP_PASSWORD);
+    start_wifi_ap(AP_SSID, AP_PASSWORD);
 	//Spiffs init
 	spiffs_init();
 	//Sensor manager init
