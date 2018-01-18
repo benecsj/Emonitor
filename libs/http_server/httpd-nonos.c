@@ -74,13 +74,15 @@ void ICACHE_FLASH_ATTR httpdPlatDisableTimeout(ConnTypePtr conn) {
 
 //Initialize listening socket, do general initialization
 void ICACHE_FLASH_ATTR httpdPlatInit(int port, int maxConnCt) {
+	sint8 ret;
 	httpdConn.type=ESPCONN_TCP;
 	httpdConn.state=ESPCONN_NONE;
 	httpdTcp.local_port=port;
 	httpdConn.proto.tcp=&httpdTcp;
 	espconn_regist_connectcb(&httpdConn, platConnCb);
-	espconn_accept(&httpdConn);
-	espconn_tcp_set_max_con_allow(&httpdConn, maxConnCt);
+	//espconn_tcp_set_max_con_allow(&httpdConn, maxConnCt);
+	ret = espconn_accept(&httpdConn);
+	DBG_HTTPS("espconn_accept [%d][%d] !!! \n", ret,espconn_tcp_get_max_con_allow(&httpdConn));
 }
 
 
