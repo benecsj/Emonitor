@@ -17,6 +17,7 @@
 #include "spiffs_manager.h"
 #include "pins.h"
 #include "httpclient.h"
+#include "http_server.h"
 
 //Apps
 #include "Emonitor.h"
@@ -105,6 +106,8 @@ void task_Init(void *pvParameters) {
 	Sensor_Manager_Init();
 	//Http client init
 	httpclient_Init();
+	//Http server init
+	Http_Server_Init();
 	//Finished
 	DBG("Init finished!!!\n-------------------------\n");
 	//Exit from the task
