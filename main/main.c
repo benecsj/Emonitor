@@ -13,6 +13,7 @@
 
 //Libs
 #include "Wifi_Manager.h"
+#include "wifi_state_machine.h"
 #include "NVM_NonVolatileMemory.h"
 #include "spiffs_manager.h"
 #include "pins.h"
