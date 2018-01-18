@@ -1,8 +1,6 @@
 #ifndef HTTPD_H
 #define HTTPD_H
 
-#include "platform.h"
-
 #define HTTPDVER "0.4"
 
 //Max length of request head. This is statically allocated for each connection.

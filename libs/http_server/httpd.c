@@ -332,6 +332,7 @@ int ICACHE_FLASH_ATTR cgiRedirectToHostname(HttpdConnData *connData) {
 //the SoftAP interface. This should preclude clients connected to the STA interface
 //to be redirected to nowhere.
 int ICACHE_FLASH_ATTR cgiRedirectApClientToHostname(HttpdConnData *connData) {
+	/*
 #ifndef FREERTOS
 	uint32 *remadr;
 	struct ip_info apip;
@@ -345,9 +346,9 @@ int ICACHE_FLASH_ATTR cgiRedirectApClientToHostname(HttpdConnData *connData) {
 	} else {
 		return HTTPD_CGI_NOTFOUND;
 	}
-#else
+#else */
 	return HTTPD_CGI_NOTFOUND;
-#endif
+//#endif
 }
 
 

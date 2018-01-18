@@ -23,8 +23,9 @@ HttpdBuiltInUrl builtInUrls[]={
 
 void Http_Server_Init(void)
 {
+	DBG_HTTPS("(HS) Http_Server_Init START\n");
 	httpdInit(builtInUrls, 80);
-
+	DBG_HTTPS("(HS) Http_Server_Init FINISH\n");
 }
 
 static long hitCounter=0;
@@ -34,9 +35,9 @@ int ICACHE_FLASH_ATTR tplCounter(HttpdConnData *connData, char *token, void **ar
 	char buff[128];
 	if (token==NULL) return HTTPD_CGI_DONE;
 
-	if (os_strcmp(token, "counter")==0) {
+	if (strcmp(token, "counter")==0) {
 		hitCounter++;
-		os_sprintf(buff, "%ld", hitCounter);
+		sprintf(buff, "%ld", hitCounter);
 	}
 	httpdSend(connData, buff, -1);
 	return HTTPD_CGI_DONE;
