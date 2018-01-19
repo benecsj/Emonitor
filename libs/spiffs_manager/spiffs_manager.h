@@ -3,6 +3,12 @@
 #define __SPIFFS_MANAGER_H__
 
 /******************************************************************************
+* Includes
+\******************************************************************************/
+
+#include "esp_spiffs.h"
+
+/******************************************************************************
 * Defines
 \******************************************************************************/
 
@@ -16,5 +22,8 @@ extern void spiffs_init(void);
 extern void spiffs_format(void);
 extern void spiffs_test_read(void);
 extern void spiffs_test_write(void);
+
+extern spiffs* spiffs_get_fs(void);
+
 #endif
 

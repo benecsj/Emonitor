@@ -8,7 +8,7 @@
 
 #include "spiffs_manager.h"
 
-#include "esp_spiffs.h"
+
 extern spiffs* esp_spiffs_get_fs();
 
 /******************************************************************************
@@ -45,15 +45,7 @@ void spiffs_init(void) {
 	SPIFFSM_DBG("(SPIFFS) Initializing SPIFFS\n");
 
 	int32 result = 0;
-/*
-    config.phys_size = FS1_FLASH_SIZE;
-    config.phys_addr = FS1_FLASH_ADDR;
-    config.phys_erase_block = SECTOR_SIZE;
-    config.log_block_size = LOG_BLOCK;
-    config.log_page_size = LOG_PAGE;
-    config.fd_buf_size = FD_BUF_SIZE * 2;
-    config.cache_buf_size = CACHE_BUF_SIZE;
-*/
+
 	//Init spiffs file system
     result = esp_spiffs_init(&config);
     //Get File System
@@ -66,7 +58,7 @@ void spiffs_init(void) {
 
 }
 
-void spiffs_test_write()
+void spiffs_test_write(void)
 {
 	int32 result = 0;
 	uint8 buf[128];
@@ -112,7 +104,7 @@ void spiffs_test_write()
     }while (created == FALSE);
 }
 
-void spiffs_test_read()
+void spiffs_test_read(void)
 {
 	char buf[128] = {0};
 	spiffs_stat status;
@@ -125,7 +117,7 @@ void spiffs_test_read()
 	printf("(SPIFFS) File: %s\n",buf);
 }
 
-void spiffs_format()
+void spiffs_format(void)
 {
 		SPIFFSM_DBG("(SPIFFS) Execute formating\n");
 		//Execute formating
@@ -134,7 +126,7 @@ void spiffs_format()
 		esp_spiffs_init(&config);
 }
 
-void spiffs_status()
+void spiffs_status(void)
 {
 	uint8 result = 0;
 	uint32 total, used;
@@ -152,3 +144,9 @@ void spiffs_status()
 	printf("(SPIFFS) Total: %d  Used: %d  Free: %d\n",total,used, total-used);
 
 }
+
+spiffs* spiffs_get_fs(void)
+{
+	return fs;
+}
+

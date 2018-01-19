@@ -9,8 +9,8 @@ int tplCounter(HttpdConnData *connData, char *token, void **arg);
 
 HttpdBuiltInUrl builtInUrls[]={
 	{"*", cgiRedirectApClientToHostname, "esp8266.nonet"},
-	{"/", cgiRedirect, "/index.tpl"},
-	{"/index.tpl", cgiEspFsTemplate, tplCounter},
+	{"/", cgiRedirect, "/index.html"},
+	{"/index.html", cgiEspFsTemplate, tplCounter},
 
 	{"/wifi", cgiRedirect, "/wifi/wifi.tpl"},
 	{"/wifi/", cgiRedirect, "/wifi/wifi.tpl"},

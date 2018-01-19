@@ -14,6 +14,7 @@ Connector to let httpd use the espfs filesystem to serve the files in it.
 #include "esp8266_platform.h"
 #include "httpdespfs.h"
 
+#include "spiffs_manager.h"
 
 // The static files marked with FLAG_GZIP are compressed and will be served with GZIP compression.
 // If the client does not advertise that he accepts GZIP send following warning message (telnet users for e.g.)
@@ -24,9 +25,9 @@ static const char *gzipNonSupportedMessage = "HTTP/1.0 501 Not implemented\r\nSe
 //path in the filesystem and if it exists, passes the file through. This simulates what a normal
 //webserver would do with static files.
 int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
-	//EspFsFile *file=connData->cgiData;
-	//TODO: Get file
-	char* file = NULL;
+	DBG_HTTPS("(HS) cgiEspFsHook START\n");
+	spiffs* fs = spiffs_get_fs();
+	spiffs_file *file=connData->cgiData;
 	int len;
 	char buff[1024];
 	char acceptEncodingBuffer[64];
@@ -34,8 +35,7 @@ int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 	
 	if (connData->conn==NULL) {
 		//Connection aborted. Clean up.
-		//espFsClose(file);
-		//TODO: Close file
+		SPIFFS_close(fs, *file);
 		return HTTPD_CGI_DONE;
 	}
 
@@ -44,26 +44,18 @@ int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 		if (connData->cgiArg != NULL) {
 			//Open a different file than provided in http request.
 			//Common usage: {"/", cgiEspFsHook, "/index.html"} will show content of index.html without actual redirect to that file if host root was requested
-			//file = espFsOpen((char*)connData->cgiArg);
-			//TODO: Open file
+			spiffs_file fileTemp = SPIFFS_open(fs, (char*)connData->cgiArg, SPIFFS_O_RDONLY, 0);
+			file = &fileTemp;
+
 		} else {
 			//Open the file so we can read it.
-			//file = espFsOpen(connData->url);
-			//TODO: Open file
+			spiffs_file fileTemp = SPIFFS_open(fs, (char*)connData->url, SPIFFS_O_RDONLY, 0);
+			file = &fileTemp;
 		}
 
 		if (file==NULL) {
 			return HTTPD_CGI_NOTFOUND;
 		}
-
-		// The gzip checking code is intentionally without #ifdefs because checking
-		// for FLAG_GZIP (which indicates gzip compressed file) is very easy, doesn't
-		// mean additional overhead and is actually safer to be on at all times.
-		// If there are no gzipped files in the image, the code bellow will not cause any harm.
-
-		// Check if requested file was GZIP compressed
-		//isGzip = espFsFlags(file) & FLAG_GZIP;
-		isGzip = FALSE;
 
 		connData->cgiData=file;
 		httpdStartResponse(connData, 200);
@@ -73,13 +65,12 @@ int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 		return HTTPD_CGI_MORE;
 	}
 
-	//len=espFsRead(file, buff, 1024);
-	len =0; //TODO: Read file
+
+	len = SPIFFS_read(fs, *file, (u8_t *)buff, 1024);
 	if (len>0) httpdSend(connData, buff, len);
 	if (len!=1024) {
 		//We're done.
-		//espFsClose(file);
-		//TODO: Close file
+		SPIFFS_close(fs, *file);
 		return HTTPD_CGI_DONE;
 	} else {
 		//Ok, till next time.
@@ -91,9 +82,7 @@ int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 //cgiEspFsTemplate can be used as a template.
 
 typedef struct {
-	//EspFsFile *file;
-	//TODO: Add file
-	char* file;
+	spiffs_file file;
 	void *tplArg;
 	char token[64];
 	int tokenPos;
@@ -102,7 +91,9 @@ typedef struct {
 typedef void (* TplCallback)(HttpdConnData *connData, char *token, void **arg);
 
 int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
+	DBG_HTTPS("(HS) cgiEspFsTemplate START\n");
 	TplData *tpd=connData->cgiData;
+	spiffs* fs = spiffs_get_fs();
 	int len;
 	int x, sp=0;
 	char *e=NULL;
@@ -111,8 +102,7 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 	if (connData->conn==NULL) {
 		//Connection aborted. Clean up.
 		((TplCallback)(connData->cgiArg))(connData, NULL, &tpd->tplArg);
-		//espFsClose(tpd->file);
-		//TODO: Close file
+		SPIFFS_close(fs, tpd->file);
 		free(tpd);
 		return HTTPD_CGI_DONE;
 	}
@@ -121,31 +111,28 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 		//First call to this cgi. Open the file so we can read it.
 		tpd=(TplData *)malloc(sizeof(TplData));
 		if (tpd==NULL) return HTTPD_CGI_NOTFOUND;
-		//tpd->file=espFsOpen(connData->url);
-		//TODO: Open file
+		DBG_HTTPS("(HS) SPIFFS_open 114\n");
+		tpd->file = SPIFFS_open(fs, (char*)connData->url, SPIFFS_O_RDONLY, 0);
+		DBG_HTTPS("(HS) SPIFFS_open 116  [%d]\n",tpd->file);
 		tpd->tplArg=NULL;
 		tpd->tokenPos=-1;
-		if (tpd->file==NULL) {
-			//espFsClose(tpd->file);
-			//TODO: Close file
+		if (tpd->file<0) {
 			free(tpd);
 			return HTTPD_CGI_NOTFOUND;
 		}
-		/*if (espFsFlags(tpd->file) & FLAG_GZIP) {
-			httpd_printf("cgiEspFsTemplate: Trying to use gzip-compressed file %s as template!\n", connData->url);
-			espFsClose(tpd->file);
-			free(tpd);
-			return HTTPD_CGI_NOTFOUND;
-		}*/
+
 		connData->cgiData=tpd;
+		DBG_HTTPS("(HS) httpdStartResponse\n");
 		httpdStartResponse(connData, 200);
+		DBG_HTTPS("(HS) httpdHeader\n");
 		httpdHeader(connData, "Content-Type", httpdGetMimetype(connData->url));
+		DBG_HTTPS("(HS) httpdEndHeaders\n");
 		httpdEndHeaders(connData);
 		return HTTPD_CGI_MORE;
 	}
-
-	//len=espFsRead(tpd->file, buff, 1024);
-	len = 0; //TODO: Read file
+	DBG_HTTPS("(HS) SPIFFS_read 135\n");
+	len = SPIFFS_read(fs, tpd->file, (u8_t *)buff, 1024);
+	DBG_HTTPS("(HS) SPIFFS_read 137  [%d]\n",len);
 	if (len>0) {
 		sp=0;
 		e=buff;
@@ -186,8 +173,7 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 	if (len!=1024) {
 		//We're done.
 		((TplCallback)(connData->cgiArg))(connData, NULL, &tpd->tplArg);
-		//espFsClose(tpd->file);
-		//TODO: Closefile
+		SPIFFS_close(fs, tpd->file);
 		free(tpd);
 		return HTTPD_CGI_DONE;
 	} else {
