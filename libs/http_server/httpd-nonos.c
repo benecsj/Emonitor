@@ -52,7 +52,7 @@ static void ICACHE_FLASH_ATTR platConnCb(void *arg) {
 		espconn_regist_disconcb(conn, platDisconCb);
 		espconn_regist_sentcb(conn, platSentCb);
 	} else {
-		espconn_disconnect(conn);
+		httpdPlatDisconnect(conn);
 	}
 }
 
@@ -81,8 +81,6 @@ void ICACHE_FLASH_ATTR httpdPlatInit(int port, int maxConnCt) {
 	httpdConn.proto.tcp=&httpdTcp;
 	espconn_regist_connectcb(&httpdConn, platConnCb);
 	ret = espconn_accept(&httpdConn);
-	//espconn_regist_time(&httpdConn, 20, 0);
-	//espconn_tcp_set_max_con_allow(&httpdConn, maxConnCt);
 	DBG_HTTPS("espconn_accept [%d][%d] !!! \n", ret,espconn_tcp_get_max_con_allow(&httpdConn));
 }
 

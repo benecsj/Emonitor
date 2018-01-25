@@ -780,6 +780,7 @@ void ICACHE_FLASH_ATTR httpdRecvCb(ConnTypePtr rconn, char *remIp, int remPort, 
 	if (conn->conn) httpdFlushSendBuffer(conn);
 	//aligned_free(sendBuff);
 	httpdPlatUnlock();
+	DBG_HTTPS("(HS) httpdRecvCb END\n");
 }
 
 //The platform layer should ALWAYS call this function, regardless if the connection is closed by the server
