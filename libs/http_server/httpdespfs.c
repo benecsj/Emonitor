@@ -20,7 +20,6 @@ Connector to let httpd use the espfs filesystem to serve the files in it.
 // If the client does not advertise that he accepts GZIP send following warning message (telnet users for e.g.)
 static const char *gzipNonSupportedMessage = "HTTP/1.0 501 Not implemented\r\nServer: esp8266-httpd/"HTTPDVER"\r\nConnection: close\r\nContent-Type: text/plain\r\nContent-Length: 52\r\n\r\nYour browser does not accept gzip-compressed data.\r\n";
 
-
 //This is a catch-all cgi function. It takes the url passed to it, looks up the corresponding
 //path in the filesystem and if it exists, passes the file through. This simulates what a normal
 //webserver would do with static files.
@@ -90,6 +89,8 @@ typedef struct {
 
 typedef void (* TplCallback)(HttpdConnData *connData, char *token, void **arg);
 
+static TplData tplData;
+
 int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 	DBG_HTTPS("(HS) cgiEspFsTemplate START\n");
 	TplData *tpd=connData->cgiData;
@@ -103,20 +104,21 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 		//Connection aborted. Clean up.
 		((TplCallback)(connData->cgiArg))(connData, NULL, &tpd->tplArg);
 		SPIFFS_close(fs, tpd->file);
-		free(tpd);
+		//free(tpd);
 		return HTTPD_CGI_DONE;
 	}
 
 	if (tpd==NULL) {
 		//First call to this cgi. Open the file so we can read it.
-		tpd=(TplData *)malloc(sizeof(TplData));
+		//tpd=(TplData *)malloc(sizeof(TplData));
+		tpd = &tplData;
 		if (tpd==NULL) return HTTPD_CGI_NOTFOUND;
 		tpd->file = SPIFFS_open(fs, (char*)connData->url, SPIFFS_O_RDONLY, 0);
 		DBG_HTTPS("(HS) SPIFFS_open [%d]\n",tpd->file);
 		tpd->tplArg=NULL;
 		tpd->tokenPos=-1;
 		if (tpd->file<0) {
-			free(tpd);
+			//free(tpd);
 			return HTTPD_CGI_NOTFOUND;
 		}
 
@@ -170,7 +172,7 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 		//We're done.
 		((TplCallback)(connData->cgiArg))(connData, NULL, &tpd->tplArg);
 		SPIFFS_close(fs, tpd->file);
-		free(tpd);
+		//free(tpd);
 		return HTTPD_CGI_DONE;
 	} else {
 		//Ok, till next time.
