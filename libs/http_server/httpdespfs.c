@@ -16,13 +16,30 @@ Connector to let httpd use the espfs filesystem to serve the files in it.
 
 #include "spiffs_manager.h"
 
+#define SPIFFS_close STUB_SPIFFS_close
+#define SPIFFS_open STUB_SPIFFS_open
+#define SPIFFS_read STUB_SPIFFS_read
+s32_t STUB_SPIFFS_close(spiffs *fs, spiffs_file fh)
+{
+	return 0;
+}
+spiffs_file STUB_SPIFFS_open(spiffs *fs, const char *path, spiffs_flags flags, spiffs_mode mode)
+{
+	return 1;
+}
+s32_t STUB_SPIFFS_read(spiffs *fs, spiffs_file fh, void *buf, s32_t len)
+{
+	char * text = "Hello Jooo"+0;
+	memcpy(buf, text, 11);
+	return 11;
+}
+
 //This is a catch-all cgi function. It takes the url passed to it, looks up the corresponding
 //path in the filesystem and if it exists, passes the file through. This simulates what a normal
 //webserver would do with static files.
 int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 	DBG_HTTPS("(HS) cgiEspFsHook START\n");
 	spiffs* fs = spiffs_get_fs();
-	spiffs_file *file=connData->cgiData;
 	int len;
 	char buff[1024];
 	char acceptEncodingBuffer[64];
@@ -30,31 +47,29 @@ int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 	
 	if (connData->conn==NULL) {
 		//Connection aborted. Clean up.
-		SPIFFS_close(fs, *file);
+		SPIFFS_close(fs, connData->file);
+		connData->file = -1;
 		return HTTPD_CGI_DONE;
 	}
 
 	//First call to this cgi.
-	if (file==NULL) {
+	if (connData->file < 0) {
 		if (connData->cgiArg != NULL) {
 			//Open a different file than provided in http request.
 			//Common usage: {"/", cgiEspFsHook, "/index.html"} will show content of index.html without actual redirect to that file if host root was requested
-			spiffs_file fileTemp = SPIFFS_open(fs, (char*)connData->cgiArg, SPIFFS_O_RDONLY, 0);
-			DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",fileTemp,(char*)connData->cgiArg);
-			file = &fileTemp;
+			connData->file = SPIFFS_open(fs, (char*)connData->cgiArg, SPIFFS_O_RDONLY, 0);
+			DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->cgiArg);
 
 		} else {
 			//Open the file so we can read it.
-			spiffs_file fileTemp = SPIFFS_open(fs, (char*)connData->url, SPIFFS_O_RDONLY, 0);
-			DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",fileTemp,(char*)connData->url);
-			file = &fileTemp;
+			connData->file = SPIFFS_open(fs, (char*)connData->url, SPIFFS_O_RDONLY, 0);
+			DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->url);
 		}
 
-		if (file==NULL) {
+		if (connData->file < 0) {
 			return HTTPD_CGI_NOTFOUND;
 		}
 
-		connData->cgiData=file;
 		httpdStartResponse(connData, 200);
 		httpdHeader(connData, "Content-Type", httpdGetMimetype(connData->url));
 		httpdHeader(connData, "Cache-Control", "max-age=3600, must-revalidate");
@@ -63,12 +78,13 @@ int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 	}
 
 
-	len = SPIFFS_read(fs, *file, (u8_t *)buff, 1024);
+	len = SPIFFS_read(fs, connData->file, (u8_t *)buff, 1024);
 	DBG_HTTPS("(HS) SPIFFS_read  [%d]\n",len);
 	if (len>0) httpdSend(connData, buff, len);
 	if (len!=1024) {
 		//We're done.
-		SPIFFS_close(fs, *file);
+		SPIFFS_close(fs, connData->file);
+		connData->file = -1;
 		return HTTPD_CGI_DONE;
 	} else {
 		//Ok, till next time.
@@ -104,6 +120,7 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 		//Connection aborted. Clean up.
 		((TplCallback)(connData->cgiArg))(connData, NULL, &tpd->tplArg);
 		SPIFFS_close(fs, tpd->file);
+		tpd->file = -1;
 	}
 	else
 	{
@@ -120,7 +137,7 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 				DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",tpd->file,(char*)connData->url);
 				tpd->tplArg=NULL;
 				tpd->tokenPos=-1;
-				if (tpd->file<0) {
+				if (tpd->file < 0) {
 					returnValue = HTTPD_CGI_NOTFOUND;
 				}
 				else
@@ -179,6 +196,7 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 				//We're done.
 				((TplCallback)(connData->cgiArg))(connData, NULL, &tpd->tplArg);
 				SPIFFS_close(fs, tpd->file);
+				tpd->file = -1;
 			} else {
 				//Ok, till next time.
 				returnValue = HTTPD_CGI_MORE;

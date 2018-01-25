@@ -58,7 +58,7 @@ static void ICACHE_FLASH_ATTR platConnCb(void *arg) {
 
 
 int ICACHE_FLASH_ATTR httpdPlatSendData(ConnTypePtr conn, char *buff, int len) {
-	int r;
+	int r=0;
 	r=espconn_send(conn, (uint8_t*)buff, len);
 	return (r>=0);
 }

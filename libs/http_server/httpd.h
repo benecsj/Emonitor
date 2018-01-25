@@ -42,6 +42,7 @@ struct HttpdConnData {
 	const void *cgiArg;		// Argument to the CGI function, as stated as the 3rd argument of
 							// the builtInUrls entry that referred to the CGI function.
 	void *cgiData;			// Opaque data pointer for the CGI function
+	spiffs_file file;       // #### Extension for file
 	char *hostName;			// Host name field of request
 	HttpdPriv *priv;		// Opaque pointer to data for internal httpd housekeeping
 	cgiSendCallback cgi;	// CGI function pointer

@@ -552,6 +552,7 @@ static void ICACHE_FLASH_ATTR httpdProcessRequest(HttpdConnData *conn) {
 			if (match) {
 				httpd_printf("Is url index %d\n", i);
 				conn->cgiData=NULL;
+				conn->file = -1;
 				conn->cgi=builtInUrls[i].cgiCb;
 				conn->cgiArg=builtInUrls[i].cgiArg;
 				break;
@@ -841,7 +842,7 @@ int ICACHE_FLASH_ATTR httpdConnectCb(ConnTypePtr conn, char *remIp, int remPort)
 	connData[i]->hostName=NULL;
 	connData[i]->priv->sendBacklog=NULL;
 	connData[i]->priv->sendBacklogSize=0;
-
+	connData[i]->file=-1;
 	connData[i]->remote_port=remPort;
 	memcpy(connData[i]->remote_ip, remIp, 4);
 

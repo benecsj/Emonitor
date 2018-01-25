@@ -34,6 +34,7 @@
 #include "esp_misc.h"
 #include "esp_wifi.h"
 #include "esp_libc.h"
+#include "spiffs_manager.h"
 
 #define httpd_printf(format, ...) os_printf(format, ##__VA_ARGS__)
 typedef struct espconn* ConnTypePtr;

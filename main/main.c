@@ -19,6 +19,7 @@
 #include "pins.h"
 #include "httpclient.h"
 #include "http_server.h"
+#include "esp_libc.h"
 
 //Apps
 #include "Emonitor.h"
@@ -172,3 +173,8 @@ void user_init(void) {
 	xTaskCreate(task_Init, "init", 4096, NULL, 1, &t);
 }
 
+
+bool ICACHE_FLASH_ATTR check_memleak_debug_enable(void)
+{
+    return MEMLEAK_DEBUG_ENABLE;
+}
