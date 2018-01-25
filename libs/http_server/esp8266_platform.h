@@ -41,4 +41,4 @@ typedef struct espconn* ConnTypePtr;
 #define DBG_HTTPS(...) printf(__VA_ARGS__)
 //#define DBG_HTTPS(...)
 
-#define HTTPD_MAX_CONNECTIONS 2
+#define HTTPD_MAX_CONNECTIONS 1

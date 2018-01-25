@@ -111,9 +111,8 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 		//First call to this cgi. Open the file so we can read it.
 		tpd=(TplData *)malloc(sizeof(TplData));
 		if (tpd==NULL) return HTTPD_CGI_NOTFOUND;
-		DBG_HTTPS("(HS) SPIFFS_open 114\n");
 		tpd->file = SPIFFS_open(fs, (char*)connData->url, SPIFFS_O_RDONLY, 0);
-		DBG_HTTPS("(HS) SPIFFS_open 116  [%d]\n",tpd->file);
+		DBG_HTTPS("(HS) SPIFFS_open [%d]\n",tpd->file);
 		tpd->tplArg=NULL;
 		tpd->tokenPos=-1;
 		if (tpd->file<0) {
@@ -122,11 +121,8 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 		}
 
 		connData->cgiData=tpd;
-		DBG_HTTPS("(HS) httpdStartResponse\n");
 		httpdStartResponse(connData, 200);
-		DBG_HTTPS("(HS) httpdHeader\n");
 		httpdHeader(connData, "Content-Type", httpdGetMimetype(connData->url));
-		DBG_HTTPS("(HS) httpdEndHeaders\n");
 		httpdEndHeaders(connData);
 		return HTTPD_CGI_MORE;
 	}

@@ -169,6 +169,6 @@ void user_init(void) {
 	xTaskCreate(task_background, "bgnd", 1024, NULL, 0, &t);
 	xTaskCreate(task_10ms, "10ms", 1024, NULL, 0, &t);
 	xTaskCreate(task_1000ms, "1000ms", 2048, NULL, 0, &t);
-	xTaskCreate(task_Init, "init", 2048, NULL, 1, &t);
+	xTaskCreate(task_Init, "init", 4096, NULL, 1, &t);
 }
 
