@@ -95,8 +95,8 @@ void Emonitor_Main_1000ms(void) {
 	Emonitor_uptime++;
 	//Free ram
 	uint32 freeRam = system_get_free_heap_size();
-
-	DBG("CYCLE(%d) PULSE(%d) HEAP:(%d)\n", Emonitor_counter,Sensor_Manager_GetPulseCount(0),freeRam);
+	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
+	DBG("CYCLE(%d) PULSE(%d) HEAP:(%d) STACK:(%d)\n", Emonitor_counter,Sensor_Manager_GetPulseCount(0),freeRam,freeStack);
 	Emonitor_timing++;
 	if(Emonitor_timing == 10){
 		taskENTER_CRITICAL();

@@ -58,6 +58,7 @@ static void ICACHE_FLASH_ATTR platConnCb(void *arg) {
 
 
 int ICACHE_FLASH_ATTR httpdPlatSendData(ConnTypePtr conn, char *buff, int len) {
+	DBG_HTTPS("(HS) <httpdPlatSendData [%d]>\n",len);
 	int r=0;
 	r=espconn_send(conn, (uint8_t*)buff, len);
 	return (r>=0);
@@ -81,13 +82,13 @@ void ICACHE_FLASH_ATTR httpdPlatInit(int port, int maxConnCt) {
 	httpdConn.proto.tcp=&httpdTcp;
 	espconn_regist_connectcb(&httpdConn, platConnCb);
 	ret = espconn_accept(&httpdConn);
-	DBG_HTTPS("espconn_accept [%d][%d] !!! \n", ret,espconn_tcp_get_max_con_allow(&httpdConn));
+	DBG_HTTPS("(HS)< espconn_accept [%d][%d] >\n", ret,espconn_tcp_get_max_con_allow(&httpdConn));
 }
 
 
 void* aligned_malloc(size_t required_bytes)
 {
-	DBG_HTTPS("(HS) malloc %d\n",required_bytes);
+	DBG_HTTPS("(HS)< malloc [%d] >\n",required_bytes);
     void* p1; // original block
     void** p2; // aligned block
     int offset = HTTPD_ALIGNMENT - 1 + sizeof(void*);
@@ -102,6 +103,7 @@ void* aligned_malloc(size_t required_bytes)
 
 void aligned_free(void *p)
 {
+	DBG_HTTPS("(HS)< free >\n");
     free(((void**)p)[-1]);
 }
 

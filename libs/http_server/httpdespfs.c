@@ -42,54 +42,62 @@ int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 	spiffs* fs = spiffs_get_fs();
 	int len;
 	char buff[1024];
-	char acceptEncodingBuffer[64];
-	int isGzip;
+	int returnValue = HTTPD_CGI_DONE;
 	
 	if (connData->conn==NULL) {
 		//Connection aborted. Clean up.
 		SPIFFS_close(fs, connData->file);
 		connData->file = -1;
-		return HTTPD_CGI_DONE;
 	}
-
-	//First call to this cgi.
-	if (connData->file < 0) {
-		if (connData->cgiArg != NULL) {
-			//Open a different file than provided in http request.
-			//Common usage: {"/", cgiEspFsHook, "/index.html"} will show content of index.html without actual redirect to that file if host root was requested
-			connData->file = SPIFFS_open(fs, (char*)connData->cgiArg, SPIFFS_O_RDONLY, 0);
-			DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->cgiArg);
-
-		} else {
-			//Open the file so we can read it.
-			connData->file = SPIFFS_open(fs, (char*)connData->url, SPIFFS_O_RDONLY, 0);
-			DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->url);
-		}
-
+	else
+	{
+		//First call to this cgi.
 		if (connData->file < 0) {
-			return HTTPD_CGI_NOTFOUND;
+			if (connData->cgiArg != NULL) {
+				//Open a different file than provided in http request.
+				//Common usage: {"/", cgiEspFsHook, "/index.html"} will show content of index.html without actual redirect to that file if host root was requested
+				connData->file = SPIFFS_open(fs, (char*)connData->cgiArg, SPIFFS_O_RDONLY, 0);
+				DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->cgiArg);
+
+			} else {
+				//Open the file so we can read it.
+				connData->file = SPIFFS_open(fs, (char*)connData->url, SPIFFS_O_RDONLY, 0);
+				DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->url);
+			}
+
+			if (connData->file < 0) {
+				returnValue = HTTPD_CGI_NOTFOUND;
+			}
+			else
+			{
+				//httpdStartResponse(connData, 200);
+				//httpdHeader(connData, "Content-Type", httpdGetMimetype(connData->url));
+				//httpdHeader(connData, "Cache-Control", "max-age=3600, must-revalidate");
+				//httpdEndHeaders(connData);
+				returnValue = HTTPD_CGI_MORE;
+			}
 		}
-
-		httpdStartResponse(connData, 200);
-		httpdHeader(connData, "Content-Type", httpdGetMimetype(connData->url));
-		httpdHeader(connData, "Cache-Control", "max-age=3600, must-revalidate");
-		httpdEndHeaders(connData);
-		return HTTPD_CGI_MORE;
+		else
+		{
+			len = SPIFFS_read(fs, connData->file, (u8_t *)buff, 1024);
+			DBG_HTTPS("(HS) SPIFFS_read  [%d]\n",len);
+			if (len>0)
+			{
+				httpdSend(connData, buff, len);
+			}
+			if (len!=1024) {
+				//We're done.
+				SPIFFS_close(fs, connData->file);
+				connData->file = -1;
+			} else {
+				//Ok, till next time.
+				returnValue = HTTPD_CGI_MORE;
+			}
+		}
 	}
 
-
-	len = SPIFFS_read(fs, connData->file, (u8_t *)buff, 1024);
-	DBG_HTTPS("(HS) SPIFFS_read  [%d]\n",len);
-	if (len>0) httpdSend(connData, buff, len);
-	if (len!=1024) {
-		//We're done.
-		SPIFFS_close(fs, connData->file);
-		connData->file = -1;
-		return HTTPD_CGI_DONE;
-	} else {
-		//Ok, till next time.
-		return HTTPD_CGI_MORE;
-	}
+	DBG_HTTPS("(HS) cgiEspFsHook END\n");
+	return returnValue;
 }
 
 

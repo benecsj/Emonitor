@@ -242,16 +242,18 @@ void ICACHE_FLASH_ATTR httdSetTransferMode(HttpdConnData *conn, int mode) {
 //Start the response headers.
 void ICACHE_FLASH_ATTR httpdStartResponse(HttpdConnData *conn, int code) {
 	DBG_HTTPS("(HS) httpdStartResponse START\n");
-	char buff[256];
+	uint32_t buff[(1024/4)+1];
 	int l;
 	const char *connStr="Connection: close\r\n";
 	if (conn->priv->flags&HFL_CHUNKED) connStr="Transfer-Encoding: chunked\r\n";
 	if (conn->priv->flags&HFL_NOCONNECTIONSTR) connStr="";
-	l=sprintf(buff, "HTTP/1.%d %d OK\r\nServer: esp8266-httpd/"HTTPDVER"\r\n%s", 
+
+	l=sprintf((char*)buff, "HTTP/1.%d %d OK\r\nServer: esp8266-httpd/"HTTPDVER"\r\n%s",
 			(conn->priv->flags&HFL_HTTP11)?1:0, 
 			code, 
 			connStr);
-	httpdSend(conn, buff, l);
+
+	httpdSend(conn, (char*)buff, l);
 	DBG_HTTPS("(HS) httpdStartResponse END\n");
 }
 
@@ -363,9 +365,12 @@ int ICACHE_FLASH_ATTR cgiRedirectApClientToHostname(HttpdConnData *connData) {
 //the data is seen as a C-string.
 //Returns 1 for success, 0 for out-of-memory.
 int ICACHE_FLASH_ATTR httpdSend(HttpdConnData *conn, const char *data, int len) {
+	DBG_HTTPS("(HS) httpdSend START\n");
+
 	if (conn->conn==NULL) return 0;
 	if (len<0) len=strlen(data);
 	if (len==0) return 0;
+
 	if (conn->priv->flags&HFL_CHUNKED && conn->priv->flags&HFL_SENDINGBODY && conn->priv->chunkHdr==NULL) {
 		if (conn->priv->sendBuffLen+len+6>HTTPD_MAX_SENDBUFF_LEN) return 0;
 		//Establish start of chunk
@@ -377,6 +382,7 @@ int ICACHE_FLASH_ATTR httpdSend(HttpdConnData *conn, const char *data, int len) 
 	memcpy(conn->priv->sendBuff+conn->priv->sendBuffLen, data, len);
 	conn->priv->sendBuffLen+=len;
 
+	DBG_HTTPS("(HS) httpdSend END\n");
 	return 1;
 }
 
