@@ -37,6 +37,7 @@ uint32 Emonitor_uptime = 0;
 
 uint8 Emonitor_ledControl = 0;
 
+uint8 Emonitor_flashButton = 0;
 
 
 /******************************************************************************
@@ -55,6 +56,8 @@ void Emonitor_Init(void) {
 	UART_SetBaudrate(UART0, BIT_RATE_115200);
 	//Init Status LED
 	pinMode(LED2_BUILTIN,OUTPUT);
+	//Init flash button
+	pinMode(FLASH_BUTTON,INPUT);
 	//Init timer for fast task
     hw_timer_init();
     hw_timer_set_func(Emonitor_Main_1ms);
@@ -68,8 +71,11 @@ void Emonitor_Init(void) {
  * Returns      : none
  *******************************************************************************/
 void Emonitor_Main_1ms(void) {
+	//Toggle led
 	digitalWrite(LED2_BUILTIN, (Emonitor_statusCounter | Emonitor_ledControl));
 	Emonitor_statusCounter= (Emonitor_statusCounter+1)%2;
+	//Read flash button
+	Emonitor_flashButton = digitalRead(FLASH_BUTTON);
 }
 
 /******************************************************************************
@@ -96,6 +102,7 @@ void Emonitor_Main_1000ms(void) {
 	//Free ram
 	uint32 freeRam = system_get_free_heap_size();
 	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
+	DBG("BUTTON(%d)\n",Emonitor_flashButton);
 	DBG("CYCLE(%d) PULSE(%d) HEAP:(%d) STACK:(%d)\n", Emonitor_counter,Sensor_Manager_GetPulseCount(0),freeRam,freeStack);
 	Emonitor_timing++;
 	if(Emonitor_timing == 10){

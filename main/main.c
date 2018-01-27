@@ -173,8 +173,3 @@ void user_init(void) {
 	xTaskCreate(task_Init, "init", 1024, NULL, 1, &t);
 }
 
-
-bool ICACHE_FLASH_ATTR check_memleak_debug_enable(void)
-{
-    return MEMLEAK_DEBUG_ENABLE;
-}
