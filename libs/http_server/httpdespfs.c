@@ -16,6 +16,7 @@ Connector to let httpd use the espfs filesystem to serve the files in it.
 
 #include "spiffs_manager.h"
 
+/*
 #define SPIFFS_close STUB_SPIFFS_close
 #define SPIFFS_open STUB_SPIFFS_open
 #define SPIFFS_read STUB_SPIFFS_read
@@ -33,7 +34,7 @@ s32_t STUB_SPIFFS_read(spiffs *fs, spiffs_file fh, void *buf, s32_t len)
 	memcpy(buf, text, 11);
 	return 11;
 }
-
+*/
 //This is a catch-all cgi function. It takes the url passed to it, looks up the corresponding
 //path in the filesystem and if it exists, passes the file through. This simulates what a normal
 //webserver would do with static files.
@@ -41,9 +42,9 @@ int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 	DBG_HTTPS("(HS) cgiEspFsHook START\n");
 	spiffs* fs = spiffs_get_fs();
 	int len;
-	char buff[1024];
+	char buff[1025];
 	int returnValue = HTTPD_CGI_DONE;
-	
+	//return HTTPD_CGI_NOTFOUND;
 	if (connData->conn==NULL) {
 		//Connection aborted. Clean up.
 		SPIFFS_close(fs, connData->file);
@@ -70,22 +71,22 @@ int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 			}
 			else
 			{
-				//httpdStartResponse(connData, 200);
-				//httpdHeader(connData, "Content-Type", httpdGetMimetype(connData->url));
-				//httpdHeader(connData, "Cache-Control", "max-age=3600, must-revalidate");
-				//httpdEndHeaders(connData);
+				httpdStartResponse(connData, 200);
+				httpdHeader(connData, "Content-Type", httpdGetMimetype(connData->url));
+				httpdHeader(connData, "Cache-Control", "max-age=3600, must-revalidate");
+				httpdEndHeaders(connData);
 				returnValue = HTTPD_CGI_MORE;
 			}
 		}
 		else
 		{
-			len = SPIFFS_read(fs, connData->file, (u8_t *)buff, 1024);
+			len = SPIFFS_read(fs, connData->file, (u8_t *)buff, HTTPD_MAX_FILE_READ_BLOCK);
 			DBG_HTTPS("(HS) SPIFFS_read  [%d]\n",len);
 			if (len>0)
 			{
 				httpdSend(connData, buff, len);
 			}
-			if (len!=1024) {
+			if (len!=HTTPD_MAX_FILE_READ_BLOCK) {
 				//We're done.
 				SPIFFS_close(fs, connData->file);
 				connData->file = -1;
@@ -161,7 +162,7 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 
 		if(returnValue == HTTPD_CGI_DONE)
 		{
-			len = SPIFFS_read(fs, tpd->file, (u8_t *)buff, 1024);
+			len = SPIFFS_read(fs, tpd->file, (u8_t *)buff, HTTPD_MAX_FILE_READ_BLOCK);
 			DBG_HTTPS("(HS) SPIFFS_read  [%d]\n",len);
 			if (len>0) {
 				sp=0;
@@ -200,7 +201,7 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 			}
 			//Send remaining bit.
 			if (sp!=0) httpdSend(connData, e, sp);
-			if (len!=1024) {
+			if (len!=HTTPD_MAX_FILE_READ_BLOCK) {
 				//We're done.
 				((TplCallback)(connData->cgiArg))(connData, NULL, &tpd->tplArg);
 				SPIFFS_close(fs, tpd->file);

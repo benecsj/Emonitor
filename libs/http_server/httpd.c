@@ -365,8 +365,8 @@ int ICACHE_FLASH_ATTR cgiRedirectApClientToHostname(HttpdConnData *connData) {
 //the data is seen as a C-string.
 //Returns 1 for success, 0 for out-of-memory.
 int ICACHE_FLASH_ATTR httpdSend(HttpdConnData *conn, const char *data, int len) {
-	DBG_HTTPS("(HS) httpdSend START\n");
-
+	DBG_HTTPS("(HS) httpdSend [%d] START\n",len);
+	int returnValue = 0;
 	if (conn->conn==NULL) return 0;
 	if (len<0) len=strlen(data);
 	if (len==0) return 0;

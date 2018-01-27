@@ -40,10 +40,12 @@
 typedef struct espconn* ConnTypePtr;
 
 
-#define DBG_HTTPS(...) printf(__VA_ARGS__)
-//#define DBG_HTTPS(...)
+//#define DBG_HTTPS(...) printf(__VA_ARGS__)
+#define DBG_HTTPS(...)
 
 #define HTTPD_MAX_CONNECTIONS 3
+
+#define HTTPD_MAX_FILE_READ_BLOCK 1000
 
 #define HTTPD_ALIGNMENT 4
 
