@@ -2,6 +2,8 @@
 #include "user_config.h"
 
 
+uint8 WifiManager_enableHotspot = 0;
+
 LOCAL void ICACHE_FLASH_ATTR on_wifi_connect(){
     os_printf("Connected\n");
     //Store current ip address
@@ -25,10 +27,28 @@ void Wifi_Manager_Init(void)
     stop_wifi_station();
     stop_wifi_ap();
 
+
+    start_wifi_station(STA_SSID, STA_PASSWORD);
+
+    //Enable hotspot if needed
+    if(WifiManager_enableHotspot == 1)
+    {
+    	start_wifi_ap(AP_SSID, AP_PASSWORD);
+    }
 }
 
 
 void Wifi_Manager_GetIp(uint8 ip[4])
 {
 	wifi_get_ip_address(ip);
+}
+
+void Wifi_Manager_Main()
+{
+
+}
+
+void Wifi_Manager_EnableHotspot(uint8 enable)
+{
+	WifiManager_enableHotspot = enable;
 }

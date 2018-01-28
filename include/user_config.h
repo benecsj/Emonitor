@@ -29,8 +29,11 @@
 #define STA_SSID "BOCI"
 #define STA_PASSWORD "fucking6"
 
-#define AP_SSID "Emonitor_1234"
+#define AP_SSID "Emonitor_0000"
 #define AP_PASSWORD "fucking6"
+
+#define DEFAULT_SERVER_ADDRESS "http://v9.emonitor.hu"
+#define DEFAULT_API_KEY "97d3e42a841ea6c219582211313d5051"
 
 //NvM
 #define EMONITOR_PARAM_START_SEC		0x8D

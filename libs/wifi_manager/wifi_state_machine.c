@@ -167,6 +167,9 @@ bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){
         os_printf("No SSID Given. Will connect to the station saved in flash\n");
         return true;
     }
+
+    wifi_station_set_hostname(AP_SSID);
+
     struct station_config config;
     memset(&config, 0, sizeof(struct station_config));
     strcpy(config.ssid, ssid);

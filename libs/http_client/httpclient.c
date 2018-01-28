@@ -500,12 +500,3 @@ void ICACHE_FLASH_ATTR httpclient_Init(void)
 	espconn_init();
 }
 
-void ICACHE_FLASH_ATTR http_callback_example(char * response_body, int http_status, char * response_headers, int body_size)
-{
-	printf("HTTP status=%d\n", http_status);
-	if (http_status != HTTP_STATUS_GENERIC_ERROR) {
-		printf("HTTP headers (%d)\n", strlen(response_headers));
-		printf("HTTP body (%d)\n", body_size);
-		printf("HTTP body=\"%s\"\n", response_body); // FIXME: this does not handle binary data.
-	}
-}
