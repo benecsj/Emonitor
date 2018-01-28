@@ -45,6 +45,11 @@ uint8 Emonitor_connectionStatus = 1;
 
 uint32 Emonitor_resetTimeoutCounter = 0;
 
+uint32 Emonitor_nodeId = 1;
+char Emonitor_url[100] = {0};
+char Emonitor_key[33] = {0};
+
+
 /******************************************************************************
 * Primitives
 \******************************************************************************/
@@ -55,12 +60,12 @@ extern void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_s
 \******************************************************************************/
 
 /******************************************************************************
- * FunctionName : Emonitor_init
+ * FunctionName : Emonitor_Preinit
  * Description  : Init emonitor application
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
-void Emonitor_Init(void) {
+void Emonitor_Preinit(void) {
 
 	//Init UART
 	UART_SetBaudrate(UART0, BIT_RATE_115200);
@@ -74,6 +79,24 @@ void Emonitor_Init(void) {
     hw_timer_init();
     hw_timer_set_func(Emonitor_Main_1ms);
     hw_timer_arm(1000,1);
+}
+
+void Emonitor_Init(void){
+    //Check if has valid url and key
+	uint8 urlLength = strlen(Emonitor_url);
+	uint8 apiKeyLength = strlen(Emonitor_key);
+	if ((urlLength <= 4) || (urlLength == 100))
+	{
+		sprintf(Emonitor_url,"%s",DEFAULT_SERVER_ADDRESS);
+	}
+	if (apiKeyLength != 32)
+	{
+		sprintf(Emonitor_key,"%s",DEFAULT_API_KEY);
+	}
+	if(Emonitor_nodeId == 0xFFFFFFFF)
+	{
+		Emonitor_nodeId = DEFAULT_NODE_ID;
+	}
 }
 
 /******************************************************************************
@@ -147,10 +170,6 @@ void Emonitor_Main_1000ms(void) {
 	char buffer[500];
 	uint8 buttonState;
 
-	uint8 nodeId = 2;
-	char url[100] = {DEFAULT_SERVER_ADDRESS};
-	char apyKey[33] = {DEFAULT_API_KEY};
-
 	uint8 tempCount;
 	uint8* ids;
 	sint16* temperatures;
@@ -175,30 +194,40 @@ void Emonitor_Main_1000ms(void) {
 
 		if(Wifi_Manager_Connected() == 1)
 		{
-			DBG("----------------Emonitor Send Data-------------\n");
-			Sensor_Manager_Get_TempSensorData(&tempCount,&ids,&temperatures);
-			//Start of Emoncsm send Url
-			Append(length,buffer,"%s/input/post.json?node=%d&json={",url,nodeId);
-			//Add freeram
-			Append(length,buffer,"freeram:%d,",freeRam);
-			//Add pulse counters
-			for(i=0;i<SENSOR_MANAGER_PULSE_COUNTERS;i++)
+			//Check if strings have a valid length
+			uint8 urlLength = strlen(Emonitor_url);
+			uint8 apiKeyLength = strlen(Emonitor_key);
+			if ((urlLength > 4) && (apiKeyLength == 32))
 			{
-				 Append(length,buffer,"Pulse_%02X:%d,",(i+1),Sensor_Manager_GetPulseCount(i));
-			}
-			//Add temperatures
-			for(i=0;i<tempCount;i++)
-			{
-				 Append(length,buffer,"Temp_%02X%02X%02X%02X%02X:%d.%d,",ids[(i*8)+1],ids[(i*8)+2],ids[(i*8)+3],ids[(i*8)+4],ids[(i*8)+7],temperatures[i]/10,abs(temperatures[i]%10));
-			}
-			//Add Uptime
-			Append(length,buffer,"uptime:%d",Emonitor_uptime);
-			//End of Emoncsm send Url
-			Append(length,buffer,"}&apikey=%s",apyKey);
+				DBG("----------------Emonitor Send Data-------------\n");
+				Sensor_Manager_Get_TempSensorData(&tempCount,&ids,&temperatures);
+				//Start of Emoncsm send Url
+				Append(length,buffer,"%s/input/post.json?node=%d&json={",Emonitor_url,Emonitor_nodeId);
+				//Add freeram
+				Append(length,buffer,"freeram:%d,",freeRam);
+				//Add pulse counters
+				for(i=0;i<SENSOR_MANAGER_PULSE_COUNTERS;i++)
+				{
+					 Append(length,buffer,"Pulse_%02X:%d,",(i+1),Sensor_Manager_GetPulseCount(i));
+				}
+				//Add temperatures
+				for(i=0;i<tempCount;i++)
+				{
+					 Append(length,buffer,"Temp_%02X%02X%02X%02X%02X:%d.%d,",ids[(i*8)+1],ids[(i*8)+2],ids[(i*8)+3],ids[(i*8)+4],ids[(i*8)+7],temperatures[i]/10,abs(temperatures[i]%10));
+				}
+				//Add Uptime
+				Append(length,buffer,"uptime:%d",Emonitor_uptime);
+				//End of Emoncsm send Url
+				Append(length,buffer,"}&apikey=%s",Emonitor_key);
 
 
-			//Send out Emoncsm Data
-			http_get(buffer, "", Emonitor_callback);
+				//Send out Emoncsm Data
+				http_get(buffer, "", Emonitor_callback);
+			}
+			else
+			{
+				DBG("(EM) Not valid userkey / server values found [%d][%d]\n",urlLength,apiKeyLength);
+			}
 		}
 		else
 		{

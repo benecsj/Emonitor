@@ -97,12 +97,14 @@ void task_Init(void *pvParameters) {
 	Init_Pins();
 	//Init NvM
 	NVM_Init();
+	//Spiffs init
+	spiffs_init();
+	//Emonitor
+	Emonitor_Init();
 	//Init application
     Remote_Control_Init();
 	//Init Wifi
 	Wifi_Manager_Init();
-	//Spiffs init
-	spiffs_init();
 	//Sensor manager init
 	Sensor_Manager_Init();
 	//Http client init
@@ -160,7 +162,8 @@ void task_background(void *pvParameters) {
  *******************************************************************************/
 void user_init(void) {
 	//Init application
-	Emonitor_Init();
+	Emonitor_Preinit();
+
 
 	DBG("SDK version:%s\n", system_get_sdk_version());
 	DBG("About to create task\r\n");

@@ -2,7 +2,7 @@
 #include "user_config.h"
 
 
-uint8 WifiManager_enableHotspot = 0;
+uint8 WifiManager_enableHotspot = 1;
 
 LOCAL void ICACHE_FLASH_ATTR on_wifi_connect(){
     os_printf("Connected\n");
@@ -29,6 +29,12 @@ void Wifi_Manager_Init(void)
 
 
     start_wifi_station(STA_SSID, STA_PASSWORD);
+
+    //Set hotspot value
+    if(WifiManager_enableHotspot == 0xFF)
+    {
+    	WifiManager_enableHotspot = 1;
+    }
 
     //Enable hotspot if needed
     if(WifiManager_enableHotspot == 1)
