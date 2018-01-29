@@ -1,7 +1,105 @@
 <html>
+
+ <head>
+<meta charset="UTF-8" />
+ <style>
+body {
+    background-color: linen;
+    justify-content: center;
+    }
+
+h1 {
+    color: #e65c00;
+    margin-top: 40px;
+    text-align: center;
+    }
+    
+div.boxed {
+    margin: 0 auto;
+    margin-bottom: 10px;
+    max-width: 400px; 
+    border: 3px solid black;
+    background-color: #F0E6DC;
+    align-items: center;
+    
+    } 
+
+img.centered {
+    display: block; 
+    margin-left: auto; 
+    margin-right: auto;
+    width: 200;
+    height : 200;
+}
+
+p.centered {
+    text-align: center;
+}
+
+input.left {
+    margin-left: 40px; 
+    margin-top: 10px;
+}
+
+p.left {
+    margin-left: 40px; 
+}
+
+</style>
+</head> 
+
+<script type="text/javascript">
+function toggle(button) {
+  if (button.value == "OFF") {
+    button.value = "ON";
+  } else {
+    button.value = "OFF";
+  }
+}
+</script>
+
 <header><title>Emonitor</title></header>
 <body>
-<h1 style="color: #5e9ca0;">Hello to Emonitor</h1>
-<img src="emonitor.png">
+<h1>Emonitor_1234</h1>
+<img class="centered" src="emonitor.png">
+<p class="centered" >Beallitasok</p>
+ <form action="/index.html">
+ 
+<div class="boxed">
+<p class="centered" >Wifi connection</p>
+<p class="left" >SSID</p>
+  <input type="text" name="firstname" value="BOCI"><br>
+  Authentication:<br>
+<select name="fruit">
+<option value ="none">None</option>
+<option value ="guava">WEP</option>
+<option value ="lychee">WPA_PSK</option>
+<option value ="papaya" selected>WPA2_PSK</option>
+</select> 
+<br>
+  Password:<br>
+  <input class="left" type="text" name="lastname" value="fucking6"><br><br>
+</div>
+ 
+<div class="boxed">
+<p class="centered" >Accespoint</p>
+  SSID:<br>
+  <input type="text" name="firstname" value="Emonitor_1234"><br>
+  Authentication:<br>
+<select name="fruit">
+<option value ="none">None</option>
+<option value ="guava">WEP</option>
+<option value ="lychee">WPA_PSK</option>
+<option value ="papaya" selected>WPA2_PSK</option>
+</select> 
+<br>
+  Password:<br>
+  <input type="text" name="lastname" value=""><br><br>
+<input type="button" value="OFF" id="button1" onclick="toggle(this)" />
+</div>
+  <input type="submit" value="Submit">
+</form> 
+
+<p><input type="button" value="Refresh Page" onClick="window.location.reload()"></p>
 </body>
 </html>

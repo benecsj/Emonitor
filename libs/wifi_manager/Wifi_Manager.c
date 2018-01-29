@@ -17,9 +17,9 @@ LOCAL void ICACHE_FLASH_ATTR on_wifi_disconnect(uint8 reason){
     os_printf("Disconnect %d\n", reason);
 }
 
-char WifiManager_STA_SSID[64] = {0};
+char WifiManager_STA_SSID[32] = {0};
 char WifiManager_STA_PASSWORD[64] = {0};
-char WifiManager_AP_SSID[64] = {0};
+char WifiManager_AP_SSID[32] = {0};
 char WifiManager_AP_PASSWORD[64] = {0};
 
 void Wifi_Manager_Init(void)
@@ -27,7 +27,7 @@ void Wifi_Manager_Init(void)
 	//Verify Parameters
 	uint8 textLength = 0;
 	textLength = strlen(WifiManager_STA_SSID);
-	if((textLength == 0) || (textLength>=64))
+	if((textLength == 0) || (textLength>=32))
 	{
 		sprintf(WifiManager_STA_SSID,"%s",DEFAULT_STA_SSID);
 	}
@@ -37,7 +37,7 @@ void Wifi_Manager_Init(void)
 		sprintf(WifiManager_STA_PASSWORD,"%s",DEFAULT_STA_PASSWORD);
 	}
 	textLength = strlen(WifiManager_AP_SSID);
-	if((textLength == 0) || (textLength>=64))
+	if((textLength == 0) || (textLength>=32))
 	{
 		Wifi_Manager_GetDefaultValues(WifiManager_AP_SSID,NULL);
 
@@ -114,7 +114,7 @@ void Wifi_Manager_GetDefaultValues(char* id, char * pass)
 	if(id != NULL)
 	{
 		fd = SPIFFS_open(fs, "/id", SPIFFS_RDONLY, 0);
-		length = SPIFFS_read(fs, fd, (u8_t *)id, 64);
+		length = SPIFFS_read(fs, fd, (u8_t *)id, 32);
 		SPIFFS_close(fs, fd);
 		id[length-1] = 0;
 	}

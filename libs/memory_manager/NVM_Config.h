@@ -18,9 +18,9 @@ extern uint8 WifiManager_enableHotspot;
 extern uint32 Emonitor_nodeId;
 extern char Emonitor_url[100];
 extern char Emonitor_key[33];
-extern char WifiManager_STA_SSID[64];
+extern char WifiManager_STA_SSID[32];
 extern char WifiManager_STA_PASSWORD[64];
-extern char WifiManager_AP_SSID[64];
+extern char WifiManager_AP_SSID[32];
 extern char WifiManager_AP_PASSWORD[64];
 
 
