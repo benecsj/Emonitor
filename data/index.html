@@ -10,7 +10,7 @@ body {
 
 h1 {
     color: #e65c00;
-    margin-top: 40px;
+    margin-top: 20px;
     text-align: center;
     }
     
@@ -21,7 +21,6 @@ div.boxed {
     border: 3px solid black;
     background-color: #F0E6DC;
     align-items: center;
-    
     } 
 
 img.centered {
@@ -36,12 +35,22 @@ p.centered {
     text-align: center;
 }
 
-input.left {
-    margin-left: 40px; 
-    margin-top: 10px;
+input.centered {
+    text-align: center;
 }
 
+input.left {
+    margin-left: 40px; 
+    margin-top: 0px;
+    margin-bottom: 0px
+}
+
+
 p.left {
+    margin-left: 40px; 
+}
+
+select.left {
     margin-left: 40px; 
 }
 
@@ -62,44 +71,48 @@ function toggle(button) {
 <body>
 <h1>Emonitor_1234</h1>
 <img class="centered" src="emonitor.png">
-<p class="centered" >Beallitasok</p>
+<p class="centered" >Configuration</p>
  <form action="/index.html">
  
 <div class="boxed">
 <p class="centered" >Wifi connection</p>
 <p class="left" >SSID</p>
-  <input type="text" name="firstname" value="BOCI"><br>
-  Authentication:<br>
-<select name="fruit">
-<option value ="none">None</option>
-<option value ="guava">WEP</option>
-<option value ="lychee">WPA_PSK</option>
-<option value ="papaya" selected>WPA2_PSK</option>
-</select> 
-<br>
-  Password:<br>
-  <input class="left" type="text" name="lastname" value="fucking6"><br><br>
+  <input class="left" type="text" name="sta_ssid" value="BOCI">
+<p class="left" >Password</p>
+  <input class="left" type="text" name="sta_pass" value=""><br><br>
+</div>
+ 
+<div class="boxed">
+<p class="centered" >Emoncms</p>
+<p class="left" >Key</p>
+  <input class="left" type="text" name="emon_key" value="97d3e42a841ea6c219582211313d5051">
+<p class="left" >URL</p>
+  <input class="left" type="text" name="emon_url" value="http://v9.emonitor.hu">
+<p class="left" >Node Id</p>
+  <input class="left" type="text" name="emon_id" value="1234"><br><br>
 </div>
  
 <div class="boxed">
 <p class="centered" >Accespoint</p>
-  SSID:<br>
-  <input type="text" name="firstname" value="Emonitor_1234"><br>
-  Authentication:<br>
-<select name="fruit">
+<p class="left" >SSID</p>
+  <input class="left" type="text" name="ap_ssid" value="Emonitor_1234">
+<p class="left" >Authentication</p>
+<select class="left" name="ap_auth">
 <option value ="none">None</option>
-<option value ="guava">WEP</option>
-<option value ="lychee">WPA_PSK</option>
-<option value ="papaya" selected>WPA2_PSK</option>
+<option value ="wep">WEP</option>
+<option value ="wpa">WPA_PSK</option>
+<option value ="wpa2" selected>WPA2_PSK</option>
 </select> 
-<br>
-  Password:<br>
-  <input type="text" name="lastname" value=""><br><br>
-<input type="button" value="OFF" id="button1" onclick="toggle(this)" />
+<p class="left" >Password</p>
+  <input class="left" type="text" name="ap_pass" value="">
+<p class="left" >Power</p>
+<select class="left" name="ap_en">
+<option value ="off">Off</option>
+<option value ="on" selected>On</option>
+</select> <br><br>
+<!-- <input class="left" type="button" value="OFF" id="button1" onclick="toggle(this)" /> -->
 </div>
-  <input type="submit" value="Submit">
+<p class="centered"><input class="centered" type="submit" value="Submit"></p>
 </form> 
-
-<p><input type="button" value="Refresh Page" onClick="window.location.reload()"></p>
 </body>
 </html>
