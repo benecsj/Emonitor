@@ -82,11 +82,11 @@ void Cpi_Wifi(uint8* params, uint8 lenght, uint8* response) {
 		text="/Wifi_Manager_Init/";
 		break;
 	case 'a':
-		start_wifi_ap(AP_SSID, AP_PASSWORD);
+		//start_wifi_ap(AP_SSID, AP_PASSWORD);
 		text="/start_wifi_ap/";
 		break;
 	case 's':
-		start_wifi_station(STA_SSID, STA_PASSWORD);
+		//start_wifi_station(STA_SSID, STA_PASSWORD);
 		text="/start_wifi_station/";
 		break;
 	case 't':

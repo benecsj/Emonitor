@@ -17,6 +17,7 @@
 #include "httpclient.h"
 #include "Sensor_Manager.h"
 #include "Wifi_Manager.h"
+#include "spiffs_manager.h"
 
 /******************************************************************************
 * Defines
@@ -43,9 +44,9 @@ uint8 Emonitor_buttonState = 0;
 uint8 Emonitor_requestState = 0;
 uint8 Emonitor_connectionStatus = 1;
 
-uint32 Emonitor_resetTimeoutCounter = 0;
+sint32 Emonitor_connectionCounter = 0;
 
-uint32 Emonitor_nodeId = 1;
+uint32 Emonitor_nodeId = 0;
 char Emonitor_url[100] = {0};
 char Emonitor_key[33] = {0};
 
@@ -54,7 +55,7 @@ char Emonitor_key[33] = {0};
 * Primitives
 \******************************************************************************/
 extern void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, char * response_headers, int body_size);
-
+extern uint32_t Emonitor_GetDefaultId(void);
 /******************************************************************************
 * Implementations
 \******************************************************************************/
@@ -93,9 +94,9 @@ void Emonitor_Init(void){
 	{
 		sprintf(Emonitor_key,"%s",DEFAULT_API_KEY);
 	}
-	if(Emonitor_nodeId == 0xFFFFFFFF)
+	if(Emonitor_nodeId == 0)
 	{
-		Emonitor_nodeId = DEFAULT_NODE_ID;
+		Emonitor_nodeId = Emonitor_GetDefaultId();
 	}
 }
 
@@ -270,13 +271,28 @@ void Emonitor_Main_1000ms(void) {
 	//Check connections status
 	if(Emonitor_connectionStatus == 0)
 	{
-		Emonitor_resetTimeoutCounter = 0;
+		Emonitor_connectionCounter = Emonitor_connectionCounter +1;
+
+		if(Emonitor_connectionCounter == TIMEOUT_TURNOFF_APP)
+		{
+			//Turn off AccesPoint
+			Wifi_Manager_EnableHotspot(0);
+			NvM_RequestSave();
+		}
+
 	}
 	else
 	{
-		Emonitor_resetTimeoutCounter = Emonitor_resetTimeoutCounter + 1;
+		Emonitor_connectionCounter = Emonitor_connectionCounter - 1;
+
+		if(Emonitor_connectionCounter == -TIMEOUT_TURNON_AP)
+		{
+			//Turn on AccesPoint
+			Wifi_Manager_EnableHotspot(1);
+			NvM_RequestSave();
+		}
 		//Check if too long no successfull send was performed
-		if(Emonitor_resetTimeoutCounter > 1800)
+		if(Emonitor_connectionCounter < -TIMEOUT_RESET_NO_COMM)
 		{
 			Emonitor_requestState = 3;
 		}
@@ -330,4 +346,18 @@ void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, 
 	}
 }
 
+uint32_t Emonitor_GetDefaultId(void)
+{
+	char buffer[64];
+	spiffs* fs = spiffs_get_fs();
+	spiffs_file fd;
+	fd = SPIFFS_open(fs, "/id", SPIFFS_RDONLY, 0);
+	SPIFFS_read(fs, fd, (u8_t *)buffer, 64);
+	SPIFFS_close(fs, fd);
+
+	char *ret;
+    ret = strchr((const char *)buffer, '_');
+
+	return( (((uint32)ret[1]-'0')*1000) + (((uint32)ret[2]-'0')*100) + (((uint32)ret[3]-'0')*10) + ((uint32)ret[4]-'0') );
+}
 

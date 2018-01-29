@@ -26,15 +26,11 @@
 #define __USER_CONFIG_H__
 
 //WIFI
-#define STA_SSID "BOCI"
-#define STA_PASSWORD "fucking6"
-
-#define AP_SSID "Emonitor_0000"
-#define AP_PASSWORD "fucking6"
+#define DEFAULT_STA_SSID "BOCI"
+#define DEFAULT_STA_PASSWORD "fucking6"
 
 #define DEFAULT_SERVER_ADDRESS 	"http://v9.emonitor.hu"
 #define DEFAULT_API_KEY 		"97d3e42a841ea6c219582211313d5051"
-#define DEFAULT_NODE_ID 		2
 
 //NvM
 #define EMONITOR_PARAM_START_SEC		0x8D
@@ -58,6 +54,11 @@
 #define ONEWIRE_BUS		D1
 #define PULSE_INPUT0    D2
 #define FLASH_BUTTON    D3
+
+//Emonitor
+#define TIMEOUT_TURNON_AP 	43200
+#define TIMEOUT_RESET_NO_COMM 43200*2
+#define TIMEOUT_TURNOFF_APP 43200*2
 
 #endif
 
