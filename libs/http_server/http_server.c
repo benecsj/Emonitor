@@ -4,13 +4,13 @@
 #include "httpd.h"
 #include "httpdespfs.h"
 
-int tplCounter(HttpdConnData *connData, char *token, void **arg);
+int Http_Server_TokenProcessor(HttpdConnData *connData, char *token, void **arg);
 
 
 HttpdBuiltInUrl builtInUrls[]={
 	{"*", cgiRedirectApClientToHostname, "esp8266.nonet"},
 	{"/", cgiRedirect, "/index.html"},
-	{"/index.html", cgiEspFsTemplate, tplCounter},
+	{"/index.html", cgiEspFsTemplate, Http_Server_TokenProcessor},
 
 	{"/wifi", cgiRedirect, "/wifi/wifi.tpl"},
 	{"/wifi/", cgiRedirect, "/wifi/wifi.tpl"},
@@ -28,17 +28,15 @@ void Http_Server_Init(void)
 	DBG_HTTPS("(HS) Http_Server_Init FINISH\n");
 }
 
-static long hitCounter=0;
-
 //Template code for the counter on the index page.
-int ICACHE_FLASH_ATTR tplCounter(HttpdConnData *connData, char *token, void **arg) {
+int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *token, void **arg) {
 	char buff[128];
+	int len;
 	if (token==NULL) return HTTPD_CGI_DONE;
 
-	if (strcmp(token, "counter")==0) {
-		hitCounter++;
-		sprintf(buff, "%ld", hitCounter);
+	if (strcmp(token, "test")==0) {
+		len = sprintf(buff, "%s", "HELLO");
 	}
-	httpdSend(connData, buff, -1);
+	httpdSend(connData, buff, len);
 	return HTTPD_CGI_DONE;
 }
