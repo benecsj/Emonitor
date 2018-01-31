@@ -162,7 +162,7 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 
 		if(returnValue == HTTPD_CGI_DONE)
 		{
-			len = SPIFFS_read(fs, tpd->file, (u8_t *)buff, HTTPD_MAX_FILE_READ_BLOCK);
+			len = SPIFFS_read(fs, tpd->file, (u8_t *)buff, HTTPD_MAX_FILE_READ_BLOCK-300);
 			DBG_HTTPS("(HS) SPIFFS_read  [%d]\n",len);
 			if (len>0) {
 				sp=0;
@@ -201,13 +201,14 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 			}
 			//Send remaining bit.
 			if (sp!=0) httpdSend(connData, e, sp);
-			if (len!=HTTPD_MAX_FILE_READ_BLOCK) {
+			if (len!=HTTPD_MAX_FILE_READ_BLOCK-300) {
 				//We're done.
 				((TplCallback)(connData->cgiArg))(connData, NULL, &tpd->tplArg);
 				SPIFFS_close(fs, tpd->file);
 				tpd->file = -1;
 			} else {
 				//Ok, till next time.
+				DBG_HTTPS("(HS) HTTPD_CGI_MORE\n");
 				returnValue = HTTPD_CGI_MORE;
 			}
 		}

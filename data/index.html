@@ -108,7 +108,7 @@ select.left {
 
 <header><title>Emonitor</title></header>
 <body>
-<h1>Emonitor_1234 %test%</h1>
+<h1>Emonitor_%emon_id%</h1>
 <img class="centered" src="emonitor.png">
  
     <form action="/index.html">
@@ -116,48 +116,49 @@ select.left {
 <div class="block">
 <div class="centerText">Wifi connection</div>
         <div>
-          <label for="ssid">SSID:</label> <input type="text" id="ssid" name="sta_ssid" value="BOCI">
+          <label for="ssid">SSID:</label> <input type="text" id="ssid" name="sta_ssid" value="%sta_ssid%">
         </div>
         <div>
-          <label for="pass">Password:</label> <input type="password" id="pass" name="sta_pass"  value="********">
+          <label for="pass">Password:</label> <input type="password" id="pass" name="sta_pass"  value="%sta_pass%">
         </div>
 </div>
 
 <div class="block">
 <div class="centerText">Emoncms</div>
         <div>
-          <label for="key">Key:</label> <textarea id="key" name="emon_key">97d3e42a841ea6c219582211313d5051</textarea>
+          <label for="key">Key:</label> <textarea id="key" name="emon_key">%emon_key%</textarea>
         </div>
         <div>
-          <label for="url">URL:</label> <input type="text" id="url" name="emon_url" value="http://v9.emonitor.hu">
+          <label for="url">URL:</label> <input type="text" id="url" name="emon_url" value="%emon_url%">
         </div>
+<!--#########################################################################################################-->
         <div>
-          <label for="node">Node Id:</label> <input type="number" id="node" name="emon_id"  value="1234">
+          <label for="node">Node Id:</label> <input type="number" id="node" name="emon_id"  value="%emon_id%">
         </div>
 </div>
 
 <div class="block">
 <div class="centerText">Accespoint</div>
         <div>
-          <label for="ssid">SSID:</label> <input type="text" id="ssid" name="ap_ssid" value="Emonitor_1234">
+          <label for="ssid">SSID:</label> <input type="text" id="ssid" name="ap_ssid" value="%ap_ssid%">
         </div>
         <div>
           <label for="auth">Auth.:</label>
 <select name="ap_auth" id="auth">
-<option value ="none">None</option>
-<option value ="wep">WEP</option>
-<option value ="wpa">WPA_PSK</option>
-<option value ="wpa2" selected>WPA2_PSK</option>
+<option value ="none" %ap_auth_none%>None</option>
+<option value ="wep" %ap_auth_wep%>WEP</option>
+<option value ="wpa" %ap_auth_wpa%>WPA_PSK</option>
+<option value ="wpa2" %ap_auth_wp2%>WPA2_PSK</option>
 </select> 
         </div>
         <div>
-          <label for="pass">Password:</label> <input type="text" id="pass" name="ap_pass"  value="12345678">
+          <label for="pass">Password:</label> <input type="text" id="pass" name="ap_pass"  value="%ap_pass%">
         </div>
         <div>
           <label for="power">Power:</label>
 <select name="ap_en" id="power">
-<option value ="off">Off</option>
-<option value ="on" selected>On</option>
+<option value ="off" %ap_off%>Off</option>
+<option value ="on" %ap_on%>On</option>
 </select> 
         </div>
 </div>
