@@ -5,6 +5,7 @@
 #include "httpdespfs.h"
 
 #include "Wifi_Manager.h"
+#include "Emonitor.h"
 
 int Http_Server_TokenProcessor(HttpdConnData *connData, char *token, void **arg);
 
@@ -57,38 +58,44 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 
 	//EMONCMS KEY
 	else if (strcmp(token, "emon_key")==0) {
-		len = sprintf(buff, "%s", "97d3e42a841ea6c219582211313d5051");
+		len = sprintf(buff, "%s", Emonitor_GetKey());
 	}
+
+	//EMONCMS URL
 	else if (strcmp(token, "emon_url")==0) {
-		len = sprintf(buff, "%s", "http://v9.emonitor.hu");
+		len = sprintf(buff, "%s", Emonitor_GetUrl());
 	}
+
+	//EMONCMS NODE ID
 	else if (strcmp(token, "emon_id")==0) {
-		len = sprintf(buff, "%s", "1234");
+		len = sprintf(buff, "%d", Emonitor_GetNodeId());
 	}
+
+	//ACCESS POINT SSID
 	else if (strcmp(token, "ap_ssid")==0) {
-		len = sprintf(buff, "%s", "Emonitor_1234");
+		len = sprintf(buff, "%s", Wifi_Manager_GetAP_SSID());
 	}
-	else if (strcmp(token, "ap_auth_none")==0) {
-		len = sprintf(buff, "%s", "");
-	}
-	else if (strcmp(token, "ap_auth_wep")==0) {
-		len = sprintf(buff, "%s", "");
-	}
-	else if (strcmp(token, "ap_auth_wpa")==0) {
-		len = sprintf(buff, "%s", "");
-	}
-	else if (strcmp(token, "ap_auth_wp2")==0) {
-		len = sprintf(buff, "%s", "selected");
-	}
+
+	//ACCESS POINT PASSWORD
 	else if (strcmp(token, "ap_pass")==0) {
-		len = sprintf(buff, "%s", "12345678");
+		len = sprintf(buff, "%s", Wifi_Manager_GetAP_PASSWORD());
 	}
+
+	//ENABLE HOTSPOT
 	else if (strcmp(token, "ap_on")==0) {
+		if(Wifi_Manager_GetEnableHotspot() == 1)
+		{
 		len = sprintf(buff, "%s", "selected");
+		}
 	}
 	else if (strcmp(token, "ap_off")==0) {
-		len = sprintf(buff, "%s", "");
+		if(Wifi_Manager_GetEnableHotspot() == 0)
+		{
+		len = sprintf(buff, "%s", "selected");
+		}
 	}
+
+
 	buff[len] = 0;
 	printf("(HS) Fetch token [%s][%s]\n",token,buff);
 	httpdSend(connData, buff, -1);

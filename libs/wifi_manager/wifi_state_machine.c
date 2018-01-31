@@ -210,20 +210,34 @@ bool ICACHE_FLASH_ATTR start_wifi_ap(const char * ssid, const char * pass){
             return false;
         }
     }
-    if(!ssid){
+    //Check ssid parameter
+    if((ssid == NULL) || (strlen(ssid)==0) )
+    {
         os_printf("No SSID Given. Will start the AP saved in flash\n");
         return true;
     }
+
+    //Create struct for config
     struct softap_config config;
     bzero(&config, sizeof(struct softap_config));
+    //Set SSID
     sprintf(config.ssid, ssid);
-    if(pass){
+    //Set PASSWORD
+    if((pass != NULL) && (strlen(pass)>0))
+    {
         sprintf(config.password, pass);
         config.authmode = AUTH_WPA_WPA2_PSK;
-        config.max_connection = 4;
-        config.ssid_hidden = FALSE;
-        config.beacon_interval = 1000;
     }
+    else
+    {
+    	config.password[0] = 0;
+    	config.authmode = AUTH_OPEN;
+    }
+
+    config.max_connection = 4;
+    config.ssid_hidden = FALSE;
+    config.beacon_interval = 1000;
+
 
     wifi_softap_set_config_current(&config);
     wifi_set_opmode(STATIONAP_MODE);

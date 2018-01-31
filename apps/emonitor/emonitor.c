@@ -112,8 +112,11 @@ void Emonitor_Main_1ms(void) {
 	switch(Emonitor_buttonState)
 	{
 	case 0:
-		Emonitor_statusCounter= (Emonitor_statusCounter+1)%2;
-		ledValue = Emonitor_statusCounter | Emonitor_ledControl;
+
+		//Emonitor_statusCounter= (Emonitor_statusCounter+1)%2;
+		//ledValue = Emonitor_statusCounter | Emonitor_ledControl;
+		Emonitor_statusCounter= (Emonitor_statusCounter+1)%1000;
+		ledValue = (Emonitor_statusCounter <998) | Emonitor_ledControl;
 		break;
 	case 1:
 		Emonitor_statusCounter= (Emonitor_statusCounter+1)%1000;
