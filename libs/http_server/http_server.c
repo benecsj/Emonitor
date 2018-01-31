@@ -14,6 +14,7 @@ HttpdBuiltInUrl builtInUrls[]={
 	{"*", cgiRedirectApClientToHostname, "esp8266.nonet"},
 	{"/", cgiRedirect, "/index.html"},
 	{"/index.html", cgiEspFsTemplate, Http_Server_TokenProcessor},
+	{"/wait.html", cgiEspFsTemplate, Http_Server_TokenProcessor},
 
 	{"/wifi", cgiRedirect, "/wifi/wifi.tpl"},
 	{"/wifi/", cgiRedirect, "/wifi/wifi.tpl"},
