@@ -4,6 +4,8 @@
 #include "httpd.h"
 #include "httpdespfs.h"
 
+#include "Wifi_Manager.h"
+
 int Http_Server_TokenProcessor(HttpdConnData *connData, char *token, void **arg);
 
 
@@ -32,14 +34,28 @@ void Http_Server_Init(void)
 int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *token, void **arg) {
 	char buff[128];
 	int len = 0;
+	int i,temp;
+
+
 	if (token==NULL) return HTTPD_CGI_DONE;
 
+	//STA SSID
 	if (strcmp(token, "sta_ssid")==0) {
-		len = sprintf(buff, "%s", "BOCI");
+		len = sprintf(buff, "%s", Wifi_Manager_GetSTA_SSID());
 	}
+
+	//STA PASSWORD
 	else if (strcmp(token, "sta_pass")==0) {
-		len = sprintf(buff, "%s", "********");
+		temp = strlen(Wifi_Manager_GetSTA_PASSWORD());
+		for(i = 0 ; i < temp ; i++)
+		{
+			buff[i] = '*';
+		}
+		buff[i] = 0;
+		len = i;
 	}
+
+	//EMONCMS KEY
 	else if (strcmp(token, "emon_key")==0) {
 		len = sprintf(buff, "%s", "97d3e42a841ea6c219582211313d5051");
 	}

@@ -3,10 +3,6 @@
 #include "Wifi_Manager.h"
 #include "spiffs_manager.h"
 
-
-
-uint8 WifiManager_enableHotspot = 1;
-
 LOCAL void ICACHE_FLASH_ATTR on_wifi_connect(){
     os_printf("Connected\n");
     //Store current ip address
@@ -17,6 +13,7 @@ LOCAL void ICACHE_FLASH_ATTR on_wifi_disconnect(uint8 reason){
     os_printf("Disconnect %d\n", reason);
 }
 
+uint8 WifiManager_enableHotspot = 1;
 char WifiManager_STA_SSID[32] = {0};
 char WifiManager_STA_PASSWORD[64] = {0};
 char WifiManager_AP_SSID[32] = {0};
@@ -26,15 +23,16 @@ void Wifi_Manager_Init(void)
 {
 	//Verify Parameters
 	uint8 textLength = 0;
+	uint8 length;
 	textLength = strlen(WifiManager_STA_SSID);
 	if((textLength == 0) || (textLength>=32))
 	{
-		sprintf(WifiManager_STA_SSID,"%s",DEFAULT_STA_SSID);
+		Wifi_Manager_SetSTA_SSID(DEFAULT_STA_SSID);
 	}
 	textLength = strlen(WifiManager_STA_PASSWORD);
 	if((textLength == 0) || (textLength>=64))
 	{
-		sprintf(WifiManager_STA_PASSWORD,"%s",DEFAULT_STA_PASSWORD);
+		Wifi_Manager_SetSTA_PASSWORD(DEFAULT_STA_PASSWORD);
 	}
 	textLength = strlen(WifiManager_AP_SSID);
 	if((textLength == 0) || (textLength>=32))
