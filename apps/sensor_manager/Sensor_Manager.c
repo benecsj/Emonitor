@@ -33,8 +33,8 @@
 #define Sensor_Manager_INVALID_TEMP 0
 #define Sensor_Manager_MAX_RETRY_COUNT 2   //6
 
-//#define DBG_SENSOR(...) printf(__VA_ARGS__)
-#define DBG_SENSOR(...)
+#define DBG_SENSOR(...) printf(__VA_ARGS__)
+//#define DBG_SENSOR(...)
 
 /**********************************************************************************
  * Variables
@@ -133,13 +133,12 @@ void Sensor_Manager_Main() {
     }
     //Report comm pass
     APP_REPORT_COMM_PASS();
-    DBG_SENSOR("(SensMan)Main\n");
     for(i=0;i<SENSOR_MANAGER_DS18B20Count;i++)
     {
-    	DBG_SENSOR("(SensMan)%d- %d.%dC - %x%x%x%x%x%x%x%x\n",i,SENSOR_MANAGER_DS18B20TempList[i]/10,SENSOR_MANAGER_DS18B20TempList[i]%10,Sensor_Manager_sensorIDs[(i*8)+0],Sensor_Manager_sensorIDs[(i*8)+1],Sensor_Manager_sensorIDs[(i*8)+2],Sensor_Manager_sensorIDs[(i*8)+3],Sensor_Manager_sensorIDs[(i*8)+4],Sensor_Manager_sensorIDs[(i*8)+5],Sensor_Manager_sensorIDs[(i*8)+6],Sensor_Manager_sensorIDs[(i*8)+7]);
+    	DBG_SENSOR("(SensMan)(%d)%d- %d.%dC - %x%x%x%x%x%x%x%x\n",i,Sensor_Manager_sensorChannels[i],SENSOR_MANAGER_DS18B20TempList[i]/10,SENSOR_MANAGER_DS18B20TempList[i]%10,Sensor_Manager_sensorIDs[(i*8)+0],Sensor_Manager_sensorIDs[(i*8)+1],Sensor_Manager_sensorIDs[(i*8)+2],Sensor_Manager_sensorIDs[(i*8)+3],Sensor_Manager_sensorIDs[(i*8)+4],Sensor_Manager_sensorIDs[(i*8)+5],Sensor_Manager_sensorIDs[(i*8)+6],Sensor_Manager_sensorIDs[(i*8)+7]);
     }
 
-    DBG_SENSOR("(SensMan)D5:%d D6:%d D7:%d D8:%d \n",digitalRead(D5),digitalRead(D6),digitalRead(D7),digitalRead(D8));
+    DBG_SENSOR("(SensMan)I0:%d I1:%d I2:%d I3:%d \n",digitalRead(PULSE_INPUT0),digitalRead(PULSE_INPUT1),digitalRead(PULSE_INPUT2),digitalRead(PULSE_INPUT3));
 
 }
 
@@ -210,7 +209,7 @@ void Sensor_Manager_UpdateSensors(void) {
 
         APP_REPORT_FAIL();
 
-        DBG_SENSOR("(SensMan)Sensors found: %d\r\n", Sensor_Manager_Count);
+        DBG_SENSOR("(SensMan)Sensors found: %d\n", Sensor_Manager_Count);
 
         //Block preemption
         //APP_ENTER_CRITICAL();
@@ -271,26 +270,26 @@ uint8 SENSOR_MANAGER_DS18B20_Search(void) {
         D18_DS18B20_FindSensor(&diff, &id[0]);
         //Check if has presence error
         if (diff == OWP_CONST_PRESENCE_ERR) {
-            DBG_SENSOR("(SensMan)No sensor found\r\n");
+            DBG_SENSOR("(SensMan)No sensor found\n");
             //Report comm fail
             APP_REPORT_COMM_FAIL();
         }//Check if has data error
         else if (diff == OWP_CONST_DATA_ERR) {
-            DBG_SENSOR("(SensMan)Bus error\r\n");
+            DBG_SENSOR("(SensMan)Bus error\n");
             //Report comm fail
             APP_REPORT_COMM_FAIL();
             //Stop search
             break;
         }//Check if has id error
         else if (id[0] != 0x28) {
-            DBG_SENSOR("(SensMan)Id error\r\n");
+            DBG_SENSOR("(SensMan)Id error\n");
             //Report comm fail
             APP_REPORT_COMM_FAIL();
             //Stop search
             break;
         }// Check ROM CRC
         else if (CRC_crc8(id, (OWP_CONST_ROMCODE_SIZE - 1), 0) != id[(OWP_CONST_ROMCODE_SIZE - 1)]) {
-            DBG_SENSOR("(SensMan)ROM crc error\r\n");
+            DBG_SENSOR("(SensMan)ROM crc error\n");
             //Report comm fail
             APP_REPORT_COMM_FAIL();
             //Stop search
@@ -306,20 +305,21 @@ uint8 SENSOR_MANAGER_DS18B20_Search(void) {
                 Sensor_Manager_sensorIDsTEMP[Sensor_Manager_Offset + j] = id[j];
             }
             //Store found sensor channel
-            Sensor_Manager_sensorChannelsTEMP[CS_nSensors] = OWP_GetChannel();
+            Sensor_Manager_sensorChannelsTEMP[CS_nSensors] = OneWireChannel;
+            DBG_SENSOR("(SensMan)Sensor found: Ch(%d) Id:(%x%x%x)\n",OneWireChannel,Sensor_Manager_sensorIDsTEMP[0],Sensor_Manager_sensorIDsTEMP[1],Sensor_Manager_sensorIDsTEMP[2]);
             //Increment sensor count
             CS_nSensors++;
         }
 
         //Check if last sensor found on oneWireChannel
         if ((diff == OWP_CONST_LAST_DEVICE) || (diff == OWP_CONST_PRESENCE_ERR)) {
+            //Next channel
+            OneWireChannel++;
             //Check if OneWire channel to search on
             if (OneWireChannel < OWP_CHANNELS_COUNT) {
-                //Next channel
-                OneWireChannel++;
                 //Don't stop search
                 diff = OWP_CONST_SEARCH_FIRST;
-                DBG_SENSOR("(SensMan)Search on channel: %d\r\n", OneWireChannel);
+                DBG_SENSOR("(SensMan)Search on channel: %d\n", OneWireChannel);
             }
             else
             {
