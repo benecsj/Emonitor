@@ -2,6 +2,8 @@
 #include "wifi_state_machine.h"
 
 
+#define DBG_WM(...) printf(__VA_ARGS__)
+//#define DBG_WM(...)
 
 
 extern void Wifi_Manager_Init(void);
@@ -17,17 +19,17 @@ extern void Wifi_Manager_GetDefaultValues(char* id, char * pass);
 
 
 extern uint8 WifiManager_enableHotspot;
-extern char WifiManager_STA_SSID[32];
-extern char WifiManager_STA_PASSWORD[64];
-extern char WifiManager_AP_SSID[32];
-extern char WifiManager_AP_PASSWORD[64];
+extern char WifiManager_STA_SSID[33];
+extern char WifiManager_STA_PASSWORD[65];
+extern char WifiManager_AP_SSID[33];
+extern char WifiManager_AP_PASSWORD[65];
 
 #define Wifi_Manager_GetEnableHotspot()  (WifiManager_enableHotspot)
 #define Wifi_Manager_SetEnableHotspot(a)  (WifiManager_enableHotspot = a)
 #define Wifi_Manager_GetSTA_SSID()	(WifiManager_STA_SSID)
 #define Wifi_Manager_SetSTA_SSID(a)	WifiManager_STA_SSID[sprintf(WifiManager_STA_SSID,"%s",a)]=0;
 #define Wifi_Manager_GetSTA_PASSWORD()	(WifiManager_STA_PASSWORD)
-#define Wifi_Manager_SetSTA_PASSWORD(a)	WifiManager_STA_PASSWORD[WifiManager_STA_PASSWORD,sprintf("%s",a)]=0;
+#define Wifi_Manager_SetSTA_PASSWORD(a)	WifiManager_STA_PASSWORD[sprintf(WifiManager_STA_PASSWORD,"%s",a)]=0;
 #define Wifi_Manager_GetAP_SSID()	(WifiManager_AP_SSID)
 #define Wifi_Manager_SetAP_SSID(a)	WifiManager_AP_SSID[sprintf(WifiManager_AP_SSID,"%s",a)]=0;
 #define Wifi_Manager_GetAP_PASSWORD()	(WifiManager_AP_PASSWORD)

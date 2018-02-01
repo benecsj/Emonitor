@@ -41,7 +41,7 @@ void set_on_client_disconnect(wifi_state_cb_t cb);
 WIFI_MODE init_esp_wifi();
 bool start_wifi_station(const char * ssid, const char * pass);
 bool stop_wifi_station();
-bool start_wifi_ap(const char * ssid, const char * pass);
+bool start_wifi_ap(const char * ssid, const char * pass, uint8 hidden);
 bool stop_wifi_ap();
 
 bool wifi_station_connected();

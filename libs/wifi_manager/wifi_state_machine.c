@@ -201,7 +201,7 @@ bool ICACHE_FLASH_ATTR stop_wifi_station(){
     return true;
 }
 
-bool ICACHE_FLASH_ATTR start_wifi_ap(const char * ssid, const char * pass){
+bool ICACHE_FLASH_ATTR start_wifi_ap(const char * ssid, const char * pass, uint8 hidden){
     WIFI_MODE mode = wifi_get_opmode();
     if((mode & SOFTAP_MODE) == 0){
         mode |= SOFTAP_MODE;
@@ -233,10 +233,20 @@ bool ICACHE_FLASH_ATTR start_wifi_ap(const char * ssid, const char * pass){
     	config.password[0] = 0;
     	config.authmode = AUTH_OPEN;
     }
+    if(hidden == 1)
+    {
+        config.max_connection = 0;
+        config.ssid_hidden = TRUE;
+        config.beacon_interval = 60000;
+    }
+    else
+    {
+        config.max_connection = 4;
+        config.ssid_hidden = FALSE;
+        config.beacon_interval = 1000;
+    }
 
-    config.max_connection = 4;
-    config.ssid_hidden = FALSE;
-    config.beacon_interval = 1000;
+
 
 
     wifi_softap_set_config_current(&config);

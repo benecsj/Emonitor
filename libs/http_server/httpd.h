@@ -96,5 +96,6 @@ void httpdRecvCb(ConnTypePtr conn, char *remIp, int remPort, char *data, unsigne
 void httpdDisconCb(ConnTypePtr conn, char *remIp, int remPort);
 int httpdConnectCb(ConnTypePtr conn, char *remIp, int remPort);
 
+extern int ICACHE_FLASH_ATTR  httpdHexVal(char c);
 
 #endif

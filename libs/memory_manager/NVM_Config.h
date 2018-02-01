@@ -18,10 +18,10 @@ extern uint8 WifiManager_enableHotspot;
 extern uint32 Emonitor_nodeId;
 extern char Emonitor_url[100];
 extern char Emonitor_key[33];
-extern char WifiManager_STA_SSID[32];
-extern char WifiManager_STA_PASSWORD[64];
-extern char WifiManager_AP_SSID[32];
-extern char WifiManager_AP_PASSWORD[64];
+extern char WifiManager_STA_SSID[33];
+extern char WifiManager_STA_PASSWORD[65];
+extern char WifiManager_AP_SSID[33];
+extern char WifiManager_AP_PASSWORD[65];
 
 
 /*DATA BLOCKS*/
@@ -33,10 +33,10 @@ extern char WifiManager_AP_PASSWORD[64];
 	NVM_DATA(Emonitor_nodeId,       sizeof(Emonitor_nodeId))\
 	NVM_DATA(Emonitor_url,       100)\
 	NVM_DATA(Emonitor_key,       33)\
-	NVM_DATA(WifiManager_STA_SSID,       64)\
-	NVM_DATA(WifiManager_STA_PASSWORD,       64)\
-	NVM_DATA(WifiManager_AP_SSID,       64)\
-	NVM_DATA(WifiManager_AP_PASSWORD,       64)\
+	NVM_DATA(WifiManager_STA_SSID,       33)\
+	NVM_DATA(WifiManager_STA_PASSWORD,       65)\
+	NVM_DATA(WifiManager_AP_SSID,       33)\
+	NVM_DATA(WifiManager_AP_PASSWORD,       65)\
 
 
 #define NVM_DATA_POS_DATA_START 16

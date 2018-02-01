@@ -48,7 +48,7 @@ sint32 Emonitor_connectionCounter = 0;
 
 uint32 Emonitor_nodeId = 0;
 char Emonitor_url[100] = {0};
-char Emonitor_key[33] = {0};
+char Emonitor_key[33] = {0xFF};
 
 
 /******************************************************************************
@@ -90,7 +90,7 @@ void Emonitor_Init(void){
 	{
 		sprintf(Emonitor_url,"%s",DEFAULT_SERVER_ADDRESS);
 	}
-	if (apiKeyLength != 32)
+	if (apiKeyLength > 32 || Emonitor_key[0] == 0xFF )
 	{
 		sprintf(Emonitor_key,"%s",DEFAULT_API_KEY);
 	}
@@ -172,6 +172,7 @@ void Emonitor_Main_1000ms(void) {
 	uint8 i;
 	uint16 length = 0;
 	char buffer[500];
+	char http[10] = {0};
 	uint8 buttonState;
 
 	uint8 tempCount;
@@ -183,7 +184,7 @@ void Emonitor_Main_1000ms(void) {
 	//Free ram and stack
 	uint32 freeRam = system_get_free_heap_size();
 	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
-	DBG("(EM) Uptime(%d) Pulse(%d) Heap:(%d) Stack:(%d)\n", Emonitor_uptime,Sensor_Manager_GetPulseCount(0),freeRam,freeStack);
+	DBG("(EM) Uptime(%d) Conn(%d) Pulse(%d) Heap:(%d) Stack:(%d)\n", Emonitor_uptime,Emonitor_connectionCounter,Sensor_Manager_GetPulseCount(0),freeRam,freeStack);
 
 	//Connection status led update
 	gpio16_output_set(Emonitor_connectionStatus | Emonitor_ledControl);
@@ -201,12 +202,17 @@ void Emonitor_Main_1000ms(void) {
 			//Check if strings have a valid length
 			uint8 urlLength = strlen(Emonitor_url);
 			uint8 apiKeyLength = strlen(Emonitor_key);
+			if(strncmp(Emonitor_url,"http://",7) != 0)
+			{
+				sprintf(http,"http://");
+			}
+
 			if ((urlLength > 4) && (apiKeyLength == 32))
 			{
 				DBG("----------------Emonitor Send Data-------------\n");
 				Sensor_Manager_Get_TempSensorData(&tempCount,&ids,&temperatures);
 				//Start of Emoncsm send Url
-				Append(length,buffer,"%s/input/post.json?node=%d&json={",Emonitor_url,Emonitor_nodeId);
+				Append(length,buffer,"%s%s/input/post.json?node=%d&json={",http,Emonitor_url,Emonitor_nodeId);
 				//Add freeram
 				Append(length,buffer,"freeram:%d,",freeRam);
 				//Add pulse counters
@@ -251,7 +257,7 @@ void Emonitor_Main_1000ms(void) {
 			switch(Emonitor_requestState)
 			{
 			case 1:
-				DBG("ENABLE HOTSPOT\n");
+				DBG("(EM) ENABLE HOTSPOT\n");
 				Wifi_Manager_EnableHotspot(1);
 				NvM_RequestSave();
 				//Clear processed request
@@ -260,7 +266,7 @@ void Emonitor_Main_1000ms(void) {
 				taskEXIT_CRITICAL();
 				break;
 			case 2:
-				DBG("FACTORY RESET\n");
+				DBG("(EM) FACTORY RESET\n");
 				NvM_RequestClear();
 				//Enter shutdown request
 				taskENTER_CRITICAL();
@@ -278,9 +284,15 @@ void Emonitor_Main_1000ms(void) {
 
 		if(Emonitor_connectionCounter == TIMEOUT_TURNOFF_APP)
 		{
-			//Turn off AccesPoint
-			Wifi_Manager_EnableHotspot(0);
-			NvM_RequestSave();
+			//Check if it turned on
+			if(Wifi_Manager_GetEnableHotspot() == 1)
+			{
+				DBG("(EM) COMM OK DISABLE HOTSPOT\n");
+				//Turn off AccesPoint
+				Wifi_Manager_EnableHotspot(0);
+				NvM_RequestSave();
+				Emonitor_requestState = 3;
+			}
 		}
 
 	}
@@ -290,15 +302,31 @@ void Emonitor_Main_1000ms(void) {
 
 		if(Emonitor_connectionCounter == -TIMEOUT_TURNON_AP)
 		{
-			//Turn on AccesPoint
-			Wifi_Manager_EnableHotspot(1);
-			NvM_RequestSave();
+			//Check if it turned off
+			if(Wifi_Manager_GetEnableHotspot() == 0)
+			{
+				DBG("(EM) COMM TIMEOUT ENABLE HOTSPOT\n");
+				//Turn on AccesPoint
+				Wifi_Manager_EnableHotspot(1);
+				NvM_RequestSave();
+				Emonitor_requestState = 3;
+			}
 		}
 		//Check if too long no successfull send was performed
 		if(Emonitor_connectionCounter < -TIMEOUT_RESET_NO_COMM)
 		{
+			DBG("(EM) COMM TIMEOUT RESET\n");
 			Emonitor_requestState = 3;
 		}
+	}
+
+	//Save was requested
+	if(Emonitor_requestState == 4)
+	{
+		DBG("(EM) SAVE REQUESTED\n");
+		NvM_RequestSave();
+		//Change to reset request
+		Emonitor_requestState = 3;
 	}
 
 	//In a shutdown state
@@ -307,6 +335,8 @@ void Emonitor_Main_1000ms(void) {
 		//Wait until NvM is done
 		if(NvM_IsBusy() == FALSE)
 		{
+			DBG("(EM) ###################################\n");
+			DBG("(EM) ###################################\n");
 			//Trigger reset
 			taskENTER_CRITICAL();
 			while(1)
