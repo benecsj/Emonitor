@@ -33,8 +33,8 @@
 #define Sensor_Manager_INVALID_TEMP 0
 #define Sensor_Manager_MAX_RETRY_COUNT 2   //6
 
-//#define DBG_SENSOR(...) printf(__VA_ARGS__)
-#define DBG_SENSOR(...)
+#define DBG_SENSOR(...) printf(__VA_ARGS__)
+//#define DBG_SENSOR(...)
 
 /**********************************************************************************
  * Variables
@@ -58,15 +58,41 @@ uint32 Sensor_Manager_PulseCounters[SENSOR_MANAGER_PULSE_COUNTERS] = {};
 uint8 SENSOR_MANAGER_DS18B20_Search(void);
 void SENSOR_MANAGER_DS18B20Measure(void);
 void Sensor_Manager_UpdateSensors(void);
+
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 0)
 void Sensor_Manager_PulseCounter0(void);
+#endif
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 1)
+void Sensor_Manager_PulseCounter1(void);
+#endif
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 2)
+void Sensor_Manager_PulseCounter2(void);
+#endif
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 3)
+void Sensor_Manager_PulseCounter3(void);
+#endif
 /**********************************************************************************
  * Functions
  **********************************************************************************/
 
 void Sensor_Manager_Init() {
 	//Pulse counter input
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 0)
 	pinMode(PULSE_INPUT0,INPUT);
 	attachInterrupt(PULSE_INPUT0,Sensor_Manager_PulseCounter0,RISING);
+#endif
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 1)
+	pinMode(PULSE_INPUT1,INPUT);
+	attachInterrupt(PULSE_INPUT1,Sensor_Manager_PulseCounter1,RISING);
+#endif
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 2)
+	pinMode(PULSE_INPUT2,INPUT);
+	attachInterrupt(PULSE_INPUT2,Sensor_Manager_PulseCounter2,RISING);
+#endif
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 3)
+	pinMode(PULSE_INPUT3,INPUT);
+	attachInterrupt(PULSE_INPUT3,Sensor_Manager_PulseCounter3,RISING);
+#endif
 	//Init pulse counters
 	Sensor_Manager_ResetPulseCounters();
 
@@ -79,6 +105,7 @@ void Sensor_Manager_Init() {
     }
     //Search for sensors
     Sensor_Manager_UpdateSensors();
+
 }
 
 void Sensor_Manager_Fast() {
@@ -112,12 +139,36 @@ void Sensor_Manager_Main() {
     	DBG_SENSOR("(SensMan)%d- %d.%dC - %x%x%x%x%x%x%x%x\n",i,SENSOR_MANAGER_DS18B20TempList[i]/10,SENSOR_MANAGER_DS18B20TempList[i]%10,Sensor_Manager_sensorIDs[(i*8)+0],Sensor_Manager_sensorIDs[(i*8)+1],Sensor_Manager_sensorIDs[(i*8)+2],Sensor_Manager_sensorIDs[(i*8)+3],Sensor_Manager_sensorIDs[(i*8)+4],Sensor_Manager_sensorIDs[(i*8)+5],Sensor_Manager_sensorIDs[(i*8)+6],Sensor_Manager_sensorIDs[(i*8)+7]);
     }
 
+    DBG_SENSOR("(SensMan)D5:%d D6:%d D7:%d D8:%d \n",digitalRead(D5),digitalRead(D6),digitalRead(D7),digitalRead(D8));
+
 }
 
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 0)
 void Sensor_Manager_PulseCounter0(void)
 {
+	PortDisableInt_NoNest();
 	Sensor_Manager_PulseCounters[0]++;
+	PortEnableInt_NoNest();
 }
+#endif
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 1)
+void Sensor_Manager_PulseCounter1(void)
+{
+	Sensor_Manager_PulseCounters[1]++;
+}
+#endif
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 2)
+void Sensor_Manager_PulseCounter2(void)
+{
+	Sensor_Manager_PulseCounters[2]++;
+}
+#endif
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 3)
+void Sensor_Manager_PulseCounter3(void)
+{
+	Sensor_Manager_PulseCounters[3]++;
+}
+#endif
 
 uint32 Sensor_Manager_GetPulseCount(uint8 id)
 {

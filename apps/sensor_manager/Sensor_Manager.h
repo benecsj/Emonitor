@@ -20,7 +20,7 @@
  **********************************************************************************/
 #define SENSOR_MANAGER_ANALOGCHANNELS_COUNT 1
 #define SENSOR_MANAGER_DS18B20MAXCOUNT 16
-#define SENSOR_MANAGER_PULSE_COUNTERS 1
+#define SENSOR_MANAGER_PULSE_COUNTERS 4
 
 /**********************************************************************************
  * Interfaces

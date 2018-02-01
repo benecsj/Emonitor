@@ -50,9 +50,12 @@
 #define CACHE_BUF_SIZE      (LOG_PAGE + 32)*8
 
 #define LED_BUILTIN		D0
-#define LED2_BUILTIN	D4
+#define LED2_BUILTIN	D4   //D4
 #define ONEWIRE_BUS		D1
-#define PULSE_INPUT0    D2
+#define PULSE_INPUT0    D5
+#define PULSE_INPUT1    D6
+#define PULSE_INPUT2    D7
+#define PULSE_INPUT3    D8
 #define FLASH_BUTTON    D3
 
 //Emonitor

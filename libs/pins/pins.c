@@ -39,6 +39,14 @@ static const uint32 g_pin_funcs[PINCOUNT] = {
     [3] = FUNC_GPIO3,
     [4] = FUNC_GPIO4,
     [5] = FUNC_GPIO5,
+
+    [6] = 0,
+    [7] = 0,
+    [8] = 0,
+    [9] = 0,
+    [10] = 0,
+    [11] = 0,
+
     [12] = FUNC_GPIO12,
     [13] = FUNC_GPIO13,
     [14] = FUNC_GPIO14,
@@ -90,6 +98,9 @@ extern void pinMode(uint8 pin, uint8 mode)
     }
 
     uint32 mux = g_pin_muxes[pin];
+    uint32 gpio =  g_pin_funcs[pin];
+	PIN_FUNC_SELECT(mux,gpio);
+
     if (mode == INPUT)
     {
         gpio_output_set(0, 0, 0, 1 << pin);
