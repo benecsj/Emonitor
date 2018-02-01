@@ -50,8 +50,9 @@
 #define CACHE_BUF_SIZE      (LOG_PAGE + 32)*8
 
 #define LED_BUILTIN		D0
-#define LED2_BUILTIN	D4   //D4
-#define ONEWIRE_BUS		D1
+#define LED2_BUILTIN	D4
+#define ONEWIRE_BUS_0	D1
+#define ONEWIRE_BUS_1	D2
 #define PULSE_INPUT0    D5
 #define PULSE_INPUT1    D6
 #define PULSE_INPUT2    D7
@@ -62,6 +63,9 @@
 #define TIMEOUT_TURNON_AP 		43200
 #define TIMEOUT_RESET_NO_COMM 	43200*2
 #define TIMEOUT_TURNOFF_APP 	43200*2
+
+//Sensor manager
+#define OWP_CHANNELS_COUNT 2
 
 #endif
 

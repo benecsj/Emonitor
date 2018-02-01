@@ -33,8 +33,8 @@
 #define Sensor_Manager_INVALID_TEMP 0
 #define Sensor_Manager_MAX_RETRY_COUNT 2   //6
 
-#define DBG_SENSOR(...) printf(__VA_ARGS__)
-//#define DBG_SENSOR(...)
+//#define DBG_SENSOR(...) printf(__VA_ARGS__)
+#define DBG_SENSOR(...)
 
 /**********************************************************************************
  * Variables
@@ -230,9 +230,12 @@ void Sensor_Manager_UpdateSensors(void) {
         //APP_EXIT_CRITICAL();
 
         /*Init sensors*/
+        for (i = 0; i < OWP_CHANNELS_COUNT; i++) {
+            //Select OWP channel
+            OWP_SelectChannel(i);
             //Broadcast convert message to all temp sensors
             D18_DS18B20_StartMeasure(D18_DS18B20_POWER_EXTERN, 0);
-
+        }
         vTaskDelay(500 / portTICK_RATE_MS);
         //Get temperature  values
         SENSOR_MANAGER_DS18B20Measure();
@@ -261,7 +264,10 @@ uint8 SENSOR_MANAGER_DS18B20_Search(void) {
     //Search until not last found or sensor count limit reached
     for (diff = OWP_CONST_SEARCH_FIRST;
             diff != OWP_CONST_LAST_DEVICE && CS_nSensors < SENSOR_MANAGER_DS18B20MAXCOUNT;) {
-        //Perform search operation
+        
+        //Select OWP channel
+        OWP_SelectChannel(OneWireChannel);
+	//Perform search operation
         D18_DS18B20_FindSensor(&diff, &id[0]);
         //Check if has presence error
         if (diff == OWP_CONST_PRESENCE_ERR) {
@@ -300,15 +306,26 @@ uint8 SENSOR_MANAGER_DS18B20_Search(void) {
                 Sensor_Manager_sensorIDsTEMP[Sensor_Manager_Offset + j] = id[j];
             }
             //Store found sensor channel
-            Sensor_Manager_sensorChannelsTEMP[CS_nSensors] = 0;
+            Sensor_Manager_sensorChannelsTEMP[CS_nSensors] = OWP_GetChannel();
             //Increment sensor count
             CS_nSensors++;
         }
 
         //Check if last sensor found on oneWireChannel
         if ((diff == OWP_CONST_LAST_DEVICE) || (diff == OWP_CONST_PRESENCE_ERR)) {
+            //Check if OneWire channel to search on
+            if (OneWireChannel < OWP_CHANNELS_COUNT) {
+                //Next channel
+                OneWireChannel++;
+                //Don't stop search
+                diff = OWP_CONST_SEARCH_FIRST;
+                DBG_SENSOR("(SensMan)Search on channel: %d\r\n", OneWireChannel);
+            }
+            else
+            {
                 //All channels are searched, stop
                 break;
+            }
         }
     }
     //Return found sensors count
@@ -318,14 +335,18 @@ uint8 SENSOR_MANAGER_DS18B20_Search(void) {
 void SENSOR_MANAGER_DS18B20Measure() {
     //Local variables
     uint8 subzero, cel, cel_frac_bits, i;
-
+    for (i = 0; i < OWP_CHANNELS_COUNT; i++) {
+        //Select OWP channel
+        OWP_SelectChannel(i);
         //Broadcast convert message to all temp sensors
         D18_DS18B20_StartMeasure(D18_DS18B20_POWER_EXTERN, 0);
-
+    }
     //Loop all available sensors
     for (i = 0; i < SENSOR_MANAGER_DS18B20Count; i++) {
         //Get sensor id position
         uint16 Sensor_Manager_Offset = i*OWP_CONST_ROMCODE_SIZE;
+        //Select OneWire channel where sensor is
+        OWP_SelectChannel(Sensor_Manager_sensorChannels[i]);
         //Get temperature data from sensor
         if (D18_DS18B20_ReadMeasure(&Sensor_Manager_sensorIDs[Sensor_Manager_Offset], &subzero, &cel, &cel_frac_bits) == D18_DS18B20_OK) // gSensorIDsOrdered
         {

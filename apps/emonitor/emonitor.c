@@ -185,7 +185,7 @@ void Emonitor_Main_1000ms(void) {
 	uint32 freeRam = system_get_free_heap_size();
 	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
 	DBG("(EM) Uptime(%d) Conn(%d) Heap:(%d) Stack:(%d)\n", Emonitor_uptime,Emonitor_connectionCounter,freeRam,freeStack);
-	DBG("(EM) Pulse0(%d) Pulse1(%d) Pulse2(%d) Pulse3(%d) \n",Sensor_Manager_GetPulseCount(0),Sensor_Manager_GetPulseCount(1),Sensor_Manager_GetPulseCount(2),Sensor_Manager_GetPulseCount(3));
+	//DBG("(EM) Pulse0(%d) Pulse1(%d) Pulse2(%d) Pulse3(%d) \n",Sensor_Manager_GetPulseCount(0),Sensor_Manager_GetPulseCount(1),Sensor_Manager_GetPulseCount(2),Sensor_Manager_GetPulseCount(3));
 	//Connection status led update
 	gpio16_output_set(Emonitor_connectionStatus | Emonitor_ledControl);
 

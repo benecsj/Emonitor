@@ -39,5 +39,7 @@ extern uint8 OWP_Byte_Read( void );
 extern uint8 OWP_Rom_Search( uint8 diff, uint8 *id );
 extern void OWP_Send_Command( uint8 command, uint8 *id );
 extern uint8 OWP_Read_Bus(void);
+extern void OWP_SelectChannel(uint8 channel);
+extern uint8 OWP_GetChannel(void);
 
 #endif /* OWP_ONE_WIRE_PROTOCOL_DRIVER_H_ */

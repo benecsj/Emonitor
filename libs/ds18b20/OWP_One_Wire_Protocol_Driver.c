@@ -9,7 +9,21 @@
 
 #include "esp_common.h"
 
+
+uint8 OWP_Channels[OWP_CHANNELS_COUNT]={ONEWIRE_BUS_0,ONEWIRE_BUS_1};
+uint8 OWP_Selected_Channel = 0;
+
 /*Functions*/
+void OWP_SelectChannel(uint8 channel)
+{
+    OWP_Selected_Channel = channel;
+}
+
+uint8 OWP_GetChannel(void)
+{
+    return OWP_Selected_Channel;
+}
+
 
 void OWP_Delay_us(uint32 delay)
 {

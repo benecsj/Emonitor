@@ -24,10 +24,10 @@
 //#define OWP_EXIT_CRITICAL()
 /*Port config*/
 
-#define OWP_GET_IN()   digitalRead(ONEWIRE_BUS)
-#define OWP_OUT_LOW()  digitalWrite(ONEWIRE_BUS, 0)
-#define OWP_OUT_HIGH() digitalWrite(ONEWIRE_BUS, 1)
-#define OWP_DIR_IN()   pinMode(ONEWIRE_BUS,INPUT);
-#define OWP_DIR_OUT()  pinMode(ONEWIRE_BUS,OUTPUT_OPEN_DRAIN);
+#define OWP_GET_IN()   digitalRead(OWP_Channels[OWP_Selected_Channel])
+#define OWP_OUT_LOW()  digitalWrite(OWP_Channels[OWP_Selected_Channel], 0)
+#define OWP_OUT_HIGH() digitalWrite(OWP_Channels[OWP_Selected_Channel], 1)
+#define OWP_DIR_IN()   pinMode(OWP_Channels[OWP_Selected_Channel],INPUT);
+#define OWP_DIR_OUT()  pinMode(OWP_Channels[OWP_Selected_Channel],OUTPUT_OPEN_DRAIN);
 
 #endif /* OWP_CONFIG_H_ */
