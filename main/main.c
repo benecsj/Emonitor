@@ -92,7 +92,7 @@ uint32 counter;
  * Init task
  */
 void task_Init(void *pvParameters) {
-	vTaskDelay(100 / portTICK_RATE_MS);
+	vTaskDelay(10 / portTICK_RATE_MS);
 	//Init pins handler
 	Init_Pins();
 	//Init NvM
@@ -149,6 +149,7 @@ void task_1000ms(void *pvParameters) {
  * Background task
  */
 void task_background(void *pvParameters) {
+	vTaskDelay(100 / portTICK_RATE_MS);
 	for (;;) {
 		Emonitor_Main_Background();
 	}
@@ -168,9 +169,12 @@ void user_init(void) {
 	DBG("\nSDK version:%s\n", system_get_sdk_version());
 	DBG("About to create task\r\n");
 	xTaskHandle t;
+	xTaskCreate(task_Init, "init", 1024, NULL, (configMAX_PRIORITIES-1), &t);
+	xTaskCreate(task_1000ms, "1000ms", 1024, NULL, 1, &t);
+	xTaskCreate(task_10ms, "10ms", 512, NULL, (configMAX_PRIORITIES-2), &t);
 	xTaskCreate(task_background, "bgnd", 512, NULL, 0, &t);
-	xTaskCreate(task_10ms, "10ms", 512, NULL, 0, &t);
-	xTaskCreate(task_1000ms, "1000ms", 1024, NULL, 0, &t);
-	xTaskCreate(task_Init, "init", 1024, NULL, 1, &t);
+
+
+
 }
 

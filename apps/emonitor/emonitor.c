@@ -70,20 +70,17 @@ void Emonitor_Preinit(void) {
 	//Init UART
 	UART_SetBaudrate(UART0, BIT_RATE_115200);
 	//Init Status LED
-	pinMode(LED2_BUILTIN,OUTPUT);
 	pinMode(LED_BUILTIN,OUTPUT);
+	pinMode(PULSE_INPUT3,INPUT);
 	digitalWrite(LED_BUILTIN,1);
 	//Init flash button
 	pinMode(FLASH_BUTTON,INPUT);
-	//Init timer for fast task
-    hw_timer_init();
-    hw_timer_set_func(Emonitor_Main_1ms);
-    hw_timer_arm(1000,1);
     //Disable Wifi
     init_esp_wifi();
 }
 
 void Emonitor_Init(void){
+	DBG("(EM) Emonitor_Init\n");
     //Check if has valid url and key
 	uint8 urlLength = strlen(Emonitor_url);
 	uint8 apiKeyLength = strlen(Emonitor_key);
@@ -99,6 +96,11 @@ void Emonitor_Init(void){
 	{
 		Emonitor_nodeId = Emonitor_GetDefaultId();
 	}
+	//Init timer for fast task
+    hw_timer_init();
+    hw_timer_set_func(Emonitor_Main_1ms);
+    hw_timer_arm(1000,1);
+
 }
 
 /******************************************************************************
@@ -131,7 +133,7 @@ void Emonitor_Main_1ms(void) {
 		break;
 	}
 	//Toggle led
-	digitalWrite(LED2_BUILTIN, (ledValue));
+	digitalWrite(LED_BUILTIN, (ledValue));
 
 	//Read flash button
 	Emonitor_flashButton = (digitalRead(FLASH_BUTTON) == 0);
@@ -190,7 +192,6 @@ void Emonitor_Main_1000ms(void) {
 	DBG("(EM) Uptime(%d) Conn(%d) Heap:(%d) Stack:(%d)\n", Emonitor_uptime,Emonitor_connectionCounter,freeRam,freeStack);
 	//DBG("(EM) Pulse0(%d) Pulse1(%d) Pulse2(%d) Pulse3(%d) \n",Sensor_Manager_GetPulseCount(0),Sensor_Manager_GetPulseCount(1),Sensor_Manager_GetPulseCount(2),Sensor_Manager_GetPulseCount(3));
 	//Connection status led update
-	digitalWrite(LED_BUILTIN,(Emonitor_connectionStatus | Emonitor_ledControl));
 
 	//Emonitor sending
 	Emonitor_timing++;
