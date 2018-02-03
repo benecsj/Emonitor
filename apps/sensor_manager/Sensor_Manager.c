@@ -115,7 +115,7 @@ void Sensor_Manager_Fast() {
     //Scan Adc channels
     for (CS_i = 0; CS_i < SENSOR_MANAGER_ANALOGCHANNELS_COUNT; CS_i++) {
         //Read Adc channel and store it in buffer
-        APP_PortMon_analogValues[CS_i] = 0;//ADC_ReadChannel(CS_i);
+        APP_PortMon_analogValues[CS_i] = system_adc_read();;
     }
 }
 
@@ -138,7 +138,7 @@ void Sensor_Manager_Main() {
     	DBG_SENSOR("(SensMan)(%d)%d- %d.%dC - %x%x%x%x%x%x%x%x\n",i,Sensor_Manager_sensorChannels[i],SENSOR_MANAGER_DS18B20TempList[i]/10,SENSOR_MANAGER_DS18B20TempList[i]%10,Sensor_Manager_sensorIDs[(i*8)+0],Sensor_Manager_sensorIDs[(i*8)+1],Sensor_Manager_sensorIDs[(i*8)+2],Sensor_Manager_sensorIDs[(i*8)+3],Sensor_Manager_sensorIDs[(i*8)+4],Sensor_Manager_sensorIDs[(i*8)+5],Sensor_Manager_sensorIDs[(i*8)+6],Sensor_Manager_sensorIDs[(i*8)+7]);
     }
 
-    DBG_SENSOR("(SensMan)I0:%d I1:%d I2:%d I3:%d \n",digitalRead(PULSE_INPUT0),digitalRead(PULSE_INPUT1),digitalRead(PULSE_INPUT2),digitalRead(PULSE_INPUT3));
+    DBG_SENSOR("(SensMan)I0:%d I1:%d I2:%d I3:%d  A:%d\n",digitalRead(PULSE_INPUT0),digitalRead(PULSE_INPUT1),digitalRead(PULSE_INPUT2),digitalRead(PULSE_INPUT3),APP_PortMon_analogValues[0]);
 
 }
 
