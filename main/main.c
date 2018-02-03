@@ -165,7 +165,7 @@ void user_init(void) {
 	Emonitor_Preinit();
 
 
-	DBG("SDK version:%s\n", system_get_sdk_version());
+	DBG("\nSDK version:%s\n", system_get_sdk_version());
 	DBG("About to create task\r\n");
 	xTaskHandle t;
 	xTaskCreate(task_background, "bgnd", 512, NULL, 0, &t);

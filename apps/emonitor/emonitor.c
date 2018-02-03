@@ -12,7 +12,6 @@
 #include "hw_timer.h"
 #include "pins.h"
 #include "NVM_NonVolatileMemory.h"
-#include "gpio.h"
 
 #include "httpclient.h"
 #include "Sensor_Manager.h"
@@ -72,14 +71,16 @@ void Emonitor_Preinit(void) {
 	UART_SetBaudrate(UART0, BIT_RATE_115200);
 	//Init Status LED
 	pinMode(LED2_BUILTIN,OUTPUT);
-	gpio16_output_conf();
-	gpio16_output_set(1);
+	pinMode(LED_BUILTIN,OUTPUT);
+	digitalWrite(LED_BUILTIN,1);
 	//Init flash button
 	pinMode(FLASH_BUTTON,INPUT);
 	//Init timer for fast task
     hw_timer_init();
     hw_timer_set_func(Emonitor_Main_1ms);
     hw_timer_arm(1000,1);
+    //Disable Wifi
+    init_esp_wifi();
 }
 
 void Emonitor_Init(void){
@@ -112,11 +113,13 @@ void Emonitor_Main_1ms(void) {
 	switch(Emonitor_buttonState)
 	{
 	case 0:
-
-		//Emonitor_statusCounter= (Emonitor_statusCounter+1)%2;
-		//ledValue = Emonitor_statusCounter | Emonitor_ledControl;
 		Emonitor_statusCounter= (Emonitor_statusCounter+1)%1000;
-		ledValue = (Emonitor_statusCounter <998) | Emonitor_ledControl;
+		ledValue = (Emonitor_statusCounter <998);
+		if((Emonitor_statusCounter == 800) && (Emonitor_connectionStatus == 0))
+		{
+			ledValue = 0 ;
+		}
+		ledValue = ledValue || Emonitor_ledControl;
 		break;
 	case 1:
 		Emonitor_statusCounter= (Emonitor_statusCounter+1)%1000;
@@ -187,7 +190,7 @@ void Emonitor_Main_1000ms(void) {
 	DBG("(EM) Uptime(%d) Conn(%d) Heap:(%d) Stack:(%d)\n", Emonitor_uptime,Emonitor_connectionCounter,freeRam,freeStack);
 	//DBG("(EM) Pulse0(%d) Pulse1(%d) Pulse2(%d) Pulse3(%d) \n",Sensor_Manager_GetPulseCount(0),Sensor_Manager_GetPulseCount(1),Sensor_Manager_GetPulseCount(2),Sensor_Manager_GetPulseCount(3));
 	//Connection status led update
-	gpio16_output_set(Emonitor_connectionStatus | Emonitor_ledControl);
+	digitalWrite(LED_BUILTIN,(Emonitor_connectionStatus | Emonitor_ledControl));
 
 	//Emonitor sending
 	Emonitor_timing++;

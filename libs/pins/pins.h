@@ -4,7 +4,7 @@
 #include "c_types.h"
 #include "stdint.h"
 
-#define D0
+#define D0  16
 #define D1	5
 #define D2	4
 #define D3	0
