@@ -103,6 +103,7 @@ void Emonitor_Init(void){
 
 }
 
+//#define EMONITOR_TIMING_TEST
 /******************************************************************************
  * FunctionName : Emonitor_Main_1ms
  * Description  : Emonitor Fast Main
@@ -111,6 +112,8 @@ void Emonitor_Init(void){
  *******************************************************************************/
 void Emonitor_Main_1ms(void) {
 	uint8 ledValue;
+
+#ifndef EMONITOR_TIMING_TEST
 	//Calculate led state
 	switch(Emonitor_buttonState)
 	{
@@ -132,6 +135,10 @@ void Emonitor_Main_1ms(void) {
 		ledValue = Emonitor_statusCounter <50;
 		break;
 	}
+#else
+	Emonitor_statusCounter= (Emonitor_statusCounter+1)%2;
+	ledValue = Emonitor_statusCounter == 0;
+#endif
 	//Toggle led
 	digitalWrite(LED_BUILTIN, (ledValue));
 
@@ -228,6 +235,11 @@ void Emonitor_Main_1000ms(void) {
 				for(i=0;i<tempCount;i++)
 				{
 					 Append(length,buffer,"Temp_%02X%02X%02X%02X%02X:%d.%d,",ids[(i*8)+1],ids[(i*8)+2],ids[(i*8)+3],ids[(i*8)+4],ids[(i*8)+7],temperatures[i]/10,abs(temperatures[i]%10));
+				}
+				//Add analog reads
+				for(i=0;i<SENSOR_MANAGER_ANALOGCHANNELS_COUNT;i++)
+				{
+					Append(length,buffer,"Analog_%02X:%d,",(i+1),Sensor_Manager_GetAnalogValue());
 				}
 				//Add Uptime
 				Append(length,buffer,"uptime:%d",Emonitor_uptime);

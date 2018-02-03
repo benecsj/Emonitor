@@ -167,6 +167,7 @@ void user_init(void) {
 
 
 	DBG("\nSDK version:%s\n", system_get_sdk_version());
+	system_print_meminfo();
 	DBG("About to create task\r\n");
 	xTaskHandle t;
 	xTaskCreate(task_Init, "init", 1024, NULL, (configMAX_PRIORITIES-1), &t);

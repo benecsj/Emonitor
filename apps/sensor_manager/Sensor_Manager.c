@@ -52,6 +52,8 @@ uint16 APP_PortMon_analogValues[SENSOR_MANAGER_ANALOGCHANNELS_COUNT];
 
 uint32 Sensor_Manager_PulseCounters[SENSOR_MANAGER_PULSE_COUNTERS] = {};
 
+uint8 pulseState = 1;
+
 /**********************************************************************************
  * Function defines
  **********************************************************************************/
@@ -105,6 +107,8 @@ void Sensor_Manager_Init() {
     }
     //Search for sensors
     Sensor_Manager_UpdateSensors();
+    //Init SW pulseCounter
+    pulseState = (system_adc_read()>512);
 
 }
 
@@ -115,8 +119,21 @@ void Sensor_Manager_Fast() {
     //Scan Adc channels
     for (CS_i = 0; CS_i < SENSOR_MANAGER_ANALOGCHANNELS_COUNT; CS_i++) {
         //Read Adc channel and store it in buffer
-        APP_PortMon_analogValues[CS_i] = system_adc_read();;
+        APP_PortMon_analogValues[CS_i] = system_adc_read();
     }
+
+    //SW pulse counter
+    if((pulseState == 1) && (APP_PortMon_analogValues[0] < 400))
+    {
+    	pulseState = 0;
+    	Sensor_Manager_PulseCounters[4]++;
+
+    }
+    else if((pulseState == 0) && (APP_PortMon_analogValues[0] > 800))
+    {
+       	pulseState = 1;
+    }
+
 }
 
 void Sensor_Manager_Main() {
@@ -153,19 +170,25 @@ void Sensor_Manager_PulseCounter0(void)
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 1)
 void Sensor_Manager_PulseCounter1(void)
 {
+	PortDisableInt_NoNest();
 	Sensor_Manager_PulseCounters[1]++;
+	PortEnableInt_NoNest();
 }
 #endif
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 2)
 void Sensor_Manager_PulseCounter2(void)
 {
+	PortDisableInt_NoNest();
 	Sensor_Manager_PulseCounters[2]++;
+	PortEnableInt_NoNest();
 }
 #endif
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 3)
 void Sensor_Manager_PulseCounter3(void)
 {
+	PortDisableInt_NoNest();
 	Sensor_Manager_PulseCounters[3]++;
+	PortEnableInt_NoNest();
 }
 #endif
 
@@ -175,6 +198,11 @@ uint32 Sensor_Manager_GetPulseCount(uint8 id)
 	uint32 tempValue = Sensor_Manager_PulseCounters[id];
 	taskEXIT_CRITICAL();
 	return tempValue;
+}
+
+uint16 Sensor_Manager_GetAnalogValue(void)
+{
+	return APP_PortMon_analogValues[0];
 }
 
 void Sensor_Manager_ResetPulseCounters(void)
