@@ -66,5 +66,9 @@
 //Sensor manager
 #define OWP_CHANNELS_COUNT 2
 
+
+//Development flags
+#define EMONITOR_TIMING_TEST
+
 #endif
 

@@ -15,7 +15,7 @@ HttpdBuiltInUrl builtInUrls[]={
 	{"/", cgiRedirect, "/index.html"},
 	{"/index.html", cgiEspFsTemplate, Http_Server_TokenProcessor},
 	{"/wait.html", cgiEspFsTemplate, Http_Server_TokenProcessor},
-
+	{"/status.html", cgiEspFsTemplate, Http_Server_TokenProcessor},
 	{"/wifi", cgiRedirect, "/wifi/wifi.tpl"},
 	{"/wifi/", cgiRedirect, "/wifi/wifi.tpl"},
 	{"/test", cgiRedirect, "/test/index.html"},

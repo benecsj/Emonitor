@@ -103,7 +103,6 @@ void Emonitor_Init(void){
 
 }
 
-//#define EMONITOR_TIMING_TEST
 /******************************************************************************
  * FunctionName : Emonitor_Main_1ms
  * Description  : Emonitor Fast Main
@@ -186,17 +185,19 @@ void Emonitor_Main_1000ms(void) {
 	char buffer[500];
 	char http[10] = {0};
 	uint8 buttonState;
-
+	uint8 ip[4];
 	uint8 tempCount;
 	uint8* ids;
 	sint16* temperatures;
 
 	//Uptime counter
 	Emonitor_uptime++;
+	//Get local ip address
+	Wifi_Manager_GetIp(ip);
 	//Free ram and stack
 	uint32 freeRam = system_get_free_heap_size();
 	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
-	DBG("(EM) Uptime(%d) Conn(%d) Heap:(%d) Stack:(%d)\n", Emonitor_uptime,Emonitor_connectionCounter,freeRam,freeStack);
+	DBG("(EM) Uptime(%d) Ip:(%d) Conn(%d) Heap:(%d) Stack:(%d)\n", Emonitor_uptime,ip[3],Emonitor_connectionCounter,freeRam,freeStack);
 	//DBG("(EM) Pulse0(%d) Pulse1(%d) Pulse2(%d) Pulse3(%d) \n",Sensor_Manager_GetPulseCount(0),Sensor_Manager_GetPulseCount(1),Sensor_Manager_GetPulseCount(2),Sensor_Manager_GetPulseCount(3));
 	//Connection status led update
 
