@@ -55,6 +55,7 @@ char Emonitor_key[33] = {0xFF};
 \******************************************************************************/
 extern void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, char * response_headers, int body_size);
 extern uint32_t Emonitor_GetDefaultId(void);
+extern void task_1ms(void);
 /******************************************************************************
 * Implementations
 \******************************************************************************/
@@ -98,7 +99,7 @@ void Emonitor_Init(void){
 	}
 	//Init timer for fast task
     hw_timer_init();
-    hw_timer_set_func(Emonitor_Main_1ms);
+    hw_timer_set_func(task_1ms);
     hw_timer_arm(1000,1);
 
 }
@@ -197,16 +198,17 @@ void Emonitor_Main_1000ms(void) {
 	//Free ram and stack
 	uint32 freeRam = system_get_free_heap_size();
 	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
-	DBG("(EM) Uptime(%d) Ip:(%d) Conn(%d) Heap:(%d) Stack:(%d)\n", Emonitor_uptime,ip[3],Emonitor_connectionCounter,freeRam,freeStack);
+	DBG("(EM) Uptime(%d) Ip:(%d) Conn(%d) Heap:(%d) Stack:(%d) Run:(%d)\n", Emonitor_uptime,ip[3],Emonitor_connectionCounter,freeRam,freeStack,Emonitor_counter);
 	//DBG("(EM) Pulse0(%d) Pulse1(%d) Pulse2(%d) Pulse3(%d) \n",Sensor_Manager_GetPulseCount(0),Sensor_Manager_GetPulseCount(1),Sensor_Manager_GetPulseCount(2),Sensor_Manager_GetPulseCount(3));
 	//Connection status led update
+
+	taskENTER_CRITICAL();
+	Emonitor_counter = 0;
+	taskEXIT_CRITICAL();
 
 	//Emonitor sending
 	Emonitor_timing++;
 	if(Emonitor_timing == 10){
-		taskENTER_CRITICAL();
-		Emonitor_counter = 0;
-		taskEXIT_CRITICAL();
 		Emonitor_timing = 0;
 
 		if(Wifi_Manager_Connected() == 1)

@@ -50,7 +50,7 @@ typedef struct espconn* ConnTypePtr;
 #define HTTPD_ALIGNMENT 4
 
 #define HTTPD_REDIRECT_TO_HOSTNAME_BUFFER 1024
-#define HTTPD_MAX_POSTBUFF_LEN 2048
+#define HTTPD_MAX_POSTBUFF_LEN 1024
 
 extern void* aligned_malloc(size_t required_bytes);
 extern void aligned_free(void *p);

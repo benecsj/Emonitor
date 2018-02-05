@@ -118,13 +118,19 @@ void task_Init(void *pvParameters) {
 	vTaskDelete( NULL );
 }
 
+void task_1ms(void){
+	Emonitor_Main_1ms();
+
+}
+
 /*
  * Fast task
  */
 void task_10ms(void *pvParameters) {
 	vTaskDelay(1000 / portTICK_RATE_MS);
 	for (;;) {
-		//Sensor_Manager_Fast();
+		Sensor_Manager_Fast();
+		//Emonitor_Main_1ms();
 		vTaskDelay(10 / portTICK_RATE_MS);
 	}
 }
