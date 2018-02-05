@@ -124,7 +124,7 @@ void task_Init(void *pvParameters) {
 void task_10ms(void *pvParameters) {
 	vTaskDelay(1000 / portTICK_RATE_MS);
 	for (;;) {
-		Sensor_Manager_Fast();
+		//Sensor_Manager_Fast();
 		vTaskDelay(10 / portTICK_RATE_MS);
 	}
 }

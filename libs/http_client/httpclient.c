@@ -238,7 +238,7 @@ static void ICACHE_FLASH_ATTR sent_callback(void * arg)
 	else {
 		// The headers were sent, now send the contents.
 		PRINTF("HTTP Sending request body\n");
-		espconn_sent(conn, (uint8 *)req->post_data, strlen(req->post_data));
+		espconn_send(conn, (uint8 *)req->post_data, strlen(req->post_data));
 		os_free(req->post_data);
 		req->post_data = NULL;
 	}
@@ -273,7 +273,7 @@ static void ICACHE_FLASH_ATTR connect_callback(void * arg)
 						 "\r\n",
 						 method, req->path, req->hostname, req->port, req->headers, post_headers);
 
-	espconn_sent(conn, (uint8 *)buf, len);
+	espconn_send(conn, (uint8 *)buf, len);
 	os_free(req->headers);
 	req->headers = NULL;
 	PRINTF("HTTP Sending request header\n");
