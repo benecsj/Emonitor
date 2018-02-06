@@ -4,6 +4,7 @@
 
 //Common
 #include "esp_common.h"
+#include "esp_system.h"
 #include "project_config.h"
 #include "user_config.h"
 
@@ -168,13 +169,28 @@ void task_background(void *pvParameters) {
  * Returns      : none
  *******************************************************************************/
 void user_init(void) {
+	struct rst_info* resetInfo;
+
 	//Init application
 	Emonitor_Preinit();
 
-
+	//Get general statuses
 	DBG("\nSDK version:%s\n", system_get_sdk_version());
 	system_print_meminfo();
-	DBG("About to create task\r\n");
+	//Get reset cause
+	resetInfo = system_get_rst_info();
+	DBG("Reset exccause:%d reason:%d\n",resetInfo->exccause,resetInfo->reason);
+	//Case on WDT reset perform some clean up
+	if( (REASON_SOFT_WDT_RST == resetInfo->reason) || (REASON_WDT_RST == resetInfo->reason) ||
+	    (REASON_EXCEPTION_RST == resetInfo->reason))
+	{
+		//Try to fix things
+		DBG("System Restart\n");
+		//Wifi_Manager_CleanUp();
+		//system_restart();
+	}
+
+	DBG("About to create task\n");
 	xTaskHandle t;
 	xTaskCreate(task_Init, "init", 1024, NULL, (configMAX_PRIORITIES-1), &t);
 	xTaskCreate(task_1000ms, "1000ms", 1024, NULL, 1, &t);

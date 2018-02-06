@@ -78,6 +78,12 @@ void Wifi_Manager_Init(void)
 
 }
 
+void Wifi_Manager_CleanUp(void)
+{
+    stop_wifi_station();
+    stop_wifi_ap();
+}
+
 
 void Wifi_Manager_GetIp(uint8 ip[4])
 {
