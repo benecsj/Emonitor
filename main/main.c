@@ -34,6 +34,8 @@
 /******************************************************************************
 * Implementations
 \******************************************************************************/
+void task_10s(void);
+uint8 Task_10s_Timing = 0;
 
 /******************************************************************************
  * FunctionName : user_rf_cal_sector_set
@@ -150,7 +152,17 @@ void task_1000ms(void *pvParameters) {
 		Sensor_Manager_Main();
 
 		vTaskDelay(1000 / portTICK_RATE_MS);
+		//10s task timing
+		if((++Task_10s_Timing) == 10)
+		{
+			Task_10s_Timing = 0;
+			task_10s();
+		}
 	}
+}
+
+void task_10s(void) {
+	Wifi_Manager_Main();
 }
 
 /*

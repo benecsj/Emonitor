@@ -67,13 +67,14 @@
 #define DEFAULT_SEND_TIMING		10
 
 //Sensor manager
-#define OWP_CHANNELS_COUNT 2
+#define OWP_CHANNELS_COUNT 	2
+#define TEMP_RESCAN_PERIOD	10
 
 //Development flags
 #define EMONITOR_TIMING_TEST    0
-#define DEBUG_SENSOR_MANAGER 	0
-#define DEBUG_EMONITOR 			1
-#define DEBUG_HTTP_CLIENT 		1
+#define DEBUG_SENSOR_MANAGER 	1
+#define DEBUG_EMONITOR 			0
+#define DEBUG_HTTP_CLIENT 		0
 #define DEBUG_HTTP_SERVER 		0
 #define DEBUG_WIFI_MANAGER		0
 

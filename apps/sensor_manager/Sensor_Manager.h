@@ -34,7 +34,10 @@ extern uint32 Sensor_Manager_GetPulseCount(uint8 id);
 extern void Sensor_Manager_ResetPulseCounters(void);
 extern uint16 Sensor_Manager_GetAnalogValue(void);
 
+extern uint32 Sensor_Manager_ErrorCounter;
 extern uint8 APP_SensMan_DS18B20Count;
 extern sint16 APP_SensMan_DS18B20TempList[];
+
+#define Sensor_Manager_GetTempHealth()	(Sensor_Manager_ErrorCounter)
 
 #endif /* APP_SENSOR_MANAGER_H_ */

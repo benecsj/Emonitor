@@ -217,66 +217,87 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 	}
 	else
 	{
-		//STA SSID
-		if (strcmp(token, "sta_ssid")==0) {
-			len = sprintf(buff, "%s", Wifi_Manager_GetSTA_SSID());
-		}
 
-		//STA PASSWORD
-		else if (strcmp(token, "sta_pass")==0) {
-			temp = strlen(Wifi_Manager_GetSTA_PASSWORD());
-			for(i = 0 ; i < temp ; i++)
-			{
-				buff[i] = '*';
+		// INDEX PAGE
+		if(strcmp(connData->url,"/index.html")==0)
+		{
+			//STA SSID
+			if (strcmp(token, "sta_ssid")==0) {
+				len = sprintf(buff, "%s", Wifi_Manager_GetSTA_SSID());
 			}
-			buff[i] = 0;
-			len = i;
-		}
 
-		//EMONCMS KEY
-		else if (strcmp(token, "emon_key")==0) {
-			len = sprintf(buff, "%s", Emonitor_GetKey());
-		}
+			//STA PASSWORD
+			else if (strcmp(token, "sta_pass")==0) {
+				temp = strlen(Wifi_Manager_GetSTA_PASSWORD());
+				for(i = 0 ; i < temp ; i++)
+				{
+					buff[i] = '*';
+				}
+				buff[i] = 0;
+				len = i;
+			}
 
-		//EMONCMS URL
-		else if (strcmp(token, "emon_url")==0) {
-			len = sprintf(buff, "%s", Emonitor_GetUrl());
-		}
+			//EMONCMS KEY
+			else if (strcmp(token, "emon_key")==0) {
+				len = sprintf(buff, "%s", Emonitor_GetKey());
+			}
 
-		//EMONCMS NODE ID
-		else if (strcmp(token, "emon_id")==0) {
-			len = sprintf(buff, "%d", Emonitor_GetNodeId());
-		}
+			//EMONCMS URL
+			else if (strcmp(token, "emon_url")==0) {
+				len = sprintf(buff, "%s", Emonitor_GetUrl());
+			}
 
-		//EMONCMS SEND PEROID
-		else if (strcmp(token, "emon_send")==0) {
-			len = sprintf(buff, "%d", Emonitor_GetSendPeriod());
-		}
+			//EMONCMS NODE ID
+			else if (strcmp(token, "emon_id")==0) {
+				len = sprintf(buff, "%d", Emonitor_GetNodeId());
+			}
 
-		//ACCESS POINT SSID
-		else if (strcmp(token, "ap_ssid")==0) {
-			len = sprintf(buff, "%s", Wifi_Manager_GetAP_SSID());
-		}
+			//EMONCMS SEND PEROID
+			else if (strcmp(token, "emon_send")==0) {
+				len = sprintf(buff, "%d", Emonitor_GetSendPeriod());
+			}
 
-		//ACCESS POINT PASSWORD
-		else if (strcmp(token, "ap_pass")==0) {
-			len = sprintf(buff, "%s", Wifi_Manager_GetAP_PASSWORD());
-		}
+			//ACCESS POINT SSID
+			else if (strcmp(token, "ap_ssid")==0) {
+				len = sprintf(buff, "%s", Wifi_Manager_GetAP_SSID());
+			}
 
-		//ENABLE HOTSPOT
-		else if (strcmp(token, "ap_on")==0) {
-			if(Wifi_Manager_GetEnableHotspot() == 1)
-			{
-			len = sprintf(buff, "%s", "selected");
+			//ACCESS POINT PASSWORD
+			else if (strcmp(token, "ap_pass")==0) {
+				len = sprintf(buff, "%s", Wifi_Manager_GetAP_PASSWORD());
+			}
+
+			//ENABLE HOTSPOT
+			else if (strcmp(token, "ap_on")==0) {
+				if(Wifi_Manager_GetEnableHotspot() == 1)
+				{
+				len = sprintf(buff, "%s", "selected");
+				}
+			}
+			else if (strcmp(token, "ap_off")==0) {
+				if(Wifi_Manager_GetEnableHotspot() == 0)
+				{
+				len = sprintf(buff, "%s", "selected");
+				}
 			}
 		}
-		else if (strcmp(token, "ap_off")==0) {
-			if(Wifi_Manager_GetEnableHotspot() == 0)
-			{
-			len = sprintf(buff, "%s", "selected");
-			}
-		}
 
+		else if(strcmp(connData->url,"/status.html")==0)
+		{
+			//EMONCMS NODE ID
+			if (strcmp(token, "emon_id")==0) {
+				len = sprintf(buff, "%d", Emonitor_GetNodeId());
+			}
+
+		}
+		else if(strcmp(connData->url,"/wait.html")==0)
+		{
+			//EMONCMS NODE ID
+			if (strcmp(token, "emon_id")==0) {
+				len = sprintf(buff, "%d", Emonitor_GetNodeId());
+			}
+
+		}
 		//Send out processed token
 		buff[len] = 0;
 		DBG_HTTPS("(HS) Fetch token [%s][%s]\n",token,buff);

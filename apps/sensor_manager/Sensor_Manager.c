@@ -12,26 +12,17 @@
 #include "D18_DS18B20_Temp_Sensor.h"
 #include "OWP_One_Wire_Protocol_Driver.h"
 #include "CRC_crc8.h"
-
+#include "user_config.h"
 
 /**********************************************************************************
  * Defines
  **********************************************************************************/
-//#define APP_VERBOSE
-//#define APP_VERBOSE_PIC32
 
-#define APP_ENTER_CRITICAL()   //non preemtive task
-#define APP_EXIT_CRITICAL()    //non preemtive task
+#define APP_REPORT_FAIL() (Sensor_Manager_ErrorCounter++)
+#define APP_REPORT_PASS() Sensor_Manager_ErrorCounter = 0
 
-#define APP_REPORT_FAIL()
-#define APP_REPORT_PASS()
-
-#define APP_REPORT_COMM_FAIL()
-#define APP_REPORT_COMM_PASS()
-
-#define Sensor_Manager_RESCAN_PERIOD 2   //10
 #define Sensor_Manager_INVALID_TEMP 0
-#define Sensor_Manager_MAX_RETRY_COUNT 2   //6
+#define Sensor_Manager_MAX_RETRY_COUNT 6
 
 #if DEBUG_SENSOR_MANAGER
 #define DBG_SENSOR(...) printf(__VA_ARGS__)
@@ -54,6 +45,8 @@ sint16 SENSOR_MANAGER_DS18B20TempList[SENSOR_MANAGER_DS18B20MAXCOUNT];
 uint16 APP_PortMon_analogValues[SENSOR_MANAGER_ANALOGCHANNELS_COUNT];
 
 uint32 Sensor_Manager_PulseCounters[SENSOR_MANAGER_PULSE_COUNTERS] = {};
+
+uint32 Sensor_Manager_ErrorCounter=0;
 
 uint8 pulseState = 1;
 
@@ -145,17 +138,15 @@ void Sensor_Manager_Main() {
     SENSOR_MANAGER_DS18B20Measure();
 
     //Temp sensor rescan timing
-    Sensor_Manager_Timing = (Sensor_Manager_Timing + 1) % Sensor_Manager_RESCAN_PERIOD;
+    Sensor_Manager_Timing = (Sensor_Manager_Timing + 1) % TEMP_RESCAN_PERIOD;
     //Is it time to scan
     if (Sensor_Manager_Timing == 0) {
         //Search for sensors again
         Sensor_Manager_UpdateSensors();
     }
-    //Report comm pass
-    APP_REPORT_COMM_PASS();
     for(i=0;i<SENSOR_MANAGER_DS18B20Count;i++)
     {
-    	DBG_SENSOR("(SensMan)(%d)%d- %d.%dC - %x%x%x%x%x%x%x%x\n",i,Sensor_Manager_sensorChannels[i],SENSOR_MANAGER_DS18B20TempList[i]/10,SENSOR_MANAGER_DS18B20TempList[i]%10,Sensor_Manager_sensorIDs[(i*8)+0],Sensor_Manager_sensorIDs[(i*8)+1],Sensor_Manager_sensorIDs[(i*8)+2],Sensor_Manager_sensorIDs[(i*8)+3],Sensor_Manager_sensorIDs[(i*8)+4],Sensor_Manager_sensorIDs[(i*8)+5],Sensor_Manager_sensorIDs[(i*8)+6],Sensor_Manager_sensorIDs[(i*8)+7]);
+    	DBG_SENSOR("(SensMan)(%d)%d- %d.%dC - %x%x%x%x%x%x%x%x\n",i,Sensor_Manager_sensorChannels[i],SENSOR_MANAGER_DS18B20TempList[i]/10,abs(SENSOR_MANAGER_DS18B20TempList[i]%10),Sensor_Manager_sensorIDs[(i*8)+0],Sensor_Manager_sensorIDs[(i*8)+1],Sensor_Manager_sensorIDs[(i*8)+2],Sensor_Manager_sensorIDs[(i*8)+3],Sensor_Manager_sensorIDs[(i*8)+4],Sensor_Manager_sensorIDs[(i*8)+5],Sensor_Manager_sensorIDs[(i*8)+6],Sensor_Manager_sensorIDs[(i*8)+7]);
     }
 
     DBG_SENSOR("(SensMan)I0:%d I1:%d I2:%d I3:%d  A:%d\n",digitalRead(PULSE_INPUT0),digitalRead(PULSE_INPUT1),digitalRead(PULSE_INPUT2),digitalRead(PULSE_INPUT3),APP_PortMon_analogValues[0]);
@@ -303,26 +294,26 @@ uint8 SENSOR_MANAGER_DS18B20_Search(void) {
         if (diff == OWP_CONST_PRESENCE_ERR) {
             DBG_SENSOR("(SensMan)No sensor found\n");
             //Report comm fail
-            APP_REPORT_COMM_FAIL();
+            APP_REPORT_FAIL();
         }//Check if has data error
         else if (diff == OWP_CONST_DATA_ERR) {
             DBG_SENSOR("(SensMan)Bus error\n");
             //Report comm fail
-            APP_REPORT_COMM_FAIL();
+            APP_REPORT_FAIL();
             //Stop search
             break;
         }//Check if has id error
         else if (id[0] != 0x28) {
             DBG_SENSOR("(SensMan)Id error\n");
             //Report comm fail
-            APP_REPORT_COMM_FAIL();
+            APP_REPORT_FAIL();
             //Stop search
             break;
         }// Check ROM CRC
         else if (CRC_crc8(id, (OWP_CONST_ROMCODE_SIZE - 1), 0) != id[(OWP_CONST_ROMCODE_SIZE - 1)]) {
             DBG_SENSOR("(SensMan)ROM crc error\n");
             //Report comm fail
-            APP_REPORT_COMM_FAIL();
+            APP_REPORT_FAIL();
             //Stop search
             break;
         }
@@ -385,7 +376,7 @@ void SENSOR_MANAGER_DS18B20Measure() {
             SENSOR_MANAGER_DS18B20TempList[i] = D18_DS18B20_TemptoDecicel(subzero, cel, cel_frac_bits);
         } else {
             //Report comm fail
-            APP_REPORT_COMM_FAIL();
+        	APP_REPORT_FAIL();
         }
     }
 }

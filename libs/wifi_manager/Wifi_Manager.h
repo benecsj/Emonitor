@@ -9,12 +9,13 @@
 #endif
 
 extern void Wifi_Manager_Init(void);
+extern void Wifi_Manager_Main(void);
 extern void Wifi_Manager_CleanUp(void);
 
 extern void Wifi_Manager_GetIp(uint8 ip[4]);
 
 extern void Wifi_Manager_EnableHotspot(uint8 enable);
-
+extern void Wifi_Manager_UpdateLevel(void);
 
 extern void Wifi_Manager_GetDefaultValues(char* id, char * pass);
 
@@ -22,11 +23,13 @@ extern void Wifi_Manager_GetDefaultValues(char* id, char * pass);
 
 
 extern uint8 WifiManager_enableHotspot;
+extern sint8 WifiManager_SignalLevel;
 extern char WifiManager_STA_SSID[33];
 extern char WifiManager_STA_PASSWORD[65];
 extern char WifiManager_AP_SSID[33];
 extern char WifiManager_AP_PASSWORD[65];
 
+#define Wifi_Manager_GetSignalLevel()  (WifiManager_SignalLevel)
 #define Wifi_Manager_GetEnableHotspot()  (WifiManager_enableHotspot)
 #define Wifi_Manager_SetEnableHotspot(a)  (WifiManager_enableHotspot = a)
 #define Wifi_Manager_GetSTA_SSID()	(WifiManager_STA_SSID)

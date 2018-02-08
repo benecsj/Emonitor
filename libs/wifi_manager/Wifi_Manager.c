@@ -19,6 +19,10 @@ char WifiManager_STA_PASSWORD[65] = {0xFF};
 char WifiManager_AP_SSID[33] = {0};
 char WifiManager_AP_PASSWORD[65] = {0xFF};
 
+struct scan_config WifiManager_ScanConfig;
+sint8 WifiManager_SignalLevel = 0;
+uint8 WifiManager_ScanRunning = 0;
+
 void Wifi_Manager_Init(void)
 {
 	//Verify Parameters
@@ -84,6 +88,58 @@ void Wifi_Manager_Init(void)
 
 }
 
+void Wifi_Manager_Main(void)
+{
+	Wifi_Manager_UpdateLevel();
+}
+
+void ICACHE_FLASH_ATTR Wifi_Manager_ScanDone(void *arg, STATUS status)
+{
+	  uint8 ssid[33];
+	  char temp[128];
+
+	  if (status == OK)
+	  {
+	    struct bss_info *bss_link = (struct bss_info *)arg;
+
+	    while (bss_link != NULL)
+	    {
+	      memset(ssid, 0, 33);
+	      if (strlen(bss_link->ssid) <= 32)
+	      {
+	        memcpy(ssid, bss_link->ssid, strlen(bss_link->ssid));
+	      }
+	      else
+	      {
+	        memcpy(ssid, bss_link->ssid, 32);
+	      }
+	      WifiManager_SignalLevel = bss_link->rssi;
+
+	      DBG_WM("(%d,\"%s\",%d,\""MACSTR"\",%d)\r\n",
+	                 bss_link->authmode, ssid, bss_link->rssi,
+	                 MAC2STR(bss_link->bssid),bss_link->channel);
+	      bss_link = bss_link->next.stqe_next;
+	    }
+	  }
+	  else
+	  {
+		  WifiManager_SignalLevel = 0;
+		  DBG_WM("scan fail !!!\r\n");
+	  }
+	  WifiManager_ScanRunning = 0;
+}
+
+void Wifi_Manager_UpdateLevel(void)
+{
+	if(WifiManager_ScanRunning == 0)
+	{
+		WifiManager_ScanRunning = 1;
+		WifiManager_ScanConfig.ssid = WifiManager_STA_SSID;
+		(void)wifi_station_scan(&WifiManager_ScanConfig, Wifi_Manager_ScanDone);
+	}
+}
+
+
 void Wifi_Manager_CleanUp(void)
 {
     stop_wifi_station();
@@ -94,11 +150,6 @@ void Wifi_Manager_CleanUp(void)
 void Wifi_Manager_GetIp(uint8 ip[4])
 {
 	wifi_get_ip_address(ip);
-}
-
-void Wifi_Manager_Main()
-{
-
 }
 
 void Wifi_Manager_EnableHotspot(uint8 enable)

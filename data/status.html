@@ -36,7 +36,7 @@
       label {
         /* To make sure that all labels have the same size and are properly aligned */
         display: inline-block;
-        width: 90px;
+        width: 120px;
         text-align: right;
       }
 
@@ -118,6 +118,25 @@ select.left {
 <img class="centered" src="emonitor.png">
 <br>
 <div class="centerText">Status</div>
- 
+<div class="block">
+<label for="ssid">Uptime:</label>
+%st_uptime%<br>
+<label for="ssid">Timing:</label>
+%st_timing%<br>
+<label for="ssid">Connected:</label>
+%st_conn%<br>
+<label for="ssid">Heap:</label>
+%st_heap%<br>
+<label for="ssid">Background:</label>
+%st_bck%<br>
+</div>
+<div class="block">
+<label for="ssid">Wifi:</label>
+%st_wifi%<br>
+<label for="ssid">Signal:</label>
+%st_signal%<br>
+<label for="ssid">Ip:</label>
+%st_ip%<br>
+</div>
 </body>
 </html>

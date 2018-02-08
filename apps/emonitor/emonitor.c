@@ -246,7 +246,7 @@ void Emonitor_Main_1000ms(void) {
 	//Free ram and stack
 	uint32 freeRam = system_get_free_heap_size();
 	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
-	PRINT_EMON("(EM) U(%d) T(%d) I(%d) C(%d) H(%d) S(%d) R(%d)\n", Emonitor_uptime,Emonitor_timing,ip[3],Emonitor_connectionCounter,freeRam,freeStack,Emonitor_counter);
+	PRINT_EMON("(EM) U(%d) T(%d) I(%d) C(%d) H(%d) S(%d) R(%d) S(%d) H(%d)\n", Emonitor_uptime,Emonitor_timing,ip[3],Emonitor_connectionCounter,freeRam,freeStack,Emonitor_counter,Wifi_Manager_GetSignalLevel(),Sensor_Manager_GetTempHealth());
 	//DBG_EMON("(EM) Pulse0(%d) Pulse1(%d) Pulse2(%d) Pulse3(%d) \n",Sensor_Manager_GetPulseCount(0),Sensor_Manager_GetPulseCount(1),Sensor_Manager_GetPulseCount(2),Sensor_Manager_GetPulseCount(3));
 	//Connection status led update
 
@@ -260,7 +260,6 @@ void Emonitor_Main_1000ms(void) {
 	taskEXIT_CRITICAL();
 	//Store timing value
 	Emonitor_StoreTiming(Emonitor_timing);
-
 	if(Emonitor_timing >= Emonitor_SendPeroid){
 		if(Wifi_Manager_Connected() == 1)
 		{
@@ -288,7 +287,8 @@ void Emonitor_Main_1000ms(void) {
 				//Add temperatures
 				for(i=0;i<tempCount;i++)
 				{
-					 Append(length,buffer,"Temp_%02X%02X%02X%02X%02X:%d.%d,",ids[(i*8)+1],ids[(i*8)+2],ids[(i*8)+3],ids[(i*8)+4],ids[(i*8)+7],temperatures[i]/10,abs(temperatures[i]%10));
+					char sign = (temperatures[i]<0 ? '-':'+');
+					 Append(length,buffer,"Temp_%02X%02X%02X%02X%02X:%c%d.%d,",ids[(i*8)+1],ids[(i*8)+2],ids[(i*8)+3],ids[(i*8)+4],ids[(i*8)+7],sign,abs(temperatures[i]/10),abs(temperatures[i]%10));
 				}
 				//Add analog reads
 				for(i=0;i<SENSOR_MANAGER_ANALOGCHANNELS_COUNT;i++)
