@@ -52,6 +52,12 @@ void Wifi_Manager_Init(void)
 	DBG_WM("(WF) AP  SSID: [%s]\n",WifiManager_AP_SSID);
 	DBG_WM("(WF) AP  PASS: [%s]\n",WifiManager_AP_PASSWORD);
 
+	//Clear default configs from Wifi if present
+	if(wifi_get_opmode() != 0x0)
+	{
+		wifi_set_opmode(0x0);
+	}
+
 	//Register eventhandlers
     set_on_station_connect(on_wifi_connect);
     set_on_station_disconnect(on_wifi_disconnect);
@@ -61,7 +67,6 @@ void Wifi_Manager_Init(void)
    	start_wifi_ap(WifiManager_AP_SSID, WifiManager_AP_PASSWORD,(WifiManager_enableHotspot==0));
     //stop_wifi_station();
     //stop_wifi_ap();
-
 
     //start_wifi_station(WifiManager_STA_SSID, WifiManager_STA_PASSWORD);
 

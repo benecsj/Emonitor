@@ -136,8 +136,8 @@ void ICACHE_FLASH_ATTR set_on_client_disconnect(wifi_state_cb_t cb){
 bool ICACHE_FLASH_ATTR wifi_set_mode(WIFI_MODE mode){
     if(!mode){
         bool s = wifi_set_opmode_current(mode);
-        wifi_fpm_open();
         wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
+        wifi_fpm_open();
         wifi_fpm_do_sleep(0xFFFFFFFF);
         return s;
     }

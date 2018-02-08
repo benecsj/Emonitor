@@ -13,7 +13,7 @@ extern void Emonitor_Init(void);
 extern void Emonitor_Main_1ms(void);
 extern void Emonitor_Main_1000ms(void);
 extern void Emonitor_Main_Background(void);
-
+extern void Emonitor_StartTimer(void);
 
 extern uint32 Emonitor_nodeId;
 extern char Emonitor_url[100];

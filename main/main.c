@@ -93,6 +93,7 @@ uint32 counter;
  * Init task
  */
 void task_Init(void *pvParameters) {
+	Emonitor_StartTimer();
 	vTaskDelay(10 / portTICK_RATE_MS);
 	//Init pins handler
 	Init_Pins();

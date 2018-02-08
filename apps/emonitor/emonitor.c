@@ -106,11 +106,14 @@ void Emonitor_Init(void){
 	{
 		Emonitor_nodeId = Emonitor_GetDefaultId();
 	}
+
+}
+
+void Emonitor_StartTimer(void){
 	//Init timer for fast task
     hw_timer_init();
     hw_timer_set_func(task_1ms);
     hw_timer_arm(1000,1);
-
 }
 
 /******************************************************************************
@@ -132,6 +135,11 @@ void Emonitor_Main_1ms(void) {
 		if((Emonitor_statusCounter == (LED_TIMING_NORMAL-150)) && (Emonitor_connectionStatus == 0))
 		{
 			ledValue = 0 ;
+		}
+		if(Wifi_Manager_Connected() == 0)
+		{
+			Emonitor_statusCounter= (Emonitor_statusCounter)%2;
+			ledValue = Emonitor_statusCounter == 0;
 		}
 		ledValue = ledValue || Emonitor_ledControl;
 		break;
