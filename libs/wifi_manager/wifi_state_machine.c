@@ -166,7 +166,8 @@ bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){
         return true;
     }
 
-    wifi_station_set_hostname((char*)ssid);
+    bool status = wifi_station_set_hostname((char*)ssid);
+    DBG_WM("(WM) SSID: [%s][%d]\n",(char*)ssid,status);
 
     struct station_config config;
     memset(&config, 0, sizeof(struct station_config));

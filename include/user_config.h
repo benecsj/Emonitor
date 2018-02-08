@@ -62,12 +62,15 @@
 #define TIMEOUT_TURNON_AP 		43200
 #define TIMEOUT_RESET_NO_COMM 	43200*2
 #define TIMEOUT_TURNOFF_APP 	43200*2
+#define LED_TIMING_NORMAL		500
+#define LED_TIMING_RESET		100
+
 
 //Sensor manager
 #define OWP_CHANNELS_COUNT 2
 
 //Development flags
-#define EMONITOR_TIMING_TEST    1
+#define EMONITOR_TIMING_TEST    0
 #define DEBUG_SENSOR_MANAGER 	0
 #define DEBUG_EMONITOR 			0
 #define DEBUG_HTTP_CLIENT 		0

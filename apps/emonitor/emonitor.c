@@ -127,21 +127,21 @@ void Emonitor_Main_1ms(void) {
 	switch(Emonitor_buttonState)
 	{
 	case 0:
-		Emonitor_statusCounter= (Emonitor_statusCounter+1)%1000;
-		ledValue = (Emonitor_statusCounter <998);
-		if((Emonitor_statusCounter == 800) && (Emonitor_connectionStatus == 0))
+		Emonitor_statusCounter= (Emonitor_statusCounter+1)%LED_TIMING_NORMAL;
+		ledValue = (Emonitor_statusCounter <(LED_TIMING_NORMAL-2));
+		if((Emonitor_statusCounter == (LED_TIMING_NORMAL-150)) && (Emonitor_connectionStatus == 0))
 		{
 			ledValue = 0 ;
 		}
 		ledValue = ledValue || Emonitor_ledControl;
 		break;
 	case 1:
-		Emonitor_statusCounter= (Emonitor_statusCounter+1)%1000;
-		ledValue = Emonitor_statusCounter <500;
+		Emonitor_statusCounter= (Emonitor_statusCounter+1)%LED_TIMING_NORMAL;
+		ledValue = Emonitor_statusCounter <(LED_TIMING_NORMAL/2);
 		break;
 	case 2:
-		Emonitor_statusCounter= (Emonitor_statusCounter+1)%100;
-		ledValue = Emonitor_statusCounter <50;
+		Emonitor_statusCounter= (Emonitor_statusCounter+1)%LED_TIMING_RESET;
+		ledValue = Emonitor_statusCounter <(LED_TIMING_RESET/2);
 		break;
 	}
 #else
@@ -217,7 +217,7 @@ void Emonitor_Main_1000ms(void) {
 
 	//Emonitor sending
 	Emonitor_timing++;
-	if(Emonitor_timing == 1){
+	if(Emonitor_timing == 10){
 		Emonitor_timing = 0;
 
 		if(Wifi_Manager_Connected() == 1)
