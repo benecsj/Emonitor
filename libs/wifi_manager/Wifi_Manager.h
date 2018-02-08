@@ -2,9 +2,11 @@
 #include "wifi_state_machine.h"
 
 
+#if DEBUG_WIFI_MANAGER
 #define DBG_WM(...) printf(__VA_ARGS__)
-//#define DBG_WM(...)
-
+#else
+#define DBG_WM(...)
+#endif
 
 extern void Wifi_Manager_Init(void);
 extern void Wifi_Manager_CleanUp(void);

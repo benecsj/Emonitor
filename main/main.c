@@ -187,6 +187,7 @@ void user_init(void) {
 		//Try to fix things
 		DBG("System Restart\n");
 		//Wifi_Manager_CleanUp();
+		//system_restore();
 		//system_restart();
 	}
 

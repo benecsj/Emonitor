@@ -33,8 +33,11 @@
 #define Sensor_Manager_INVALID_TEMP 0
 #define Sensor_Manager_MAX_RETRY_COUNT 2   //6
 
-//#define DBG_SENSOR(...) printf(__VA_ARGS__)
+#if DEBUG_SENSOR_MANAGER
+#define DBG_SENSOR(...) printf(__VA_ARGS__)
+#else
 #define DBG_SENSOR(...)
+#endif
 
 /**********************************************************************************
  * Variables

@@ -35,13 +35,16 @@
 #include "esp_wifi.h"
 #include "esp_libc.h"
 #include "spiffs_manager.h"
+#include "user_config.h"
 
-#define httpd_printf(format, ...) os_printf(format, ##__VA_ARGS__)
 typedef struct espconn* ConnTypePtr;
 
 
+#if DEBUG_HTTP_SERVER
 #define DBG_HTTPS(...) printf(__VA_ARGS__)
-//#define DBG_HTTPS(...)
+#else
+#define DBG_HTTPS(...)
+#endif
 
 #define HTTPD_MAX_CONNECTIONS 3
 

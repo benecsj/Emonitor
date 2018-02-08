@@ -24,6 +24,15 @@
 
 #define Append(length,buffer,format,...) length += sprintf(&buffer[length],format,__VA_ARGS__)
 
+#if DEBUG_EMONITOR
+#define DBG_EMON(...) printf(__VA_ARGS__)
+#else
+#define DBG_EMON(...)
+#endif
+
+
+#define PRINT_EMON(...) printf(__VA_ARGS__)
+
 /******************************************************************************
 * Variables
 \******************************************************************************/
@@ -81,7 +90,7 @@ void Emonitor_Preinit(void) {
 }
 
 void Emonitor_Init(void){
-	DBG("(EM) Emonitor_Init\n");
+	PRINT_EMON("(EM) Emonitor_Init\n");
     //Check if has valid url and key
 	uint8 urlLength = strlen(Emonitor_url);
 	uint8 apiKeyLength = strlen(Emonitor_key);
@@ -113,7 +122,7 @@ void Emonitor_Init(void){
 void Emonitor_Main_1ms(void) {
 	uint8 ledValue;
 
-#ifndef EMONITOR_TIMING_TEST
+#if (EMONITOR_TIMING_TEST == 0)
 	//Calculate led state
 	switch(Emonitor_buttonState)
 	{
@@ -198,8 +207,8 @@ void Emonitor_Main_1000ms(void) {
 	//Free ram and stack
 	uint32 freeRam = system_get_free_heap_size();
 	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
-	DBG("(EM) Uptime(%d) Ip:(%d) Conn(%d) Heap:(%d) Stack:(%d) Run:(%d)\n", Emonitor_uptime,ip[3],Emonitor_connectionCounter,freeRam,freeStack,Emonitor_counter);
-	//DBG("(EM) Pulse0(%d) Pulse1(%d) Pulse2(%d) Pulse3(%d) \n",Sensor_Manager_GetPulseCount(0),Sensor_Manager_GetPulseCount(1),Sensor_Manager_GetPulseCount(2),Sensor_Manager_GetPulseCount(3));
+	PRINT_EMON("(EM) Uptime(%d) Ip:(%d) Conn(%d) Heap:(%d) Stack:(%d) Run:(%d)\n", Emonitor_uptime,ip[3],Emonitor_connectionCounter,freeRam,freeStack,Emonitor_counter);
+	//DBG_EMON("(EM) Pulse0(%d) Pulse1(%d) Pulse2(%d) Pulse3(%d) \n",Sensor_Manager_GetPulseCount(0),Sensor_Manager_GetPulseCount(1),Sensor_Manager_GetPulseCount(2),Sensor_Manager_GetPulseCount(3));
 	//Connection status led update
 
 	taskENTER_CRITICAL();
@@ -208,7 +217,7 @@ void Emonitor_Main_1000ms(void) {
 
 	//Emonitor sending
 	Emonitor_timing++;
-	if(Emonitor_timing == 10){
+	if(Emonitor_timing == 1){
 		Emonitor_timing = 0;
 
 		if(Wifi_Manager_Connected() == 1)
@@ -223,7 +232,7 @@ void Emonitor_Main_1000ms(void) {
 
 			if ((urlLength > 4) && (apiKeyLength == 32))
 			{
-				DBG("----------------Emonitor Send Data-------------\n");
+				DBG_EMON("----------------Emonitor Send Data-------------\n");
 				Sensor_Manager_Get_TempSensorData(&tempCount,&ids,&temperatures);
 				//Start of Emoncsm send Url
 				Append(length,buffer,"%s%s/input/post.json?node=%d&json={",http,Emonitor_url,Emonitor_nodeId);
@@ -255,7 +264,7 @@ void Emonitor_Main_1000ms(void) {
 			}
 			else
 			{
-				DBG("(EM) Not valid userkey / server values found [%d][%d]\n",urlLength,apiKeyLength);
+				DBG_EMON("(EM) Not valid userkey / server values found [%d][%d]\n",urlLength,apiKeyLength);
 			}
 		}
 		else
@@ -276,7 +285,7 @@ void Emonitor_Main_1000ms(void) {
 			switch(Emonitor_requestState)
 			{
 			case 1:
-				DBG("(EM) ENABLE HOTSPOT\n");
+				DBG_EMON("(EM) ENABLE HOTSPOT\n");
 				Wifi_Manager_EnableHotspot(1);
 				NvM_RequestSave();
 				//Clear processed request
@@ -285,7 +294,7 @@ void Emonitor_Main_1000ms(void) {
 				taskEXIT_CRITICAL();
 				break;
 			case 2:
-				DBG("(EM) FACTORY RESET\n");
+				DBG_EMON("(EM) FACTORY RESET\n");
 				NvM_RequestClear();
 				//Enter shutdown request
 				taskENTER_CRITICAL();
@@ -306,7 +315,7 @@ void Emonitor_Main_1000ms(void) {
 			//Check if it turned on
 			if(Wifi_Manager_GetEnableHotspot() == 1)
 			{
-				DBG("(EM) COMM OK DISABLE HOTSPOT\n");
+				DBG_EMON("(EM) COMM OK DISABLE HOTSPOT\n");
 				//Turn off AccesPoint
 				Wifi_Manager_EnableHotspot(0);
 				NvM_RequestSave();
@@ -324,7 +333,7 @@ void Emonitor_Main_1000ms(void) {
 			//Check if it turned off
 			if(Wifi_Manager_GetEnableHotspot() == 0)
 			{
-				DBG("(EM) COMM TIMEOUT ENABLE HOTSPOT\n");
+				DBG_EMON("(EM) COMM TIMEOUT ENABLE HOTSPOT\n");
 				//Turn on AccesPoint
 				Wifi_Manager_EnableHotspot(1);
 				NvM_RequestSave();
@@ -334,7 +343,7 @@ void Emonitor_Main_1000ms(void) {
 		//Check if too long no successfull send was performed
 		if(Emonitor_connectionCounter < -TIMEOUT_RESET_NO_COMM)
 		{
-			DBG("(EM) COMM TIMEOUT RESET\n");
+			DBG_EMON("(EM) COMM TIMEOUT RESET\n");
 			Emonitor_requestState = 3;
 		}
 	}
@@ -342,7 +351,7 @@ void Emonitor_Main_1000ms(void) {
 	//Save was requested
 	if(Emonitor_requestState == 4)
 	{
-		DBG("(EM) SAVE REQUESTED\n");
+		DBG_EMON("(EM) SAVE REQUESTED\n");
 		NvM_RequestSave();
 		//Change to reset request
 		Emonitor_requestState = 3;
@@ -354,8 +363,8 @@ void Emonitor_Main_1000ms(void) {
 		//Wait until NvM is done
 		if(NvM_IsBusy() == FALSE)
 		{
-			DBG("(EM) ###################################\n");
-			DBG("(EM) ###################################\n");
+			PRINT_EMON("(EM) ###################################\n");
+			PRINT_EMON("(EM) ###################################\n");
 			//Trigger reset
 			taskENTER_CRITICAL();
 			while(1)
@@ -381,11 +390,11 @@ void Emonitor_Main_Background(void) {
 
 void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, char * response_headers, int body_size)
 {
-	printf("HTTP status=%d\n", http_status);
+	DBG_EMON("HTTP status=%d\n", http_status);
 	if (http_status != HTTP_STATUS_GENERIC_ERROR) {
-		printf("HTTP headers (%d)\n", strlen(response_headers));
-		printf("HTTP body (%d)\n", body_size);
-		printf("HTTP body=\"%s\"\n", response_body); // FIXME: this does not handle binary data.
+		DBG_EMON("HTTP headers (%d)\n", strlen(response_headers));
+		DBG_EMON("HTTP body (%d)\n", body_size);
+		DBG_EMON("HTTP body=\"%s\"\n", response_body); // FIXME: this does not handle binary data.
 
 		if(http_status == 200)
 		{

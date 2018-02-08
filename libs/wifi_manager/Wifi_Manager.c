@@ -4,13 +4,13 @@
 #include "spiffs_manager.h"
 
 LOCAL void ICACHE_FLASH_ATTR on_wifi_connect(){
-    os_printf("Connected\n");
+	DBG_WM("Connected\n");
     //Store current ip address
 
 }
 
 LOCAL void ICACHE_FLASH_ATTR on_wifi_disconnect(uint8 reason){
-    os_printf("Disconnect %d\n", reason);
+	DBG_WM("Disconnect %d\n", reason);
 }
 
 uint8 WifiManager_enableHotspot = 1;

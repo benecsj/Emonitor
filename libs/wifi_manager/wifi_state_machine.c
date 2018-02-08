@@ -32,9 +32,7 @@
 #include "espressif/esp_wifi.h"
 #include "espressif/esp_sta.h"
 #include "espressif/esp_softap.h"
-#include "wifi_state_machine.h"
-
-#include "user_config.h"
+#include "Wifi_Manager.h"
 
 typedef void (* wifi_state_cb_t)();
 
@@ -55,7 +53,7 @@ void ICACHE_FLASH_ATTR wifi_event_handler_cb(System_Event_t *event)
         return;
     }
 
-    os_printf("[WiFi] event %u\n", event->event_id);
+    DBG_WM("[WiFi] event %u\n", event->event_id);
 
     switch (event->event_id) {
         case EVENT_STAMODE_DISCONNECTED:
@@ -159,12 +157,12 @@ bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){
     if((mode & STATION_MODE) == 0){
         mode |= STATION_MODE;
         if(!wifi_set_mode(mode)){
-            os_printf("Failed to enable Station mode!\n");
+        	DBG_WM("Failed to enable Station mode!\n");
             return false;
         }
     }
     if(!ssid){
-        os_printf("No SSID Given. Will connect to the station saved in flash\n");
+    	DBG_WM("No SSID Given. Will connect to the station saved in flash\n");
         return true;
     }
 
@@ -177,14 +175,14 @@ bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){
         strcpy(config.password, pass);
     }
     if(!wifi_station_set_config_current(&config)){
-        os_printf("Failed to set Station config!\n");
+    	DBG_WM("Failed to set Station config!\n");
         return false;
     }
 
     if(!wifi_station_dhcpc_status()){
-        os_printf("DHCP is not started. Starting it...\n");
+    	DBG_WM("DHCP is not started. Starting it...\n");
         if(!wifi_station_dhcpc_start()){
-            os_printf("DHCP start failed!\n");
+        	DBG_WM("DHCP start failed!\n");
             return false;
         }
     }
@@ -195,7 +193,7 @@ bool ICACHE_FLASH_ATTR stop_wifi_station(){
     WIFI_MODE mode = wifi_get_opmode();
     mode &= ~STATION_MODE;
     if(!wifi_set_mode(mode)){
-        os_printf("Failed to disable Station mode!\n");
+    	DBG_WM("Failed to disable Station mode!\n");
         return false;
     }
     return true;
@@ -206,14 +204,14 @@ bool ICACHE_FLASH_ATTR start_wifi_ap(const char * ssid, const char * pass, uint8
     if((mode & SOFTAP_MODE) == 0){
         mode |= SOFTAP_MODE;
         if(!wifi_set_mode(mode)){
-            os_printf("Failed to enable AP mode!\n");
+        	DBG_WM("Failed to enable AP mode!\n");
             return false;
         }
     }
     //Check ssid parameter
     if((ssid == NULL) || (strlen(ssid)==0) )
     {
-        os_printf("No SSID Given. Will start the AP saved in flash\n");
+    	DBG_WM("No SSID Given. Will start the AP saved in flash\n");
         return true;
     }
 
@@ -268,7 +266,7 @@ bool ICACHE_FLASH_ATTR stop_wifi_ap(){
     WIFI_MODE mode = wifi_get_opmode();
     mode &= ~SOFTAP_MODE;
     if(!wifi_set_mode(mode)){
-        os_printf("Failed to disable AP mode!\n");
+    	DBG_WM("Failed to disable AP mode!\n");
         return false;
     }
     return true;

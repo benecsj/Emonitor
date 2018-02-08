@@ -19,9 +19,10 @@
 #include "lwip/ip_addr.h"
 #include "espconn.h"
 #include "esp_misc.h"
+#include "user_config.h"
 
 // Debug output.
-#if 1
+#if DEBUG_HTTP_CLIENT
 #define PRINTF(...) printf(__VA_ARGS__)
 #else
 #define PRINTF(...)
@@ -46,7 +47,7 @@ static char * ICACHE_FLASH_ATTR esp_strdup(const char * str)
 	}
 	char * new_str = (char *)os_malloc(strlen(str) + 1); // 1 for null character
 	if (new_str == NULL) {
-		printf("esp_strdup: malloc error");
+		PRINTF("esp_strdup: malloc error");
 		return NULL;
 	}
 	strcpy(new_str, str);
@@ -209,14 +210,14 @@ static void ICACHE_FLASH_ATTR receive_callback(void * arg, char * buf, unsigned 
 	const int new_size = req->buffer_size + len;
 	char * new_buffer;
 	if (new_size > BUFFER_SIZE_MAX || NULL == (new_buffer = (char *)os_malloc(new_size))) {
-		printf("HTTP Response too long (%d)\n", new_size);
+		PRINTF("HTTP Response too long (%d)\n", new_size);
 		req->buffer[0] = '\0'; // Discard the buffer to avoid using an incomplete response.
 		espconn_disconnect(conn);
 		return; // The disconnect callback will be called.
 	}
 	else
 	{
-		printf("HTTP Response received (%d)\n", new_size);
+		PRINTF("HTTP Response received (%d)\n", new_size);
 	}
 	memcpy(new_buffer, req->buffer, req->buffer_size);
 	memcpy(new_buffer + req->buffer_size - 1 /*overwrite the null character*/, buf, len); // Append new data.
@@ -294,7 +295,7 @@ static void ICACHE_FLASH_ATTR disconnect_callback(void * arg)
 		int body_size = 0;
 		char * body = "";
 		if (req->buffer == NULL) {
-			printf("Buffer shouldn't be NULL\n");
+			PRINTF("Buffer shouldn't be NULL\n");
 		}
 		else if (req->buffer[0] != '\0') {
 			// FIXME: make sure this is not a partial response, using the Content-Length header.
@@ -303,7 +304,7 @@ static void ICACHE_FLASH_ATTR disconnect_callback(void * arg)
 			const char * version11 = "HTTP/1.1 ";
 			if (strncmp(req->buffer, version10, strlen(version10)) != 0
 			 && strncmp(req->buffer, version11, strlen(version11)) != 0) {
-				printf("Invalid version in %s\n", req->buffer);
+				PRINTF("Invalid version in %s\n", req->buffer);
 			}
 			else {
 				http_status = atoi(req->buffer + strlen(version10));
@@ -349,7 +350,7 @@ static void ICACHE_FLASH_ATTR dns_callback(const char * hostname, ip_addr_t * ad
 	request_args * req = (request_args *)arg;
 	sint8 result;
 	if (addr == NULL) {
-		printf("DNS failed for %s\n", hostname);
+		PRINTF("DNS failed for %s\n", hostname);
 		if (req->user_callback != NULL) {
 			req->user_callback("", -1, "", 0);
 		}
@@ -422,10 +423,10 @@ void ICACHE_FLASH_ATTR http_raw_request(const char * hostname, int port, const c
 	}
 	else {
 		if (error == ESPCONN_ARG) {
-			printf("DNS arg error %s\n", hostname);
+			PRINTF("DNS arg error %s\n", hostname);
 		}
 		else {
-			printf("DNS error code %d\n", error);
+			PRINTF("DNS error code %d\n", error);
 		}
 		dns_callback(hostname, NULL, req); // Handle all DNS errors the same way.
 	}
@@ -471,14 +472,13 @@ void ICACHE_FLASH_ATTR http_post(const char * url, const char * post_data, const
 	else {
 		port = atoi(colon + 1);
 		if (port == 0) {
-			printf("IP Port error %s\n", url);
+			PRINTF("IP Port error %s\n", url);
 			return;
 		}
 
 		memcpy(hostname, url, colon - url);
 		hostname[colon - url] = '\0';
 	}
-
 
 	if (path[0] == '\0') { // Empty path is not allowed.
 		path = "/";
