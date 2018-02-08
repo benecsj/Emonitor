@@ -72,7 +72,7 @@
 #define TEMP_RESCAN_PERIOD	2
 
 //Development flags
-#define EMONITOR_TIMING_TEST    0
+#define EMONITOR_TIMING_TEST    1
 #define DEBUG_SENSOR_MANAGER 	0
 #define DEBUG_EMONITOR 			0
 #define DEBUG_HTTP_CLIENT 		0

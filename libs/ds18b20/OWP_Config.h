@@ -18,8 +18,8 @@
 #include "freertos/task.h"
 
 /*Critical session*/
-#define OWP_ENTER_CRITICAL()  vTaskSuspendAll()
-#define OWP_EXIT_CRITICAL()	xTaskResumeAll()
+#define OWP_ENTER_CRITICAL()  taskENTER_CRITICAL()//vTaskSuspendAll()
+#define OWP_EXIT_CRITICAL()	taskEXIT_CRITICAL() //xTaskResumeAll()
 
 /*Port config*/
 #define OWP_GET_IN()   digitalRead(OWP_Channels[OWP_Selected_Channel])
