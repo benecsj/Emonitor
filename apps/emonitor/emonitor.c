@@ -57,7 +57,7 @@ sint32 Emonitor_connectionCounter = 0;
 uint32 Emonitor_nodeId = 0;
 char Emonitor_url[100] = {0};
 char Emonitor_key[33] = {0xFF};
-
+uint32 Emonitor_SendPeroid = 0;
 
 /******************************************************************************
 * Primitives
@@ -106,7 +106,12 @@ void Emonitor_Init(void){
 	{
 		Emonitor_nodeId = Emonitor_GetDefaultId();
 	}
-
+	if((Emonitor_SendPeroid == 0) || (Emonitor_SendPeroid >3600))
+	{
+		Emonitor_SendPeroid = DEFAULT_SEND_TIMING;
+	}
+	//Restore timing
+	Emonitor_timing = Emonitor_RestoreTiming();
 }
 
 void Emonitor_StartTimer(void){
@@ -114,6 +119,32 @@ void Emonitor_StartTimer(void){
     hw_timer_init();
     hw_timer_set_func(task_1ms);
     hw_timer_arm(1000,1);
+}
+
+void Emonitor_StoreTiming(uint32_t timingValue){
+	  uint8 buffer[4];
+	  buffer[0] = (timingValue>>24) & 0xF;
+	  buffer[1] = (timingValue>>16) & 0xF;
+	  buffer[2] = (timingValue>>8) & 0xF;
+	  buffer[3] = (timingValue) & 0xF;
+	  system_rtc_mem_write(64, buffer, 4);
+}
+
+uint32_t Emonitor_RestoreTiming(void){
+	  uint8 buffer[4];
+	  uint32_t timingValue = 0;
+	  system_rtc_mem_read(64, buffer, 4);
+	  timingValue |=  (((uint32_t) buffer[0])<<24);
+	  timingValue |=  (((uint32_t) buffer[1])<<16);
+	  timingValue |=  (((uint32_t) buffer[2])<<8);
+	  timingValue |=  (((uint32_t) buffer[3]));
+	  //plausibity check
+	  if(timingValue > Emonitor_SendPeroid*2)
+	  {
+		  timingValue = Emonitor_SendPeroid -10;
+	  }
+
+	  return timingValue;
 }
 
 /******************************************************************************
@@ -215,7 +246,7 @@ void Emonitor_Main_1000ms(void) {
 	//Free ram and stack
 	uint32 freeRam = system_get_free_heap_size();
 	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
-	PRINT_EMON("(EM) Uptime(%d) Ip:(%d) Conn(%d) Heap:(%d) Stack:(%d) Run:(%d)\n", Emonitor_uptime,ip[3],Emonitor_connectionCounter,freeRam,freeStack,Emonitor_counter);
+	PRINT_EMON("(EM) U(%d) T(%d) I(%d) C(%d) H(%d) S(%d) R(%d)\n", Emonitor_uptime,Emonitor_timing,ip[3],Emonitor_connectionCounter,freeRam,freeStack,Emonitor_counter);
 	//DBG_EMON("(EM) Pulse0(%d) Pulse1(%d) Pulse2(%d) Pulse3(%d) \n",Sensor_Manager_GetPulseCount(0),Sensor_Manager_GetPulseCount(1),Sensor_Manager_GetPulseCount(2),Sensor_Manager_GetPulseCount(3));
 	//Connection status led update
 
@@ -224,10 +255,13 @@ void Emonitor_Main_1000ms(void) {
 	taskEXIT_CRITICAL();
 
 	//Emonitor sending
+	taskENTER_CRITICAL();
 	Emonitor_timing++;
-	if(Emonitor_timing == 10){
-		Emonitor_timing = 0;
+	taskEXIT_CRITICAL();
+	//Store timing value
+	Emonitor_StoreTiming(Emonitor_timing);
 
+	if(Emonitor_timing >= Emonitor_SendPeroid){
 		if(Wifi_Manager_Connected() == 1)
 		{
 			//Check if strings have a valid length
@@ -407,6 +441,10 @@ void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, 
 		if(http_status == 200)
 		{
 			Emonitor_connectionStatus = 0;
+			//Send was successfull clear timer
+			taskENTER_CRITICAL();
+			Emonitor_timing = 0;
+			taskEXIT_CRITICAL();
 		}
 		else
 		{

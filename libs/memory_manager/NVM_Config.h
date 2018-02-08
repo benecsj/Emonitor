@@ -16,6 +16,7 @@ extern uint8 NVM_test_value;
 extern uint8 Emonitor_ledControl;
 extern uint8 WifiManager_enableHotspot;
 extern uint32 Emonitor_nodeId;
+extern uint32 Emonitor_SendPeroid;
 extern char Emonitor_url[100];
 extern char Emonitor_key[33];
 extern char WifiManager_STA_SSID[33];
@@ -31,13 +32,13 @@ extern char WifiManager_AP_PASSWORD[65];
 	NVM_DATA(Emonitor_ledControl,       sizeof(Emonitor_ledControl))\
 	NVM_DATA(WifiManager_enableHotspot,       sizeof(WifiManager_enableHotspot))\
 	NVM_DATA(Emonitor_nodeId,       sizeof(Emonitor_nodeId))\
+	NVM_DATA(Emonitor_SendPeroid,       sizeof(Emonitor_SendPeroid))\
 	NVM_DATA(Emonitor_url,       100)\
 	NVM_DATA(Emonitor_key,       33)\
 	NVM_DATA(WifiManager_STA_SSID,       33)\
 	NVM_DATA(WifiManager_STA_PASSWORD,       65)\
 	NVM_DATA(WifiManager_AP_SSID,       33)\
 	NVM_DATA(WifiManager_AP_PASSWORD,       65)\
-
 
 #define NVM_DATA_POS_DATA_START 16
 

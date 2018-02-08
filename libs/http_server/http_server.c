@@ -167,6 +167,15 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 							}
 						}
 
+						//EMONCMS SEND PEROID
+						else if (strcmp(name, "emon_send")==0) {
+							temp = strtol(buff,NULL,10);
+							if((temp > 0) && (temp <=3600))
+							{
+								Emonitor_SetSendPeriod(temp);
+							}
+						}
+
 						//ACCESS POINT SSID
 						else if (strcmp(name, "ap_ssid")==0) {
 							//Check length
@@ -237,6 +246,11 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 		//EMONCMS NODE ID
 		else if (strcmp(token, "emon_id")==0) {
 			len = sprintf(buff, "%d", Emonitor_GetNodeId());
+		}
+
+		//EMONCMS SEND PEROID
+		else if (strcmp(token, "emon_send")==0) {
+			len = sprintf(buff, "%d", Emonitor_GetSendPeriod());
 		}
 
 		//ACCESS POINT SSID

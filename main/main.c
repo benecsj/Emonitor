@@ -171,7 +171,6 @@ void task_background(void *pvParameters) {
  *******************************************************************************/
 void user_init(void) {
 	struct rst_info* resetInfo;
-
 	//Init application
 	Emonitor_Preinit();
 

@@ -28,7 +28,6 @@
 //WIFI
 #define DEFAULT_STA_SSID "BOCI"
 #define DEFAULT_STA_PASSWORD "fucking6"
-
 #define DEFAULT_SERVER_ADDRESS 	"http://v9.emonitor.hu"
 #define DEFAULT_API_KEY 		"97d3e42a841ea6c219582211313d5051"
 
@@ -49,6 +48,7 @@
 #define FD_BUF_SIZE         32*4
 #define CACHE_BUF_SIZE      (LOG_PAGE + 32)*8
 
+//Pins
 #define LED_BUILTIN		D0
 #define ONEWIRE_BUS_0	D1
 #define ONEWIRE_BUS_1	D2
@@ -64,7 +64,7 @@
 #define TIMEOUT_TURNOFF_APP 	43200*2
 #define LED_TIMING_NORMAL		500
 #define LED_TIMING_RESET		100
-
+#define DEFAULT_SEND_TIMING		10
 
 //Sensor manager
 #define OWP_CHANNELS_COUNT 2
@@ -72,8 +72,8 @@
 //Development flags
 #define EMONITOR_TIMING_TEST    0
 #define DEBUG_SENSOR_MANAGER 	0
-#define DEBUG_EMONITOR 			0
-#define DEBUG_HTTP_CLIENT 		0
+#define DEBUG_EMONITOR 			1
+#define DEBUG_HTTP_CLIENT 		1
 #define DEBUG_HTTP_SERVER 		0
 #define DEBUG_WIFI_MANAGER		0
 

@@ -59,16 +59,17 @@ void Wifi_Manager_Init(void)
 	}
 
 	//Register eventhandlers
+
     set_on_station_connect(on_wifi_connect);
     set_on_station_disconnect(on_wifi_disconnect);
+
     //Init Wifi
     //init_esp_wifi();
-    start_wifi_station(WifiManager_STA_SSID, WifiManager_STA_PASSWORD);
    	start_wifi_ap(WifiManager_AP_SSID, WifiManager_AP_PASSWORD,(WifiManager_enableHotspot==0));
-    //stop_wifi_station();
-    //stop_wifi_ap();
+   	start_wifi_station(WifiManager_STA_SSID, WifiManager_STA_PASSWORD);
 
-    //start_wifi_station(WifiManager_STA_SSID, WifiManager_STA_PASSWORD);
+    ////stop_wifi_station();
+    ////stop_wifi_ap();
 
     //Set hotspot value
     if(WifiManager_enableHotspot == 0xFF)
