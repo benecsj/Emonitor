@@ -26,10 +26,11 @@
 #define __USER_CONFIG_H__
 
 //WIFI
-#define DEFAULT_STA_SSID "BOCI"
-#define DEFAULT_STA_PASSWORD "fucking6"
+#define DEFAULT_STA_SSID 		"BOCI"
+#define DEFAULT_STA_PASSWORD 	"fucking6"
 #define DEFAULT_SERVER_ADDRESS 	"http://v9.emonitor.hu"
 #define DEFAULT_API_KEY 		"97d3e42a841ea6c219582211313d5051"
+#define WIFI_SCAN_TIMING 		60
 
 //NvM
 #define EMONITOR_PARAM_START_SEC		0x8D
@@ -68,11 +69,11 @@
 
 //Sensor manager
 #define OWP_CHANNELS_COUNT 	2
-#define TEMP_RESCAN_PERIOD	10
+#define TEMP_RESCAN_PERIOD	2
 
 //Development flags
 #define EMONITOR_TIMING_TEST    0
-#define DEBUG_SENSOR_MANAGER 	1
+#define DEBUG_SENSOR_MANAGER 	0
 #define DEBUG_EMONITOR 			0
 #define DEBUG_HTTP_CLIENT 		0
 #define DEBUG_HTTP_SERVER 		0

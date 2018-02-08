@@ -23,6 +23,8 @@ struct scan_config WifiManager_ScanConfig;
 sint8 WifiManager_SignalLevel = 0;
 uint8 WifiManager_ScanRunning = 0;
 
+uint8 WifiManager_ScanTiming = 0;
+
 void Wifi_Manager_Init(void)
 {
 	//Verify Parameters
@@ -90,7 +92,12 @@ void Wifi_Manager_Init(void)
 
 void Wifi_Manager_Main(void)
 {
-	Wifi_Manager_UpdateLevel();
+	WifiManager_ScanTiming++;
+	if(WifiManager_ScanTiming == WIFI_SCAN_TIMING)
+	{
+		WifiManager_ScanTiming = 0;
+		Wifi_Manager_UpdateLevel();
+	}
 }
 
 void ICACHE_FLASH_ATTR Wifi_Manager_ScanDone(void *arg, STATUS status)
