@@ -51,10 +51,10 @@
 
 //Pins
 #define LED_BUILTIN		D0
-#define ONEWIRE_BUS_0	D1
-#define ONEWIRE_BUS_1	D2
-#define PULSE_INPUT0    D7
-#define PULSE_INPUT1    D6
+#define ONEWIRE_BUS_0	D1     //D1
+#define ONEWIRE_BUS_1	D2     //D2
+#define PULSE_INPUT0    D7     //D7
+#define PULSE_INPUT1    D6     //D6
 #define PULSE_INPUT2    D5
 #define PULSE_INPUT3    D4
 #define FLASH_BUTTON    D3
@@ -72,7 +72,7 @@
 #define TEMP_RESCAN_PERIOD	2
 
 //Development flags
-#define EMONITOR_TIMING_TEST    1
+#define EMONITOR_TIMING_TEST    0
 #define DEBUG_SENSOR_MANAGER 	0
 #define DEBUG_EMONITOR 			0
 #define DEBUG_HTTP_CLIENT 		0
