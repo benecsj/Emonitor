@@ -22,6 +22,17 @@ extern uint32 Emonitor_SendPeroid;
 extern char Emonitor_url[100];
 extern char Emonitor_key[33];
 extern uint8 Emonitor_requestState;
+extern uint32 Emonitor_uptime;
+extern uint32 Emonitor_timing;
+extern sint32 Emonitor_connectionCounter;
+extern uint32 Emonitor_freeRam;
+extern uint32 Emonitor_counterMirror;
+
+#define Emonitor_GetUptime()	(Emonitor_uptime)
+#define Emonitor_GetSendTiming()	(Emonitor_timing)
+#define Emonitor_GetConnectionCounter()	(Emonitor_connectionCounter)
+#define Emonitor_GetFreeRam()	(Emonitor_freeRam)
+#define Emonitor_GetBackgroundCount()	(Emonitor_counterMirror)
 
 #define Emonitor_GetNodeId()  (Emonitor_nodeId)
 #define Emonitor_SetNodeId(a)  (Emonitor_nodeId = a)

@@ -119,13 +119,13 @@ void Sensor_Manager_Fast() {
     }
 
     //SW pulse counter
-    if((pulseState == 1) && (APP_PortMon_analogValues[0] < 400))
+    if((pulseState == 1) && (APP_PortMon_analogValues[0] < 300))
     {
     	pulseState = 0;
     	Sensor_Manager_PulseCounters[4]++;
 
     }
-    else if((pulseState == 0) && (APP_PortMon_analogValues[0] > 800))
+    else if((pulseState == 0) && (APP_PortMon_analogValues[0] > 600))
     {
        	pulseState = 1;
     }
@@ -191,6 +191,40 @@ uint32 Sensor_Manager_GetPulseCount(uint8 id)
 	taskENTER_CRITICAL();
 	uint32 tempValue = Sensor_Manager_PulseCounters[id];
 	taskEXIT_CRITICAL();
+	return tempValue;
+}
+
+uint32 Sensor_Manager_GetPulseLevel(uint8 id)
+{
+	uint32_t tempValue = 0;
+	switch(id)
+	{
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 0)
+	case 0:
+		tempValue = digitalRead(PULSE_INPUT0);
+	break;
+#endif
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 1)
+	case 1:
+		tempValue = digitalRead(PULSE_INPUT1);
+	break;
+#endif
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 2)
+	case 2:
+		tempValue = digitalRead(PULSE_INPUT2);
+	break;
+#endif
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 3)
+	case 3:
+		tempValue = digitalRead(PULSE_INPUT3);
+	break;
+#endif
+#if (SENSOR_MANAGER_PULSE_COUNTERS > 4)
+	case 4:
+		tempValue = Sensor_Manager_GetAnalogValue();
+	break;
+#endif
+	}
 	return tempValue;
 }
 

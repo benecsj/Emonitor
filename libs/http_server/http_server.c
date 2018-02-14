@@ -4,6 +4,7 @@
 #include "httpdespfs.h"
 
 #include "Wifi_Manager.h"
+#include "Sensor_Manager.h"
 #include "Emonitor.h"
 
 int Http_Server_TokenProcessor(HttpdConnData *connData, char *token, void **arg);
@@ -217,7 +218,8 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 	}
 	else
 	{
-
+		//-----------------------------------------------------------------
+		//-----------------------------------------------------------------
 		// INDEX PAGE
 		if(strcmp(connData->url,"/index.html")==0)
 		{
@@ -281,15 +283,123 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 				}
 			}
 		}
-
+		//-----------------------------------------------------------------
+		//-----------------------------------------------------------------
+		// STATUS
 		else if(strcmp(connData->url,"/status.html")==0)
 		{
 			//EMONCMS NODE ID
 			if (strcmp(token, "emon_id")==0) {
 				len = sprintf(buff, "%d", Emonitor_GetNodeId());
 			}
+			//DEVICE UPTIME
+			else if (strcmp(token, "st_uptime")==0) {
+				len = sprintf(buff, " %d sec", Emonitor_GetUptime());
+			}
+			//EMONCMS SENDTIMING
+			else if (strcmp(token, "st_timing")==0) {
+				len = sprintf(buff, " %d \\ %d", Emonitor_GetSendTiming()+1,Emonitor_GetSendPeriod());
+			}
+			//EMONCMS CONNECTION COUNTER
+			else if (strcmp(token, "st_conn")==0) {
+				len = sprintf(buff, " %d", Emonitor_GetConnectionCounter());
+			}
+			//EMONCMS HEAP
+			else if (strcmp(token, "st_heap")==0) {
+				uint32_t usedRAM = (HTTP_TOTALRAM -Emonitor_GetFreeRam())/1024;
+				uint32_t freeRAM = (Emonitor_GetFreeRam())/1024;
+				uint32_t usagePercent = ((double)(usedRAM)/(double)(usedRAM+freeRAM))*100;
+				len = sprintf(buff, " %d%% Used: %d kb Free: %d kb ", usagePercent, usedRAM,freeRAM);
+			}
+			//EMONCMS BACKGROUND COUNT
+			else if (strcmp(token, "st_bck")==0) {
+				uint32_t countUsage = HTTP_EMPTYCOUNT - Emonitor_GetBackgroundCount();
+				double usage = ((double)countUsage/(double)HTTP_EMPTYCOUNT)*100;
+				countUsage = usage;
+				len = sprintf(buff, " %d%%", countUsage);
+			}
+			//WIFI CONNECTION
+			else if (strcmp(token, "st_wifi")==0) {
 
+				if(Wifi_Manager_IsConnected() == 1)
+				{
+					len = sprintf(buff, " Connected to %s",Wifi_Manager_GetSTA_SSID());
+				}
+				else
+				{
+					len = sprintf(buff, " Searching... (%s)",Wifi_Manager_GetSTA_SSID());
+				}
+			}
+			//WIFI POWER LEVEL
+			else if (strcmp(token, "st_signal")==0) {
+
+				if(Wifi_Manager_IsConnected() == 1)
+				{
+					sint8 signalLevel = Wifi_Manager_GetSignalLevel();
+					uint32_t signalPercent = 0;
+					if(signalLevel > -50)
+					{
+						signalPercent = 100;
+					}
+					else if(signalLevel < -90)
+					{
+						signalPercent = 0;
+					}
+					else
+					{
+						signalPercent = 100+(uint32_t)(((double)signalLevel+50)*(double)2.5);
+					}
+					len = sprintf(buff, " %d%% (%d dBm)",signalPercent,signalLevel);
+				}
+				else
+				{
+					len = sprintf(buff, "--");
+				}
+			}
+			//WIFI IP
+			else if (strcmp(token, "st_ip")==0) {
+
+				if(Wifi_Manager_IsConnected() == 1)
+				{
+					uint8 ip[4];
+					Wifi_Manager_GetIp(ip);
+					len = sprintf(buff, " %d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);
+				}
+				else
+				{
+					len = sprintf(buff, "--");
+				}
+			}
+			//PULSE COUNTERS
+			else if (strcmp(token, "pulse_01")==0) {
+					uint32 count = Sensor_Manager_GetPulseCount(0);
+					uint8 level = Sensor_Manager_GetPulseLevel(0);
+					len = sprintf(buff, " %d  (%d)",count,level);
+			}
+			else if (strcmp(token, "pulse_02")==0) {
+					uint32 count = Sensor_Manager_GetPulseCount(1);
+					uint8 level = Sensor_Manager_GetPulseLevel(1);
+					len = sprintf(buff, " %d  (%d)",count,level);
+			}
+			else if (strcmp(token, "pulse_03")==0) {
+					uint32 count = Sensor_Manager_GetPulseCount(2);
+					uint8 level = Sensor_Manager_GetPulseLevel(2);
+					len = sprintf(buff, " %d  (%d)",count,level);
+			}
+			else if (strcmp(token, "pulse_04")==0) {
+					uint32 count = Sensor_Manager_GetPulseCount(3);
+					uint8 level = Sensor_Manager_GetPulseLevel(3);
+					len = sprintf(buff, " %d  (%d)",count,level);
+			}
+			else if (strcmp(token, "pulse_05")==0) {
+					uint32 count = Sensor_Manager_GetPulseCount(4);
+					uint32 level = Sensor_Manager_GetPulseLevel(4);
+					len = sprintf(buff, " %d  (%d)",count,level);
+			}
 		}
+		//-----------------------------------------------------------------
+		//-----------------------------------------------------------------
+		// WAIT
 		else if(strcmp(connData->url,"/wait.html")==0)
 		{
 			//EMONCMS NODE ID

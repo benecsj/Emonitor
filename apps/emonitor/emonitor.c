@@ -38,6 +38,7 @@
 \******************************************************************************/
 
 uint32 Emonitor_counter = 0;
+uint32 Emonitor_counterMirror = 0;
 uint32 Emonitor_statusCounter = 0;
 
 uint32 Emonitor_timing = 0;
@@ -53,6 +54,8 @@ uint8 Emonitor_requestState = 0;
 uint8 Emonitor_connectionStatus = 1;
 
 sint32 Emonitor_connectionCounter = 0;
+
+uint32 Emonitor_freeRam = 0;
 
 uint32 Emonitor_nodeId = 0;
 char Emonitor_url[100] = {0};
@@ -167,7 +170,7 @@ void Emonitor_Main_1ms(void) {
 		{
 			ledValue = 0 ;
 		}
-		if(Wifi_Manager_Connected() == 0)
+		if(Wifi_Manager_IsConnected() == 0)
 		{
 			Emonitor_statusCounter= (Emonitor_statusCounter)%2;
 			ledValue = Emonitor_statusCounter == 0;
@@ -244,13 +247,15 @@ void Emonitor_Main_1000ms(void) {
 	//Get local ip address
 	Wifi_Manager_GetIp(ip);
 	//Free ram and stack
-	uint32 freeRam = system_get_free_heap_size();
+	Emonitor_freeRam = system_get_free_heap_size();
 	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
-	PRINT_EMON("(EM) U(%d) T(%d) I(%d) C(%d) H(%d) S(%d) R(%d) S(%d) H(%d)\n", Emonitor_uptime,Emonitor_timing,ip[3],Emonitor_connectionCounter,freeRam,freeStack,Emonitor_counter,Wifi_Manager_GetSignalLevel(),Sensor_Manager_GetTempHealth());
+	PRINT_EMON("(EM) U(%d) T(%d) I(%d) C(%d) H(%d) S(%d) R(%d) S(%d) H(%d)\n", Emonitor_uptime,Emonitor_timing,ip[3],Emonitor_connectionCounter,Emonitor_freeRam,freeStack,Emonitor_counter,Wifi_Manager_GetSignalLevel(),Sensor_Manager_GetTempHealth());
 	//DBG_EMON("(EM) Pulse0(%d) Pulse1(%d) Pulse2(%d) Pulse3(%d) \n",Sensor_Manager_GetPulseCount(0),Sensor_Manager_GetPulseCount(1),Sensor_Manager_GetPulseCount(2),Sensor_Manager_GetPulseCount(3));
 	//Connection status led update
 
+
 	taskENTER_CRITICAL();
+	Emonitor_counterMirror = Emonitor_counter;
 	Emonitor_counter = 0;
 	taskEXIT_CRITICAL();
 
@@ -261,7 +266,7 @@ void Emonitor_Main_1000ms(void) {
 	//Store timing value
 	Emonitor_StoreTiming(Emonitor_timing);
 	if(Emonitor_timing >= Emonitor_SendPeroid){
-		if(Wifi_Manager_Connected() == 1)
+		if(Wifi_Manager_IsConnected() == 1)
 		{
 			//Check if strings have a valid length
 			uint8 urlLength = strlen(Emonitor_url);
@@ -278,7 +283,7 @@ void Emonitor_Main_1000ms(void) {
 				//Start of Emoncsm send Url
 				Append(length,buffer,"%s%s/input/post.json?node=%d&json={",http,Emonitor_url,Emonitor_nodeId);
 				//Add freeram
-				Append(length,buffer,"freeram:%d,",freeRam);
+				Append(length,buffer,"freeram:%d,",Emonitor_freeRam);
 				//Add pulse counters
 				for(i=0;i<SENSOR_MANAGER_PULSE_COUNTERS;i++)
 				{

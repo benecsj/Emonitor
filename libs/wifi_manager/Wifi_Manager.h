@@ -19,7 +19,7 @@ extern void Wifi_Manager_UpdateLevel(void);
 
 extern void Wifi_Manager_GetDefaultValues(char* id, char * pass);
 
-#define Wifi_Manager_Connected	wifi_station_connected
+#define Wifi_Manager_IsConnected	wifi_station_connected
 
 
 extern uint8 WifiManager_enableHotspot;

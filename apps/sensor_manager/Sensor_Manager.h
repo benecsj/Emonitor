@@ -31,6 +31,7 @@ extern void Sensor_Manager_Fast();
 
 extern void Sensor_Manager_Get_TempSensorData(uint8* count, uint8** ids,sint16** temperatures );
 extern uint32 Sensor_Manager_GetPulseCount(uint8 id);
+extern uint32 Sensor_Manager_GetPulseLevel(uint8 id);
 extern void Sensor_Manager_ResetPulseCounters(void);
 extern uint16 Sensor_Manager_GetAnalogValue(void);
 

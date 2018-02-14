@@ -55,5 +55,8 @@ typedef struct espconn* ConnTypePtr;
 #define HTTPD_REDIRECT_TO_HOSTNAME_BUFFER 1024
 #define HTTPD_MAX_POSTBUFF_LEN 1024
 
+#define HTTP_EMPTYCOUNT 550000
+#define HTTP_TOTALRAM	81920
+
 extern void* aligned_malloc(size_t required_bytes);
 extern void aligned_free(void *p);

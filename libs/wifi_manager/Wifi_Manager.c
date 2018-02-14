@@ -6,7 +6,7 @@
 LOCAL void ICACHE_FLASH_ATTR on_wifi_connect(){
 	DBG_WM("Connected\n");
     //Store current ip address
-
+	Wifi_Manager_UpdateLevel();
 }
 
 LOCAL void ICACHE_FLASH_ATTR on_wifi_disconnect(uint8 reason){
