@@ -2,6 +2,7 @@
 #include <esp8266_platform.h>
 #include "httpd.h"
 #include "httpdespfs.h"
+#include "esp_system.h"
 
 #include "Wifi_Manager.h"
 #include "Sensor_Manager.h"
@@ -409,6 +410,33 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 						char sign = (temperatures[id]<0 ? '-':' ');
 						len = sprintf(buff, "<tr><td>%02X%02X%02X%02X%02X</td><td>%c%d.%dC</td></tr>",ids[(id*8)+1],ids[(id*8)+2],ids[(id*8)+3],ids[(id*8)+4],ids[(id*8)+7],sign,abs(temperatures[id]/10),abs(temperatures[id]%10));
 					}
+			}
+			else if (strcmp(token, "st_rst")==0) {
+				uint32 reset = Emonitor_GetResetReason();
+				switch(reset)
+				{
+				case REASON_DEFAULT_RST:
+					len = sprintf(buff, "DEFAULT_RST");
+					break;
+				case REASON_WDT_RST:
+					len = sprintf(buff, "WDT_RST");
+					break;
+				case REASON_EXCEPTION_RST:
+					len = sprintf(buff, "EXCEPTION_RST");
+					break;
+				case REASON_SOFT_WDT_RST:
+					len = sprintf(buff, "SOFT_WDT_RST");
+					break;
+				case REASON_SOFT_RESTART:
+					len = sprintf(buff, "SOFT_RESTART");
+					break;
+				case REASON_DEEP_SLEEP_AWAKE:
+					len = sprintf(buff, "DEEP_SLEEP_AWAKE");
+					break;
+				case REASON_EXT_SYS_RST:
+					len = sprintf(buff, "EXT_SYS_RST");
+					break;
+				}
 			}
 		}
 

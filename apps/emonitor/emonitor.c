@@ -41,6 +41,8 @@ uint32 Emonitor_counter = 0;
 uint32 Emonitor_counterMirror = 0;
 uint32 Emonitor_statusCounter = 0;
 
+uint32 Emonitor_resetReason = 0;
+
 uint32 Emonitor_timing = 0;
 
 uint32 Emonitor_uptime = 0;

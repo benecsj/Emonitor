@@ -23,6 +23,8 @@ extern void Cpi_NvM(uint8* params,uint8 lenght, uint8* response);
 extern void Cpi_Wifi(uint8* params,uint8 lenght, uint8* response);
 extern void Cpi_Spiffs(uint8* params,uint8 lenght, uint8* response);
 extern void Cpi_Sensor(uint8* params,uint8 lenght, uint8* response);
+extern void Cpi_Reset(uint8* params,uint8 lenght, uint8* response);
+
 /* Processing callout */
 
 
@@ -34,6 +36,7 @@ extern void Cpi_Sensor(uint8* params,uint8 lenght, uint8* response);
         {"cwifi"  ,CPI_VARIABLE_LENGHT  ,Cpi_Wifi, NULL},\
         {"spifs"  ,CPI_VARIABLE_LENGHT  ,Cpi_Spiffs, NULL},\
         {"sense"  ,CPI_VARIABLE_LENGHT  ,Cpi_Sensor, NULL},\
+        {"reset"  ,CPI_VARIABLE_LENGHT  ,Cpi_Reset, NULL},\
 
 /* Communication protocol setup*/
 /* Tokens: */

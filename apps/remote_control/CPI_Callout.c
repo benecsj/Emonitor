@@ -23,6 +23,16 @@ extern uint8 Emonitor_ledControl;
 Global variables and functions
  ***********************************************************************************************************************/
 
+void Cpi_Reset(uint8* params,uint8 lenght, uint8* response) {
+	//Trigger reset
+	taskENTER_CRITICAL();
+	while(1)
+	{
+
+	}
+	taskEXIT_CRITICAL();
+}
+
 void Cpi_NvM(uint8* params, uint8 lenght, uint8* response) {
 	char* text = "/OK/"+0;
 	uint8 selection;

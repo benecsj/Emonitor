@@ -27,7 +27,10 @@ extern uint32 Emonitor_timing;
 extern sint32 Emonitor_connectionCounter;
 extern uint32 Emonitor_freeRam;
 extern uint32 Emonitor_counterMirror;
+extern uint32 Emonitor_resetReason;
 
+#define Emonitor_SetResetReason(a) (Emonitor_resetReason = a)
+#define Emonitor_GetResetReason() (Emonitor_resetReason)
 #define Emonitor_GetUptime()	(Emonitor_uptime)
 #define Emonitor_GetSendTiming()	(Emonitor_timing)
 #define Emonitor_GetConnectionCounter()	(Emonitor_connectionCounter)

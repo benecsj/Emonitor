@@ -179,6 +179,7 @@ void user_init(void) {
 	system_print_meminfo();
 	//Get reset cause
 	resetInfo = system_get_rst_info();
+	Emonitor_SetResetReason(resetInfo->reason);
 	DBG("Reset exccause:%d reason:%d\n",resetInfo->exccause,resetInfo->reason);
 	//Case on WDT reset perform some clean up
 	if( (REASON_SOFT_WDT_RST == resetInfo->reason) || (REASON_WDT_RST == resetInfo->reason) ||
