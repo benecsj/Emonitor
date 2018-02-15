@@ -1,88 +1,103 @@
 <html>
 
 <head>
+
+<title>Emonitor_%emon_id%</title>
+  
 <meta http-equiv="refresh" content="1;url=status.html" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+<meta name="description" content="Emonitor">
+<meta name="author" content="Emonitor">
+<meta name="theme-color" content="#000000" />
+
 <meta charset="UTF-8" />
-  
- <style>
- 
-.block {
-    /* Just to center the form on the page */
-    margin: 0 auto;
-    width: 400px;
-    /* To see the outline of the form */
-    padding: 1em;
-    border: 3px solid black;
-    background-color: #F0E6DC;
-    margin-bottom: 10px;
-}
- 
-label {
-    /* To make sure that all labels have the same size and are properly aligned */
-    display: inline-block;
-    width: 120px;
-    text-align: right;
-}
- 
-body {
-    background-color: linen;
-    justify-content: center;
-}
-
-.h1 {
-    color: #e65c00;
-    margin-top: 20px;
-    text-align: center;
-}
-    
-.centerImg {
-    display: block; 
-    margin-left: auto; 
-    margin-right: auto;
-    width: 200;
-    height : 200;
-}
-
-.centerText {
-    color: #000000;
-    text-align: center;
-}
-    
-</style>
+<link rel="stylesheet" type="text/css" href="style.css">
 </head> 
 
-<header><title>Emonitor</title></header>
 
 <body>
-<h1 class="h1">Emonitor_%emon_id%</h1>
-<img class="centerImg" src="emonitor.png">
-<br>
-<div class="centerText">Status</div>
-<div class="block">
-<label>Uptime:</label>%st_uptime%<br>
-<label>Timing:</label>%st_timing%<br>
-<label>Connected:</label>%st_conn%<br>
-<label>RAM:</label>%st_heap%<br>
-<label>CPU:</label>%st_bck%<br>
-</div>
-<div class="block">
-<label>Wifi:</label>%st_wifi%<br>
-<label>Signal:</label>%st_signal%<br>
-<label>Ip:</label>%st_ip%<br>
-</div>
-<div class="block">
-<label>Pulse 1:</label>%pulse_01%<br>
-<label>Pulse 2:</label>%pulse_02%<br>
-<label>Pulse 3:</label>%pulse_03%<br>
-<label>Pulse 4:</label>%pulse_04%<br>
-<label>Pulse 5:</label>%pulse_05%<br>
-</div>
-<div class="block">
-<label>Comm Health:</label>%temp_health%<br>
-<label>Count:</label>%temp_count%<br>
+  <div id="page">
+    <div class="box">
+      <h1><span>E</span>monitor_%emon_id%</h1>
+      <h3>Home Energy Monitoring</h3>
+    </div>
+<!--############-->
+    <div id="left-hand-container" style="display">
+     <!--//////////////////////////////////////////////////////////////////////////////////-->
+      <div id="one">
+        <h2>1. Device</h2>
+        <div class="itembody-wrapper">
+          <p><b class="fixwidth">Uptime:</b> %st_uptime%<br>
+          <b class="fixwidth">Timing:</b> %st_timing%<br>
+          <b class="fixwidth">Connected:</b> %st_conn%<br>
+          <b class="fixwidth">RAM:</b> %st_heap%<br>
+          <b class="fixwidth">CPU:</b> %st_bck%</p>
+        </div>
+      </div> 
+     <!--//////////////////////////////////////////////////////////////////////////////////-->
+      <div id="two">
+        <h2>2. WiFi Network</h2>
+        <div class="itembody-wrapper">
+          <p><b class="fixwidth">Connection:</b> <span id="mode"></span></p>
+
+          <div id="client-view">
+            <table>
+              <tr>
+                <th>Network</th>
+                <th>RSSI</th>
+              </tr>
+                <tbody id="sta-ssid">
+                  <tr>
+                    <td>%st_wifi%</td>
+                    <td>%st_signal%</td>
+                  </tr>
+                </tbody>
+            </table>
+            <p><b class="fixwidth">IP Address:</b> %st_ip%</p>
+          </div>
+        </div>
+      </div>       
+     <!--//////////////////////////////////////////////////////////////////////////////////-->
+      <div id="three">
+        <h2>3. Pulse counters</h2>
+        <div class="itembody-wrapper">
+          <table>
+            <tr>
+              <th>Id</th>
+              <th>Count</th>
+              <th>Level</th>
+            </tr>
+            <tbody>
+%pulsc_01%
+%pulsc_02%
+%pulsc_03%
+%pulsc_04%
+%pulsc_05%
+            </tbody>
+          </table><br>
+        </div>
+      </div>
+      
+    </div>
+ <!--############-->
+   <div id="right-hand-container" style="display">
+     <!--//////////////////////////////////////////////////////////////////////////////////-->
+      <div id="four">
+        <h2>4. Temp sensors</h2>
+        <div class="itembody-wrapper">
+          <p><b class="fixwidth">Comm Health:</b> <span id="count"></span>%temp_health% <br>
+          <b class="fixwidth">Count:</b> <span id="count"></span>%temp_count%</p>
+          <table>
+            <tr>
+              <th>Id</th>
+              <th>Temp</th>
+            </tr>
+            <tbody>
 %ds18_01%
 %ds18_02%
 %ds18_03%
@@ -99,7 +114,13 @@ body {
 %ds18_14%
 %ds18_15%
 %ds18_16%
+            </tbody>
+          </table><br>
+        </div>
+   </div>
+   
 </div>
+
 </body>
 
 </html>
