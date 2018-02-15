@@ -396,6 +396,36 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 					uint32 level = Sensor_Manager_GetPulseLevel(4);
 					len = sprintf(buff, " %d  (%d)",count,level);
 			}
+			//TEMP SENSORS
+			else if (strcmp(token, "temp_health")==0) {
+					uint32 health = Sensor_Manager_GetTempHealth();
+					uint32 percent = 100;
+					if(health > 10)
+					{
+						percent = 0;
+					}
+					else if(health > 1)
+					{
+						percent = percent - ((health-1) * 10) ;
+					}
+					len = sprintf(buff, " %d%% (%d)",percent, health);
+			}
+			else if (strcmp(token, "temp_count")==0) {
+					uint8 count = Sensor_Manager_GetTempCount();
+					len = sprintf(buff, " %d",count);
+			}
+			else if (strncmp(token, "ds18_",5)==0) {
+					uint32 id = ((token[5]-'0')*10)+(token[6]-'0')-1;
+					uint8* ids;
+					uint8 count;
+					sint16* temperatures;
+					Sensor_Manager_Get_TempSensorData(&count,&ids,&temperatures);
+					if(id<count)
+					{
+						char sign = (temperatures[id]<0 ? '-':' ');
+						len = sprintf(buff, "<label>%02X%02X%02X%02X%02X:</label> %c%d.%dC<br>",ids[(id*8)+1],ids[(id*8)+2],ids[(id*8)+3],ids[(id*8)+4],ids[(id*8)+7],sign,abs(temperatures[id]/10),abs(temperatures[id]%10));
+					}
+			}
 		}
 		//-----------------------------------------------------------------
 		//-----------------------------------------------------------------

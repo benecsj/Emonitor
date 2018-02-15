@@ -1,88 +1,45 @@
 <html>
 
- <head>
- 
+<head>
 <meta http-equiv="refresh" content="1;url=status.html" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-
 <meta charset="UTF-8" />
+<link rel="stylesheet" type="text/css" href="style.css">
+  
  <style>
  
-      div.block {
-        /* Just to center the form on the page */
-        margin: 0 auto;
-        width: 400px;
-        /* To see the outline of the form */
-        padding: 1em;
-        border: 3px solid black;
-        background-color: #F0E6DC;
-        margin-bottom: 10px;
-      }
+.block {
+    /* Just to center the form on the page */
+    margin: 0 auto;
+    width: 400px;
+    /* To see the outline of the form */
+    padding: 1em;
+    border: 3px solid black;
+    background-color: #F0E6DC;
+    margin-bottom: 10px;
+}
  
-      form {
-        /* Just to center the form on the page */
-        margin: 0 auto;
-        width: 400px;
-        /* To see the outline of the form */
-        padding: 1em;
-      }
-
-      form div + div {
-        margin-top: 1em;
-      }
-
-      label {
-        /* To make sure that all labels have the same size and are properly aligned */
-        display: inline-block;
-        width: 120px;
-        text-align: right;
-      }
-
-      input, textarea {
-        /* To make sure that all text fields have the same font settings By default, textareas have a monospace font */
-        font: 1em sans-serif;
-        /* To give the same size to all text fields */
-        width: 300px;
-        box-sizing: border-box; /* To harmonize the look & feel of text field border */
-        border: 1px solid #999;
-      }
-
-      input:focus, textarea:focus {
-        /* To give a little highlight on active elements */
-        border-color: #000;
-      }
-
-      textarea {
-        /* To properly align multiline text fields with their labels */
-        vertical-align: top;
-        /* To give enough room to type some text */
-        height: 3em;
-      }
-
-      .button {
-            text-align: center;
-      }
-
+label {
+    /* To make sure that all labels have the same size and are properly aligned */
+    display: inline-block;
+    width: 120px;
+    text-align: right;
+}
  
 body {
     background-color: linen;
     justify-content: center;
-    }
+}
 
-h1 {
+.h1 {
     color: #e65c00;
     margin-top: 20px;
     text-align: center;
-    }
+}
     
- .centerText {
-    color: #000000;
-    text-align: center;
-    }
-
-img.centered {
+.centerImg {
     display: block; 
     margin-left: auto; 
     margin-right: auto;
@@ -90,73 +47,60 @@ img.centered {
     height : 200;
 }
 
-input.centered {
+.centerText {
+    color: #000000;
     text-align: center;
 }
-
-input.left {
-    margin-left: 40px; 
-    margin-top: 0px;
-    margin-bottom: 0px
-}
-
-
-p.left {
-    margin-left: 40px; 
-}
-
-select.left {
-    margin-left: 40px; 
-}
-
+    
 </style>
 </head> 
 
 <header><title>Emonitor</title></header>
+
 <body>
-<h1>Emonitor_%emon_id%</h1>
-<img class="centered" src="emonitor.png">
+<h1 class="h1">Emonitor_%emon_id%</h1>
+<img class="centerImg" src="emonitor.png">
 <br>
 <div class="centerText">Status</div>
 <div class="block">
-<label for="ssid">Uptime:</label>%st_uptime%<br>
-<label for="ssid">Timing:</label>%st_timing%<br>
-<label for="ssid">Connected:</label>%st_conn%<br>
-<label for="ssid">RAM:</label>%st_heap%<br>
-<label for="ssid">CPU:</label>%st_bck%<br>
+<label>Uptime:</label>%st_uptime%<br>
+<label>Timing:</label>%st_timing%<br>
+<label>Connected:</label>%st_conn%<br>
+<label>RAM:</label>%st_heap%<br>
+<label>CPU:</label>%st_bck%<br>
 </div>
 <div class="block">
-<label for="ssid">Wifi:</label>%st_wifi%<br>
-<label for="ssid">Signal:</label>%st_signal%<br>
-<label for="ssid">Ip:</label>%st_ip%<br>
+<label>Wifi:</label>%st_wifi%<br>
+<label>Signal:</label>%st_signal%<br>
+<label>Ip:</label>%st_ip%<br>
 </div>
 <div class="block">
-<label for="ssid">Pulse 1:</label>%pulse_01%<br>
-<label for="ssid">Pulse 2:</label>%pulse_02%<br>
-<label for="ssid">Pulse 3:</label>%pulse_03%<br>
-<label for="ssid">Pulse 4:</label>%pulse_04%<br>
-<label for="ssid">Pulse 5:</label>%pulse_05%<br>
+<label>Pulse 1:</label>%pulse_01%<br>
+<label>Pulse 2:</label>%pulse_02%<br>
+<label>Pulse 3:</label>%pulse_03%<br>
+<label>Pulse 4:</label>%pulse_04%<br>
+<label>Pulse 5:</label>%pulse_05%<br>
 </div>
 <div class="block">
-<label for="ssid">Comm Health:</label>%temp_health%<br>
-<label for="ssid">Count:</label>%temp_count%<br>
-%temp_01%
-%temp_02%
-%temp_03%
-%temp_04%
-%temp_05%
-%temp_06%
-%temp_07%
-%temp_08%
-%temp_09%
-%temp_10%
-%temp_11%
-%temp_12%
-%temp_13%
-%temp_14%
-%temp_15%
-%temp_16%
-<label>1234567890:</label> 20.3C<br>
+<label>Comm Health:</label>%temp_health%<br>
+<label>Count:</label>%temp_count%<br>
+%ds18_01%
+%ds18_02%
+%ds18_03%
+%ds18_04%
+%ds18_05%
+%ds18_06%
+%ds18_07%
+%ds18_08%
+%ds18_09%
+%ds18_10%
+%ds18_11%
+%ds18_12%
+%ds18_13%
+%ds18_14%
+%ds18_15%
+%ds18_16%
 </div>
 </body>
+
 </html>

@@ -46,10 +46,6 @@ typedef struct espconn* ConnTypePtr;
 #define DBG_HTTPS(...)
 #endif
 
-#define HTTPD_MAX_CONNECTIONS 3
-
-#define HTTPD_MAX_FILE_READ_BLOCK 1000
-
 #define HTTPD_ALIGNMENT 4
 
 #define HTTPD_REDIRECT_TO_HOSTNAME_BUFFER 1024
