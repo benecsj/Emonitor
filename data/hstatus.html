@@ -1,0 +1,126 @@
+<html>
+
+<head>
+
+<title>Emonitor_%emon_id%</title>
+  
+<meta http-equiv="refresh" content="1;url=hstatus.html" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+<meta name="description" content="Emonitor">
+<meta name="author" content="Emonitor">
+<meta name="theme-color" content="#000000" />
+
+<meta charset="UTF-8" />
+<link rel="stylesheet" type="text/css" href="style.css">
+</head> 
+
+
+<body>
+  <div id="page">
+    <div class="box">
+      <h1><span>E</span>monitor_%emon_id%</h1>
+      <h3>Home Energy Monitoring</h3>
+    </div>
+<!--############-->
+    <div id="left-hand-container" style="display">
+     <!--//////////////////////////////////////////////////////////////////////////////////-->
+      <div id="one">
+        <h2>1. Device</h2>
+        <div class="itembody-wrapper">
+          <p><b class="fixwidth">Uptime:</b> %st_uptime%<br>
+          <b class="fixwidth">Timing:</b> %st_timing%<br>
+          <b class="fixwidth">Connected:</b> %st_conn%<br>
+          <b class="fixwidth">RAM:</b> %st_heap%<br>
+          <b class="fixwidth">CPU:</b> %st_bck%</p>
+        </div>
+      </div> 
+     <!--//////////////////////////////////////////////////////////////////////////////////-->
+      <div id="two">
+        <h2>2. WiFi Network</h2>
+        <div class="itembody-wrapper">
+          <p><b class="fixwidth">Connection:</b> <span id="mode"></span></p>
+
+          <div id="client-view">
+            <table>
+              <tr>
+                <th>Network</th>
+                <th>RSSI</th>
+              </tr>
+                <tbody id="sta-ssid">
+                  <tr>
+                    <td>%st_wifi%</td>
+                    <td>%st_signal%</td>
+                  </tr>
+                </tbody>
+            </table>
+            <p><b class="fixwidth">IP Address:</b> %st_ip%</p>
+          </div>
+        </div>
+      </div>       
+     <!--//////////////////////////////////////////////////////////////////////////////////-->
+      <div id="three">
+        <h2>3. Pulse counters</h2>
+        <div class="itembody-wrapper">
+          <table>
+            <tr>
+              <th>Id</th>
+              <th>Count</th>
+              <th>Level</th>
+            </tr>
+            <tbody>
+%pulsc_01%
+%pulsc_02%
+%pulsc_03%
+%pulsc_04%
+%pulsc_05%
+            </tbody>
+          </table><br>
+        </div>
+      </div>
+      
+    </div>
+ <!--############-->
+   <div id="right-hand-container" style="display">
+     <!--//////////////////////////////////////////////////////////////////////////////////-->
+      <div id="four">
+        <h2>4. Temp sensors</h2>
+        <div class="itembody-wrapper">
+          <p><b class="fixwidth">Comm Health:</b> <span id="count"></span>%temp_health% <br>
+          <b class="fixwidth">Count:</b> <span id="count"></span>%temp_count%</p>
+          <table>
+            <tr>
+              <th>Id</th>
+              <th>Temp</th>
+            </tr>
+            <tbody>
+%ds18_01%
+%ds18_02%
+%ds18_03%
+%ds18_04%
+%ds18_05%
+%ds18_06%
+%ds18_07%
+%ds18_08%
+%ds18_09%
+%ds18_10%
+%ds18_11%
+%ds18_12%
+%ds18_13%
+%ds18_14%
+%ds18_15%
+%ds18_16%
+            </tbody>
+          </table><br>
+        </div>
+   </div>
+   
+</div>
+
+</body>
+
+</html>

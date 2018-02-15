@@ -16,6 +16,7 @@ HttpdBuiltInUrl builtInUrls[]={
 	{"/index.html", cgiEspFsTemplate, Http_Server_TokenProcessor},
 	{"/wait.html", cgiEspFsTemplate, Http_Server_TokenProcessor},
 	{"/status.html", cgiEspFsTemplate, Http_Server_TokenProcessor},
+	{"/hstatus.html", cgiEspFsTemplate, Http_Server_TokenProcessor},
 	{"/wifi", cgiRedirect, "/wifi/wifi.tpl"},
 	{"/wifi/", cgiRedirect, "/wifi/wifi.tpl"},
 	{"/test", cgiRedirect, "/test/index.html"},
@@ -427,6 +428,135 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 					}
 			}
 		}
+		//-----------------------------------------------------------------
+		//-----------------------------------------------------------------
+		//HSTATUS
+		else if(strcmp(connData->url,"/hstatus.html")==0)
+		{
+			//EMONCMS NODE ID
+			if (strcmp(token, "emon_id")==0) {
+				len = sprintf(buff, "%d", Emonitor_GetNodeId());
+			}
+			//DEVICE UPTIME
+			else if (strcmp(token, "st_uptime")==0) {
+				len = sprintf(buff, " %d sec", Emonitor_GetUptime());
+			}
+			//EMONCMS SENDTIMING
+			else if (strcmp(token, "st_timing")==0) {
+				len = sprintf(buff, " %d \\ %d", Emonitor_GetSendTiming()+1,Emonitor_GetSendPeriod());
+			}
+			//EMONCMS CONNECTION COUNTER
+			else if (strcmp(token, "st_conn")==0) {
+				len = sprintf(buff, " %d", Emonitor_GetConnectionCounter());
+			}
+			//EMONCMS HEAP
+			else if (strcmp(token, "st_heap")==0) {
+				uint32_t usedRAM = (HTTP_TOTALRAM -Emonitor_GetFreeRam())/1024;
+				uint32_t freeRAM = (Emonitor_GetFreeRam())/1024;
+				uint32_t usagePercent = ((double)(usedRAM)/(double)(usedRAM+freeRAM))*100;
+				len = sprintf(buff, " %d%% Used: %d kb Free: %d kb ", usagePercent, usedRAM,freeRAM);
+			}
+			//EMONCMS BACKGROUND COUNT
+			else if (strcmp(token, "st_bck")==0) {
+				uint32_t countUsage = HTTP_EMPTYCOUNT - Emonitor_GetBackgroundCount();
+				double usage = ((double)countUsage/(double)HTTP_EMPTYCOUNT)*100;
+				countUsage = usage;
+				len = sprintf(buff, " %d%%", countUsage);
+			}
+			//WIFI CONNECTION
+			else if (strcmp(token, "st_wifi")==0) {
+
+				if(Wifi_Manager_IsConnected() == 1)
+				{
+					len = sprintf(buff, "%s",Wifi_Manager_GetSTA_SSID());
+				}
+				else
+				{
+					len = sprintf(buff, "--");
+				}
+			}
+			//WIFI POWER LEVEL
+			else if (strcmp(token, "st_signal")==0) {
+
+				if(Wifi_Manager_IsConnected() == 1)
+				{
+					sint8 signalLevel = Wifi_Manager_GetSignalLevel();
+					uint32_t signalPercent = 0;
+					if(signalLevel > -50)
+					{
+						signalPercent = 100;
+					}
+					else if(signalLevel < -90)
+					{
+						signalPercent = 0;
+					}
+					else
+					{
+						signalPercent = 100+(uint32_t)(((double)signalLevel+50)*(double)2.5);
+					}
+					len = sprintf(buff, " %d%% (%d dBm)",signalPercent,signalLevel);
+				}
+				else
+				{
+					len = sprintf(buff, "--");
+				}
+			}
+			//WIFI IP
+			else if (strcmp(token, "st_ip")==0) {
+
+				if(Wifi_Manager_IsConnected() == 1)
+				{
+					uint8 ip[4];
+					Wifi_Manager_GetIp(ip);
+					len = sprintf(buff, " %d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);
+				}
+				else
+				{
+					len = sprintf(buff, "--");
+				}
+			}
+			//PULSE COUNTERS
+			else if (strncmp(token, "pulsc_",6)==0) {
+				    uint32 id = (token[7]-'0')-1;
+				    if(id<5)
+				    {
+						uint32 count = Sensor_Manager_GetPulseCount(id);
+						uint32 level = Sensor_Manager_GetPulseLevel(id);
+						len = sprintf(buff, "<tr><td>0%d</td><td>%d</td><td>%d</td></tr>",(id+1),count,level);
+				    }
+			}
+			//TEMP SENSORS
+			else if (strcmp(token, "temp_health")==0) {
+					uint32 health = Sensor_Manager_GetTempHealth();
+					uint32 percent = 100;
+					if(health > 10)
+					{
+						percent = 0;
+					}
+					else if(health > 1)
+					{
+						percent = percent - ((health-1) * 10) ;
+					}
+					len = sprintf(buff, " %d%% (%d)",percent, health);
+			}
+			else if (strcmp(token, "temp_count")==0) {
+					uint8 count = Sensor_Manager_GetTempCount();
+					len = sprintf(buff, " %d",count);
+			}
+			else if (strncmp(token, "ds18_",5)==0) {
+					uint32 id = ((token[5]-'0')*10)+(token[6]-'0')-1;
+					uint8* ids;
+					uint8 count;
+					sint16* temperatures;
+					Sensor_Manager_Get_TempSensorData(&count,&ids,&temperatures);
+					if(id<count)
+					{
+						char sign = (temperatures[id]<0 ? '-':' ');
+						len = sprintf(buff, "<tr><td>%02X%02X%02X%02X%02X</td><td>%c%d.%dC</td></tr>",ids[(id*8)+1],ids[(id*8)+2],ids[(id*8)+3],ids[(id*8)+4],ids[(id*8)+7],sign,abs(temperatures[id]/10),abs(temperatures[id]%10));
+					}
+			}
+		}
+
 		//-----------------------------------------------------------------
 		//-----------------------------------------------------------------
 		// WAIT

@@ -151,6 +151,12 @@ button {
 
 /*----------------*/
 
+.fixwidth {
+    display: inline-block;
+    width: 100px;
+    text-align: right;
+}
+
 .box {
     padding-top: 5px;
     padding-bottom: 5px;
@@ -166,7 +172,7 @@ button {
 }
 
 .box h1 span {
-    color: #0699fa;
+    color: #e65c00;
 }
 
 .box h3 {
