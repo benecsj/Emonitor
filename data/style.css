@@ -3,7 +3,7 @@ body {
     height: 100%;
     font-family: Arial,"sans-serif";
     font-size: 17px;
-    background-color: #F0E6DC;
+    background-color: #F8F8F8;
     color: #555555;
     margin: 0;
 }
@@ -18,65 +18,125 @@ body {
     overflow-x: hidden;
 }
 
-@media screen and (min-width: 1024px) {
-
-#left-hand-container {
-    width: 50%;
-    float: left;
-    margin-bottom: 40px;
-}
-}
-
-@media screen and (min-width: 1024px) {
-
-#right-hand-container {
-    width: 50%;
-    float: right;
-    margin-bottom: 40px;
-}
-}
-
-#one,#two,#three,#four,#five,#six,#seven {
+#one,#two,#three,#four,#five,#six,#seven,#ten {
     background-color: #f1f1f1;
     box-sizing: border-box;
     margin: 5px 5px 5px 5px;
 }
 
+@media screen and (min-width: 421px) {
+    #center-container {
+        width: 100%;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+}
+
+input[type="text"],
+input[type="password"] {
+    font: 1em sans-serif;
+    box-sizing: border-box;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+    width: 380px;
+}
+
+input[type="number"] {
+    font: 1em sans-serif;
+    box-sizing: border-box;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+    width: 120px;
+}
+
+textarea {
+        border-radius: 4px;
+        padding: 10px;
+        margin-top: 10px;
+        width: 380px;
+        box-sizing: border-box; /* To harmonize the look & feel of text field border */
+        border: 1px solid #999;
+      }
+
+
+/*----Large screen----*/
 @media screen and (min-width: 1024px) {
+
+    #left-hand-container {
+        width: 50%;
+        float: left;
+        margin-bottom: 40px;
+    }
+    #left-hand-inner-container {
+
+    }
+
+    #center-container {
+        width: 100%;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+
+    #right-hand-container {
+        width: 50%;
+        float: right;
+        margin-bottom: 40px;
+    }
+
      #one,#two,#three {
          vertical-align: top;
          display: inline-block;
          width: 500px;
      }
-}
 
-@media screen and (min-width: 1024px) {
      #four,#five,#six,#seven {
         vertical-align: top;
          display: inline-block;
          width: 500px;
          right: 0;
      }
+
+     #ten {
+         vertical-align: top;
+         display: inline-block;
+         width: 500px;
+     }
+
+}
+/*---Small screen----*/
+@media screen and (max-width: 420px) {
+    input[type="text"],
+    input[type="password"]  {
+        width: 100%;
+    }
+    textarea {
+        width: 100%;
+    }
 }
 
 .itembody-wrapper {
     padding: 5px 25px 5px 25px;
 }
 
-input[type="text"],
-input[type="password"] {
-    box-sizing: border-box;
-    border-radius: 4px;
-    padding: 10px;
-    margin-top: 10px;
-    width: 280px;
+select {
+  padding: 10px;
+  margin-top: 10px;
+  width: 80px;
+  border: 0px solid #bbb;
+  box-shadow: 0 2px 1px 0 rgba(0,0,0,0.2);
+  background-color:white;
 }
 
-@media screen and (max-width: 420px) {
-    input[type="text"],
-    input[type="password"]  {
-        width: 240px;
-    }
+select:hover {
+  box-shadow: 0 1px 1px 0 rgba(0,0,0,0.1);
+}
+
+option {
+  background:#ffffff;
+  border-top:1px solid #444;
+  padding: 20px;
 }
 
 #update {
@@ -115,7 +175,7 @@ td {
 /*----------------*/
 
 p {
-    padding-top: 10px;
+    padding-top: 0px;
 }
 
 
@@ -134,7 +194,7 @@ h2 {
 }
 
 button {
-    background-color: #0699fa;
+    background-color: #e65c00;
     border-radius: 10px;
     border: none;
     color: #ffffff;
