@@ -9,7 +9,7 @@
 #include "Emonitor.h"
 
 int Http_Server_TokenProcessor(HttpdConnData *connData, char *token, void **arg);
-
+uint16 Http_Server_FormId = 0;
 
 HttpdBuiltInUrl builtInUrls[]={
 	{"*", cgiRedirectApClientToHostname, "esp8266.nonet"},
@@ -31,6 +31,7 @@ void Http_Server_Init(void)
 	DBG_HTTPS("(HS) Http_Server_Init START\n");
 	httpdInit(builtInUrls, 80);
 	DBG_HTTPS("(HS) Http_Server_Init FINISH\n");
+	Http_Server_FormId = os_random();
 }
 
 //Template code for the counter on the index page.
@@ -207,12 +208,23 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 								Wifi_Manager_EnableHotspot(0);
 							}
 						}
+						//CHECK IF FORM ID IS VALID
+						else if (strcmp(name, "form_id")==0) {
+							temp = strtol(buff,NULL,10);
+							if(temp != Http_Server_FormId)
+							{
+								break;
+							}
+						}
 					}
 				}
 				while(connData->getArgs[i] != 0);
-
-				//request save after update
-				Emonitor_Request(4);
+				//Only save when form id was ok
+				if(connData->getArgs[i] == 0)
+				{
+					//request save after update
+					Emonitor_Request(4);
+				}
 
 			}
 		}
@@ -283,6 +295,11 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 				len = sprintf(buff, "%s", "selected");
 				}
 			}
+			//FORM ID
+			else if (strcmp(token, "form_id")==0) {
+				len = sprintf(buff, "%d",Http_Server_FormId);
+			}
+
 		}
 		//-----------------------------------------------------------------
 		//-----------------------------------------------------------------
