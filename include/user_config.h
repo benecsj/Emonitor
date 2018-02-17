@@ -36,8 +36,8 @@
 #define EMONITOR_PARAM_START_SEC		0x8D
 
 //SPIFFS
-#define FS1_FLASH_SIZE      (128*1024)
-#define FS2_FLASH_SIZE      (128*1024)
+#define FS1_FLASH_SIZE      (256*1024)
+#define FS2_FLASH_SIZE      (256*1024)
 
 #define FS1_FLASH_ADDR      (1024*1024)
 #define FS2_FLASH_ADDR      (1280*1024)
