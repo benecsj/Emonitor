@@ -84,7 +84,7 @@
 #define DEBUG_SENSOR_MANAGER 	0
 #define DEBUG_EMONITOR 			0
 #define DEBUG_HTTP_CLIENT 		0
-#define DEBUG_HTTP_SERVER 		1
+#define DEBUG_HTTP_SERVER 		0
 #define DEBUG_WIFI_MANAGER		0
 
 

@@ -37,17 +37,17 @@
       <h3>Home Energy Monitoring</h3>
     </div>
 <!--############-->
-    <div id="left-hand-container" style="display" data-bind="visible: initialised()">
+    <div id="left-hand-container" style="display">
      <!--//////////////////////////////////////////////////////////////////////////////////-->
       <div id="one">
         <h2>1. Device</h2>
         <div class="itembody-wrapper">
-          <p id="text_uptime"><b class="fixwidth">Uptime:</b> <t data-bind="text: status.st_uptime"></t><br>
-          <b class="fixwidth">Timing:</b> <t data-bind="text: status.st_timing"></t><br>
-          <b class="fixwidth">Connected:</b> <t data-bind="text: status.st_conn"></t><br>
-          <b class="fixwidth">RAM:</b> <t data-bind="text: status.st_heap"></t><br>
-          <b class="fixwidth">CPU:</b> <t data-bind="text: status.st_bck"></t><br>
-          <b class="fixwidth">Reset:</b> <t data-bind="text: status.st_rst"></t></p>
+          <p id="text_uptime"><b class="fixwidth">Uptime:</b> <t data-bind="text: status.st_uptime()||'%st_uptime%'">%st_uptime%</t> sec<br>
+          <b class="fixwidth">Timing:</b> <t data-bind="text: status.st_timing()||'%st_timing%'">%st_timing%</t><br>
+          <b class="fixwidth">Connected:</b> <t data-bind="text: status.st_conn()||'%st_conn%'">%st_conn%</t><br>
+          <b class="fixwidth">RAM:</b> <t data-bind="text: status.st_heap()||'%st_heap%'">%st_heap%</t><br>
+          <b class="fixwidth">CPU:</b> <t data-bind="text: status.st_bck()||'%st_bck%'">%st_bck%</t>%%<br>
+          <b class="fixwidth">Reset:</b> <t data-bind="text: status.st_rst()||'%st_rst%'">%st_rst%</t></p>
         </div>
       </div> 
      <!--//////////////////////////////////////////////////////////////////////////////////-->
@@ -64,12 +64,12 @@
               </tr>
                 <tbody id="sta-ssid">
                   <tr>
-                    <td data-bind="text: status.st_wifi"></td>
-                    <td data-bind="text: status.st_signal"></td>
+                    <td data-bind="text: status.st_wifi()||'%st_wifi%'">%st_wifi%</td>
+                    <td data-bind="text: status.st_signal()||'%st_signal%'">%st_signal%</td>
                   </tr>
                 </tbody>
             </table>
-            <p><b class="fixwidth">IP Address:</b> <t data-bind="text: status.st_ip"></t></p>
+            <p><b class="fixwidth">IP Address:</b> <t data-bind="text: status.st_ip()||'%st_ip%'">%st_ip%</t></p>
           </div>
         </div>
       </div>       
@@ -96,13 +96,13 @@
       
     </div>
  <!--############-->
-   <div id="right-hand-container" style="display" data-bind="visible: initialised()">
+   <div id="right-hand-container" style="display">
      <!--//////////////////////////////////////////////////////////////////////////////////-->
       <div id="four">
         <h2>4. Temp sensors</h2>
         <div class="itembody-wrapper">
-          <p><b class="fixwidth">Com Err:</b> <span id="count"></span> <t data-bind="text: status.temp_health"></t><br>
-          <b class="fixwidth">Count:</b> <span id="count"></span> <t data-bind="text: status.temp_count"></t></p>
+          <p><b class="fixwidth">Com Err:</b> <span id="count"></span> <t data-bind="text: status.temp_health()||'%temp_health%'">%temp_health%</t><br>
+          <b class="fixwidth">Count:</b> <span id="count"></span> <t data-bind="text: status.temp_count()||'%temp_count%'">%temp_count%</t></p>
           <table>
             <tr>
               <th>Id</th>

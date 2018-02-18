@@ -314,29 +314,29 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 			}
 			//DEVICE UPTIME
 			else if (strcmp(token, "st_uptime")==0) {
-				len = sprintf(buff, " %d sec", Emonitor_GetUptime());
+				len = sprintf(buff, "%d", Emonitor_GetUptime());
 			}
 			//EMONCMS SENDTIMING
 			else if (strcmp(token, "st_timing")==0) {
-				len = sprintf(buff, " %d \\ %d", Emonitor_GetSendTiming()+1,Emonitor_GetSendPeriod());
+				len = sprintf(buff, "%d | %d", Emonitor_GetSendTiming()+1,Emonitor_GetSendPeriod());
 			}
 			//EMONCMS CONNECTION COUNTER
 			else if (strcmp(token, "st_conn")==0) {
-				len = sprintf(buff, " %d", Emonitor_GetConnectionCounter());
+				len = sprintf(buff, "%d", Emonitor_GetConnectionCounter());
 			}
 			//EMONCMS HEAP
 			else if (strcmp(token, "st_heap")==0) {
 				uint32_t usedRAM = (HTTP_TOTALRAM -Emonitor_GetFreeRam())/1024;
 				uint32_t freeRAM = (Emonitor_GetFreeRam())/1024;
 				uint32_t usagePercent = ((double)(usedRAM)/(double)(usedRAM+freeRAM))*100;
-				len = sprintf(buff, " %d%% Used: %d kb Free: %d kb ", usagePercent, usedRAM,freeRAM);
+				len = sprintf(buff, "%d%% Used: %d kb Free: %d kb", usagePercent, usedRAM,freeRAM);
 			}
 			//EMONCMS BACKGROUND COUNT
 			else if (strcmp(token, "st_bck")==0) {
 				uint32_t countUsage = HTTP_EMPTYCOUNT - Emonitor_GetBackgroundCount();
 				double usage = ((double)countUsage/(double)HTTP_EMPTYCOUNT)*100;
 				countUsage = usage;
-				len = sprintf(buff, " %d%%", countUsage);
+				len = sprintf(buff, "%d%", countUsage);
 			}
 			//WIFI CONNECTION
 			else if (strcmp(token, "st_wifi")==0) {
@@ -369,7 +369,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 					{
 						signalPercent = 100+(uint32_t)(((double)signalLevel+50)*(double)2.5);
 					}
-					len = sprintf(buff, " %d%% (%d dBm)",signalPercent,signalLevel);
+					len = sprintf(buff, "%d%% (%d dBm)",signalPercent,signalLevel);
 				}
 				else
 				{

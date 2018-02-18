@@ -14,65 +14,169 @@ Connector to let httpd use the espfs filesystem to serve the files in it.
 #include "esp8266_platform.h"
 #include "httpdespjson.h"
 
-#include "spiffs_manager.h"
+#include "Wifi_Manager.h"
+#include "Sensor_Manager.h"
+#include "Emonitor.h"
+#include "esp_system.h"
 
 int ICACHE_FLASH_ATTR cgiEspJsonTemplate(HttpdConnData *connData) {
 	DBG_HTTPS("(HS) cgiEspJsonTemplate START\n");
-	spiffs* fs = spiffs_get_fs();
-	int len;
-	char buff[1025];
+	int length =0;
+	char buffer[1025];
 	int returnValue = HTTPD_CGI_DONE;
-	//return HTTPD_CGI_NOTFOUND;
+
 	if (connData->conn==NULL) {
-		//Connection aborted. Clean up.
-		SPIFFS_close(fs, connData->file);
 		connData->file = -1;
 	}
 	else
 	{
 		//First call to this cgi.
 		if (connData->file < 0) {
-			if (connData->cgiArg != NULL) {
-				//Open a different file than provided in http request.
-				//Common usage: {"/", cgiEspFsHook, "/index.html"} will show content of index.html without actual redirect to that file if host root was requested
-				connData->file = SPIFFS_open(fs, (char*)connData->cgiArg, SPIFFS_O_RDONLY, 0);
-				DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->cgiArg);
+			connData->file = 1;
+			httpdStartResponse(connData, 200);
+			httpdHeader(connData, "Content-Type", httpdGetMimetype(connData->url));
+			httpdHeader(connData, "Cache-Control", "max-age=3600, must-revalidate");
+			httpdEndHeaders(connData);
+			returnValue = HTTPD_CGI_MORE;
 
-			} else {
-				//Open the file so we can read it.
-				connData->file = SPIFFS_open(fs, (char*)connData->url, SPIFFS_O_RDONLY, 0);
-				DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->url);
-			}
-
-			if (connData->file < 0) {
-				returnValue = HTTPD_CGI_NOTFOUND;
-			}
-			else
-			{
-				httpdStartResponse(connData, 200);
-				httpdHeader(connData, "Content-Type", httpdGetMimetype(connData->url));
-				httpdHeader(connData, "Cache-Control", "max-age=3600, must-revalidate");
-				httpdEndHeaders(connData);
-				returnValue = HTTPD_CGI_MORE;
-			}
 		}
 		else
 		{
-			len = SPIFFS_read(fs, connData->file, (u8_t *)buff, HTTPD_MAX_FILE_READ_BLOCK);
-			len = sprintf(buff,"{\"st_wifi\":\"HELLO\"}");
-			DBG_HTTPS("(HS) SPIFFS_read  [%d]\n",len);
-			if (len>0)
+
+			//Open Json
+			length += sprintf(&buffer[length],"{");
+
+			//EMONCMS NODE ID
+			length += sprintf(&buffer[length],"\"emon_id\":\"%d\",",Emonitor_GetNodeId());
+			//DEVICE UPTIME
+			length += sprintf(&buffer[length],"\"st_uptime\":\"%d\",",Emonitor_GetUptime());
+			//EMONCMS SENDTIMING
+			length += sprintf(&buffer[length],"\"st_timing\":\"%d | %d\",",Emonitor_GetSendTiming()+1,Emonitor_GetSendPeriod());
+			//EMONCMS CONNECTION COUNTER
+			length += sprintf(&buffer[length],"\"st_conn\":\"%d\",",Emonitor_GetConnectionCounter());
+			//EMONCMS HEAP
+			uint32_t usedRAM = (HTTP_TOTALRAM -Emonitor_GetFreeRam())/1024;
+			uint32_t freeRAM = (Emonitor_GetFreeRam())/1024;
+			uint32_t usagePercent = ((double)(usedRAM)/(double)(usedRAM+freeRAM))*100;
+			length += sprintf(&buffer[length],"\"st_heap\":\"%d%% Used: %d kb Free: %d kb\",", usagePercent, usedRAM,freeRAM);
+			//EMONCMS BACKGROUND COUNT
+			uint32_t countUsage = HTTP_EMPTYCOUNT - Emonitor_GetBackgroundCount();
+			double usage = ((double)countUsage/(double)HTTP_EMPTYCOUNT)*100;
+			countUsage = usage;
+			length += sprintf(&buffer[length],"\"st_bck\":\" %d%\",",countUsage);
+
+			//RESET
+			uint32 reset = Emonitor_GetResetReason();
+			switch(reset)
 			{
-				httpdSend(connData, buff, len);
+			case REASON_DEFAULT_RST:
+				length += sprintf(&buffer[length],"\"st_rst\":\"DEFAULT_RST\",");
+				break;
+			case REASON_WDT_RST:
+				length += sprintf(&buffer[length],"\"st_rst\":\"WDT_RST\",");
+				break;
+			case REASON_EXCEPTION_RST:
+				length += sprintf(&buffer[length],"\"st_rst\":\"EXCEPTION_RST\",");
+				break;
+			case REASON_SOFT_WDT_RST:
+				length += sprintf(&buffer[length],"\"st_rst\":\"SOFT_WDT_RST\",");
+				break;
+			case REASON_SOFT_RESTART:
+				length += sprintf(&buffer[length],"\"st_rst\":\"SOFT_RESTART\",");
+				break;
+			case REASON_DEEP_SLEEP_AWAKE:
+				length += sprintf(&buffer[length],"\"st_rst\":\"DEEP_SLEEP_AWAKE\",");
+				break;
+			case REASON_EXT_SYS_RST:
+				length += sprintf(&buffer[length],"\"st_rst\":\"EXT_SYS_RST\",");
+				break;
 			}
-			if (len!=HTTPD_MAX_FILE_READ_BLOCK) {
-				//We're done.
-				SPIFFS_close(fs, connData->file);
-				connData->file = -1;
-			} else {
-				//Ok, till next time.
-				returnValue = HTTPD_CGI_MORE;
+
+			//SSID
+			length += sprintf(&buffer[length],"\"st_wifi\":\"%s\",",Wifi_Manager_GetSTA_SSID());
+			//WIFISIGNAL
+			if(Wifi_Manager_IsConnected() == 1)
+			{
+				sint8 signalLevel = Wifi_Manager_GetSignalLevel();
+				uint32_t signalPercent = 0;
+				if(signalLevel > -50)
+				{
+					signalPercent = 100;
+				}
+				else if(signalLevel < -90)
+				{
+					signalPercent = 0;
+				}
+				else
+				{
+					signalPercent = 100+(uint32_t)(((double)signalLevel+50)*(double)2.5);
+				}
+				length += sprintf(&buffer[length],"\"st_signal\":\"%d%% (%d dBm)\",",signalPercent,signalLevel);
 			}
+			else
+			{
+				length += sprintf(&buffer[length],"\"st_signal\":\"--\",");
+			}
+			//IPADRESS
+			if(Wifi_Manager_IsConnected() == 1)
+			{
+				uint8 ip[4];
+				Wifi_Manager_GetIp(ip);
+				length += sprintf(&buffer[length],"\"st_ip\":\"%d.%d.%d.%d\",",ip[0],ip[1],ip[2],ip[3]);
+			}
+			else
+			{
+				length += sprintf(&buffer[length],"\"st_ip\":\"--\",");
+			}
+			//PULSE COUNTERS
+			uint32 id = 0;
+			for(id=0; id < 5; id++)
+			{
+				uint32 count = Sensor_Manager_GetPulseCount(id);
+				uint32 level = Sensor_Manager_GetPulseLevel(id);
+				length += sprintf(&buffer[length],"\"pc_%02d\":\"%d|%d\",",(id+1),count,level);
+			}
+			//TEMP COUNT
+			uint8 count = Sensor_Manager_GetTempCount();
+			length += sprintf(&buffer[length],"\"temp_count\":%d,",count);
+			//TEMP SENSORS
+			id = 0;
+			for(id=0; id < count; id++)
+			{
+				uint8* ids;
+				uint8 count;
+				sint16* temperatures;
+				Sensor_Manager_Get_TempSensorData(&count,&ids,&temperatures);
+				if(id<count)
+				{
+					char sign = (temperatures[id]<0 ? '-':' ');
+					length += sprintf(&buffer[length],"\"ds18_%02d\":\"%02X%02X%02X%02X%02X|%c%d.%d\",",id+1,ids[(id*8)+1],ids[(id*8)+2],ids[(id*8)+3],ids[(id*8)+4],ids[(id*8)+7],sign,abs(temperatures[id]/10),abs(temperatures[id]%10));
+				}
+			}
+			//TEMP HEALTH
+			uint32 health = Sensor_Manager_GetTempHealth();
+			uint32 percent = 100;
+			if(health > 10)
+			{
+				percent = 0;
+			}
+			else if(health > 1)
+			{
+				percent = percent - ((health-1) * 10) ;
+			}
+			length += sprintf(&buffer[length],"\"temp_health\":\"%d%% (%d)\"",percent, health);
+
+
+
+
+			//Close Json
+			length += sprintf(&buffer[length],"}");
+
+
+
+			//Send data
+			httpdSend(connData, buffer, length);
+			connData->file = -1;
 		}
 	}
 
