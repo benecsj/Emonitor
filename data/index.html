@@ -16,7 +16,7 @@
 <link rel="stylesheet" type="text/css" href="style.css">
 </head> 
 
-<body>
+<body onLoad="pageloaded();">
   <div id="page">
   
     <ul>
@@ -34,7 +34,11 @@
       <h3>Home Energy Monitoring</h3>
     </div>
     
-    <form action="/wait.html">
+      <div id="center-container" data-bind="visible: !initialised()">
+        <h3 class="fadeIn">Loading, please wait...</h3>
+      </div> 
+    
+    <form action="/wait.html" data-bind="visible: initialised()" style="display: none">
 <!--############-->
     <div id="center-container" style="display">
      <!--//////////////////////////////////////////////////////////////////////////////////-->
@@ -99,6 +103,9 @@
   </div>
 </div>
 
+  <script src="libs.js" type="text/javascript"></script>
+  <script src="emonitor.js" type="text/javascript"></script>
+  
 </body>
 
 </html>

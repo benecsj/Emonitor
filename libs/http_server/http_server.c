@@ -2,6 +2,7 @@
 #include <esp8266_platform.h>
 #include "httpd.h"
 #include "httpdespfs.h"
+#include "httpdespjson.h"
 #include "esp_system.h"
 
 #include "Wifi_Manager.h"
@@ -17,6 +18,7 @@ HttpdBuiltInUrl builtInUrls[]={
 	{"/index.html", cgiEspFsTemplate, Http_Server_TokenProcessor},
 	{"/wait.html", cgiEspFsTemplate, Http_Server_TokenProcessor},
 	{"/status.html", cgiEspFsTemplate, Http_Server_TokenProcessor},
+	{"/status.json", cgiEspJsonTemplate, NULL},
 	{"/wifi", cgiRedirect, "/wifi/wifi.tpl"},
 	{"/wifi/", cgiRedirect, "/wifi/wifi.tpl"},
 	{"/test", cgiRedirect, "/test/index.html"},

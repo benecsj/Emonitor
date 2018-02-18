@@ -4,7 +4,6 @@
 
 <title>Emonitor_%emon_id%</title>
   
-<meta http-equiv="refresh" content="1;url=status.html" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
@@ -20,7 +19,7 @@
 </head> 
 
 
-<body>
+<body onLoad="pageloaded();">
   <div id="page">
   
     <ul>
@@ -38,17 +37,17 @@
       <h3>Home Energy Monitoring</h3>
     </div>
 <!--############-->
-    <div id="left-hand-container" style="display">
+    <div id="left-hand-container" style="display" data-bind="visible: initialised()">
      <!--//////////////////////////////////////////////////////////////////////////////////-->
       <div id="one">
         <h2>1. Device</h2>
         <div class="itembody-wrapper">
-          <p><b class="fixwidth">Uptime:</b> %st_uptime%<br>
-          <b class="fixwidth">Timing:</b> %st_timing%<br>
-          <b class="fixwidth">Connected:</b> %st_conn%<br>
-          <b class="fixwidth">RAM:</b> %st_heap%<br>
-          <b class="fixwidth">CPU:</b> %st_bck%<br>
-          <b class="fixwidth">Reset:</b> %st_rst%</p>
+          <p id="text_uptime"><b class="fixwidth">Uptime:</b> <t data-bind="text: status.st_uptime"></t><br>
+          <b class="fixwidth">Timing:</b> <t data-bind="text: status.st_timing"></t><br>
+          <b class="fixwidth">Connected:</b> <t data-bind="text: status.st_conn"></t><br>
+          <b class="fixwidth">RAM:</b> <t data-bind="text: status.st_heap"></t><br>
+          <b class="fixwidth">CPU:</b> <t data-bind="text: status.st_bck"></t><br>
+          <b class="fixwidth">Reset:</b> <t data-bind="text: status.st_rst"></t></p>
         </div>
       </div> 
      <!--//////////////////////////////////////////////////////////////////////////////////-->
@@ -65,12 +64,12 @@
               </tr>
                 <tbody id="sta-ssid">
                   <tr>
-                    <td>%st_wifi%</td>
-                    <td>%st_signal%</td>
+                    <td data-bind="text: status.st_wifi"></td>
+                    <td data-bind="text: status.st_signal"></td>
                   </tr>
                 </tbody>
             </table>
-            <p><b class="fixwidth">IP Address:</b> %st_ip%</p>
+            <p><b class="fixwidth">IP Address:</b> <t data-bind="text: status.st_ip"></t></p>
           </div>
         </div>
       </div>       
@@ -85,11 +84,11 @@
               <th>Level</th>
             </tr>
             <tbody>
-%pulsc_01%
-%pulsc_02%
-%pulsc_03%
-%pulsc_04%
-%pulsc_05%
+<tr><td>1<td data-bind="text: status.getCounter.count(1)"></td><td data-bind="text: status.getCounter.level(1)"></td></tr>
+<tr><td>2<td data-bind="text: status.getCounter.count(2)"></td><td data-bind="text: status.getCounter.level(2)"></td></tr>
+<tr><td>3<td data-bind="text: status.getCounter.count(3)"></td><td data-bind="text: status.getCounter.level(3)"></td></tr>
+<tr><td>4<td data-bind="text: status.getCounter.count(4)"></td><td data-bind="text: status.getCounter.level(4)"></td></tr>
+<tr><td>5<td data-bind="text: status.getCounter.count(5)"></td><td data-bind="text: status.getCounter.level(5)"></td></tr>
             </tbody>
           </table><br>
         </div>
@@ -97,41 +96,44 @@
       
     </div>
  <!--############-->
-   <div id="right-hand-container" style="display">
+   <div id="right-hand-container" style="display" data-bind="visible: initialised()">
      <!--//////////////////////////////////////////////////////////////////////////////////-->
       <div id="four">
         <h2>4. Temp sensors</h2>
         <div class="itembody-wrapper">
-          <p><b class="fixwidth">Com Err:</b> <span id="count"></span>%temp_health% <br>
-          <b class="fixwidth">Count:</b> <span id="count"></span>%temp_count%</p>
+          <p><b class="fixwidth">Com Err:</b> <span id="count"></span> <t data-bind="text: status.temp_health"></t><br>
+          <b class="fixwidth">Count:</b> <span id="count"></span> <t data-bind="text: status.temp_count"></t></p>
           <table>
             <tr>
               <th>Id</th>
               <th>Temp</th>
             </tr>
             <tbody>
-%ds18_01%
-%ds18_02%
-%ds18_03%
-%ds18_04%
-%ds18_05%
-%ds18_06%
-%ds18_07%
-%ds18_08%
-%ds18_09%
-%ds18_10%
-%ds18_11%
-%ds18_12%
-%ds18_13%
-%ds18_14%
-%ds18_15%
-%ds18_16%
+<tr data-bind="visible: status.getTemp.visible(1)"><td data-bind="text: status.getTemp.id(1)"></td><td><t data-bind="text: status.getTemp.value(1)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(2)"><td data-bind="text: status.getTemp.id(2)"></td><td><t data-bind="text: status.getTemp.value(2)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(3)"><td data-bind="text: status.getTemp.id(3)"></td><td><t data-bind="text: status.getTemp.value(3)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(4)"><td data-bind="text: status.getTemp.id(4)"></td><td><t data-bind="text: status.getTemp.value(4)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(5)"><td data-bind="text: status.getTemp.id(5)"></td><td><t data-bind="text: status.getTemp.value(5)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(6)"><td data-bind="text: status.getTemp.id(6)"></td><td><t data-bind="text: status.getTemp.value(6)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(7)"><td data-bind="text: status.getTemp.id(7)"></td><td><t data-bind="text: status.getTemp.value(7)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(8)"><td data-bind="text: status.getTemp.id(8)"></td><td><t data-bind="text: status.getTemp.value(8)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(9)"><td data-bind="text: status.getTemp.id(9)"></td><td><t data-bind="text: status.getTemp.value(9)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(10)"><td data-bind="text: status.getTemp.id(10)"></td><td><t data-bind="text: status.getTemp.value(10)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(11)"><td data-bind="text: status.getTemp.id(11)"></td><td><t data-bind="text: status.getTemp.value(11)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(12)"><td data-bind="text: status.getTemp.id(12)"></td><td><t data-bind="text: status.getTemp.value(12)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(13)"><td data-bind="text: status.getTemp.id(13)"></td><td><t data-bind="text: status.getTemp.value(13)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(14)"><td data-bind="text: status.getTemp.id(14)"></td><td><t data-bind="text: status.getTemp.value(14)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(15)"><td data-bind="text: status.getTemp.id(15)"></td><td><t data-bind="text: status.getTemp.value(15)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(16)"><td data-bind="text: status.getTemp.id(16)"></td><td><t data-bind="text: status.getTemp.value(16)"></t>C</td></tr>
             </tbody>
           </table><br>
         </div>
    </div>
    
 </div>
+
+  <script src="libs.js" type="text/javascript"></script>
+  <script src="emonitor.js" type="text/javascript"></script>
 
 </body>
 

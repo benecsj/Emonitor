@@ -62,6 +62,15 @@ textarea {
         border: 1px solid #999;
       }
 
+.fadeIn {
+    text-align: center;
+    animation: keyFramesFadeIn 500ms step-end both;
+}
+
+@keyframes keyFramesFadeIn {
+    from { color: #F8F8F8 }
+    to   { color: #555555 }
+}
 
 /*----Large screen----*/
 @media screen and (min-width: 1024px) {
