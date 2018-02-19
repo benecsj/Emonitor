@@ -43,6 +43,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 	int i,j,k,temp;
 	uint8 tokenizer;
 	char name[32];
+	bool saveNeeded = FALSE;
 
 	//Check if has token
 	if (token==NULL)
@@ -127,6 +128,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 							if(strlen(buff)<=32)
 							{
 								Wifi_Manager_SetSTA_SSID(buff);
+								saveNeeded = TRUE;
 							}
 						}
 
@@ -215,19 +217,28 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 							temp = strtol(buff,NULL,10);
 							if(temp != Http_Server_FormId)
 							{
+								saveNeeded = FALSE;
 								break;
 							}
+						}
+						//RESET REQUEST
+						else if (strcmp(name, "restart")==0) {
+							Emonitor_Request(3);
+						}
+						//RESET REQUEST
+						else if (strcmp(name, "reset")==0) {
+							Emonitor_Request(2);
 						}
 					}
 				}
 				while(connData->getArgs[i] != 0);
-				//Only save when form id was ok
-				if(connData->getArgs[i] == 0)
+
+				//Only save when needed
+				if(saveNeeded == TRUE)
 				{
 					//request save after update
 					Emonitor_Request(4);
 				}
-
 			}
 		}
 	}
@@ -329,7 +340,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 				uint32_t usedRAM = (HTTP_TOTALRAM -Emonitor_GetFreeRam())/1024;
 				uint32_t freeRAM = (Emonitor_GetFreeRam())/1024;
 				uint32_t usagePercent = ((double)(usedRAM)/(double)(usedRAM+freeRAM))*100;
-				len = sprintf(buff, "%d%% Used: %d kb Free: %d kb", usagePercent, usedRAM,freeRAM);
+				len = sprintf(buff, "%d%% Free: %d kb", usagePercent,freeRAM);
 			}
 			//EMONCMS BACKGROUND COUNT
 			else if (strcmp(token, "st_bck")==0) {

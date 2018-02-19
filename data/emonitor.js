@@ -172,6 +172,8 @@ case 16:temp = self.ds18_16();break;
 StatusViewModel.prototype = Object.create(BaseViewModel.prototype);
 StatusViewModel.prototype.constructor = StatusViewModel;
 
+function factoryReset(){if(confirm("Are you sure?")){window.location.replace("wait.html?reset=1");}}
+function restart(){window.location.replace("wait.html?restart=1");}
 //---------------------------------------------------------------------------
 function EmonitorViewModel() {
   var self = this;
@@ -196,8 +198,8 @@ function EmonitorViewModel() {
     self.updating(true);
 
     delay = 1;
-    if(self.statusEnabled)  delay = 1;
-    if(self.waitEnabled) delay = 5000;
+    if(self.statusEnabled){delay = 1;updateTime = 300;}
+    if(self.waitEnabled){delay = 5000;}
 
     updateTimer = setTimeout(self.update, delay);
     

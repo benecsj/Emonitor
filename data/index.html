@@ -37,6 +37,13 @@
       <div id="center-container" data-bind="visible: !initialised()">
         <h3 class="fadeIn">Loading, please wait...</h3>
       </div> 
+           
+    <div  data-bind="visible: initialised()" style="display: none">
+        <div style="  display: flex;align-items: center;justify-content: center;">
+            <button type="submit" onclick="restart()">Restart</button>
+            <button type="submit" onclick="factoryReset()">FactoryReset</button>
+        </div>
+    </div>
     
     <form action="/wait.html" data-bind="visible: initialised()" style="display: none">
 <!--############-->

@@ -58,7 +58,7 @@ int ICACHE_FLASH_ATTR cgiEspJsonTemplate(HttpdConnData *connData) {
 			uint32_t usedRAM = (HTTP_TOTALRAM -Emonitor_GetFreeRam())/1024;
 			uint32_t freeRAM = (Emonitor_GetFreeRam())/1024;
 			uint32_t usagePercent = ((double)(usedRAM)/(double)(usedRAM+freeRAM))*100;
-			length += sprintf(&buffer[length],"\"st_heap\":\"%d%% Used: %d kb Free: %d kb\",", usagePercent, usedRAM,freeRAM);
+			length += sprintf(&buffer[length],"\"st_heap\":\"%d%% Free: %d kb\",", usagePercent, usedRAM,freeRAM);
 			//EMONCMS BACKGROUND COUNT
 			uint32_t countUsage = HTTP_EMPTYCOUNT - Emonitor_GetBackgroundCount();
 			double usage = ((double)countUsage/(double)HTTP_EMPTYCOUNT)*100;
