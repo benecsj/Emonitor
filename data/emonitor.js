@@ -31,7 +31,7 @@ BaseViewModel.prototype.update = function (after) {
   }
   var self = this;
   self.fetching(true);
-  $.get(self.remoteUrl, function (data) {
+  $.get(self.remoteUrl+"?t="+Date.now(), function (data) {
     ko.mapping.fromJS(data, self);
   }, 'json').always(function () {
     self.fetching(false);
@@ -50,29 +50,29 @@ function StatusViewModel() {
     "st_heap": null,
     "st_bck": null,
     "st_rst": null,
-    "pc_01": "##|##",
-    "pc_02": "##|##",
-    "pc_03": "##|##",
-    "pc_04": "##|##",
-    "pc_05": "##|##",
+    "pc_01": " | ",
+    "pc_02": " | ",
+    "pc_03": " | ",
+    "pc_04": " | ",
+    "pc_05": " | ",
     "temp_health": null,
     "temp_count": 16,
-    "ds18_01": "##########|#.#",
-    "ds18_02": "##########|#.#",
-    "ds18_03": "##########|#.#",
-    "ds18_04": "##########|#.#",
-    "ds18_05": "##########|#.#",
-    "ds18_06": "##########|#.#",
-    "ds18_07": "##########|#.#",
-    "ds18_08": "##########|#.#",
-    "ds18_09": "##########|#.#",
-    "ds18_10": "##########|#.#",
-    "ds18_11": "##########|#.#",
-    "ds18_12": "##########|#.#",
-    "ds18_13": "##########|#.#",
-    "ds18_14": "##########|#.#",
-    "ds18_15": "##########|#.#",
-    "ds18_16": "##########|#.#",
+    "ds18_01": "          | . ",
+    "ds18_02": "          | . ",
+    "ds18_03": "          | . ",
+    "ds18_04": "          | . ",
+    "ds18_05": "          | . ",
+    "ds18_06": "          | . ",
+    "ds18_07": "          | . ",
+    "ds18_08": "          | . ",
+    "ds18_09": "          | . ",
+    "ds18_10": "          | . ",
+    "ds18_11": "          | . ",
+    "ds18_12": "          | . ",
+    "ds18_13": "          | . ",
+    "ds18_14": "          | . ",
+    "ds18_15": "          | . ",
+    "ds18_16": "          | . ",
     "st_wifi": null,
     "st_signal": null,
     "st_ip" : null
@@ -179,12 +179,14 @@ function EmonitorViewModel() {
   self.initialised = ko.observable(false);
   self.updating = ko.observable(false);
 
-  self.statusEnabled = reference.endsWith("status.html")
-  self.indexEnabled = reference.endsWith("index.html")
- 
+  self.statusEnabled = reference.includes("status.html");
+  self.indexEnabled = reference.endsWith("index.html");
+  self.waitEnabled = reference.includes("wait.html");
+  
   var updateTimer = null;
   var updateTime = 1 * 1000;
-  var reqCounter = 0;
+  var pendingRequest = false;
+  var cycleCount = 0;
   self.status = new StatusViewModel();
 
   // -----------------------------------------------------------------------
@@ -193,14 +195,11 @@ function EmonitorViewModel() {
   self.start = function () {
     self.updating(true);
 
-    //Stop timer on index page
-    if(!self.indexEnabled) {
-       updateTimer = setTimeout(self.update, updateTime);
-    }
-    else
-    {
-        self.initialised(true);
-    }
+    delay = 1;
+    if(self.statusEnabled)  delay = 1;
+    if(self.waitEnabled) delay = 5000;
+
+    updateTimer = setTimeout(self.update, delay);
     
     self.updating(false);
   };
@@ -217,15 +216,27 @@ function EmonitorViewModel() {
       clearTimeout(updateTimer);
       updateTimer = null;
     }
-    
-    if(self.status.fetching() == false) 
+    //Status page
+    if(self.statusEnabled)
     {
-    self.status.remoteUrl = hostName + '/status.json' +"?t="+Date.now() ;
-    reqCounter = reqCounter +1;
-    console.log("Fetching Data");
-      self.status.update(function () {})
+        if(pendingRequest == false) 
+        {
+        pendingRequest = true;
+          self.status.update(function () { 
+              pendingRequest = false;
+          })
+        }
     }
-    console.log("Cycle");
+    //Wait page
+    if(self.waitEnabled)
+    {
+        self.status.update(function () { 
+            window.location.replace("index.html");
+        })
+    }
+
+    
+    console.log("Cycle:"+cycleCount);cycleCount++;
 
     updateTimer = setTimeout(self.update, updateTime);
     self.updating(false);

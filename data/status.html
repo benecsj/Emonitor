@@ -37,7 +37,7 @@
       <h3>Home Energy Monitoring</h3>
     </div>
 <!--############-->
-    <div id="left-hand-container" style="display">
+    <div id="left-hand-container" data-bind="visible: initialised()" style="display: none">
      <!--//////////////////////////////////////////////////////////////////////////////////-->
       <div id="one">
         <h2>1. Device</h2>
@@ -96,7 +96,7 @@
       
     </div>
  <!--############-->
-   <div id="right-hand-container" style="display">
+   <div id="right-hand-container" data-bind="visible: initialised()" style="display: none">
      <!--//////////////////////////////////////////////////////////////////////////////////-->
       <div id="four">
         <h2>4. Temp sensors</h2>
