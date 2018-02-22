@@ -70,6 +70,7 @@
 //Sensor manager
 #define OWP_CHANNELS_COUNT 	2
 #define TEMP_RESCAN_PERIOD	2
+#define MHZ14_INPUT_PIN		PULSE_INPUT0
 
 //Web server
 #define HTTPD_MAX_HEAD_LEN		1024
@@ -86,7 +87,7 @@
 #define DEBUG_HTTP_CLIENT 		0
 #define DEBUG_HTTP_SERVER 		0
 #define DEBUG_WIFI_MANAGER		0
-
+#define DEBUG_MHZ14				0
 
 #endif
 

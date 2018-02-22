@@ -50,13 +50,14 @@ function StatusViewModel() {
     "st_heap": null,
     "st_bck": null,
     "st_rst": null,
-    "pc_01": " | ",
-    "pc_02": " | ",
-    "pc_03": " | ",
-    "pc_04": " | ",
-    "pc_05": " | ",
+    "meter_co2": null,
+    "pc_01": "0|0",
+    "pc_02": "0|0",
+    "pc_03": "0|0",
+    "pc_04": "0|0",
+    "pc_05": "0|0",
     "temp_health": null,
-    "temp_count": 16,
+    "temp_count": 0,
     "ds18_01": "          | . ",
     "ds18_02": "          | . ",
     "ds18_03": "          | . ",
@@ -77,7 +78,6 @@ function StatusViewModel() {
     "st_signal": null,
     "st_ip" : null
   }, hostName + '/status.json');
-
 
     this.getCounter = ko.observable(0);
     this.getCounter.count = function (value) {
@@ -168,6 +168,13 @@ case 16:temp = self.ds18_16();break;
     return self.pc_01().substr(self.pc_01().lastIndexOf("|")+1,10);
   }, self);
 
+  self.hasMeterCO2 = ko.pureComputed(function() {
+    if((self.meter_co2() != null) && (self.meter_co2() != 10000)) {
+    return true;
+    }
+    return false;   
+  }, self);
+
 }
 StatusViewModel.prototype = Object.create(BaseViewModel.prototype);
 StatusViewModel.prototype.constructor = StatusViewModel;
@@ -182,6 +189,7 @@ function EmonitorViewModel() {
   self.updating = ko.observable(false);
 
   self.statusEnabled = reference.includes("status.html");
+  self.clockEnabled = reference.includes("clock.html");
   self.indexEnabled = reference.endsWith("index.html");
   self.waitEnabled = reference.includes("wait.html");
   
@@ -199,6 +207,7 @@ function EmonitorViewModel() {
 
     delay = 1;
     if(self.statusEnabled){delay = 1;updateTime = 300;}
+    if(self.clockEnabled){delay = 1;updateTime = 10000;}
     if(self.waitEnabled){delay = 5000;}
 
     updateTimer = setTimeout(self.update, delay);
@@ -219,7 +228,7 @@ function EmonitorViewModel() {
       updateTimer = null;
     }
     //Status page
-    if(self.statusEnabled)
+    if(self.statusEnabled || self.clockEnabled)
     {
         if(pendingRequest == false) 
         {
@@ -236,8 +245,11 @@ function EmonitorViewModel() {
             window.location.replace("index.html");
         })
     }
-
-    
+    //Clock page
+    if(self.clockEnabled)
+    {
+        clockUpdate();
+    }
     console.log("Cycle:"+cycleCount);cycleCount++;
 
     updateTimer = setTimeout(self.update, updateTime);

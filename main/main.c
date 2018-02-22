@@ -122,7 +122,7 @@ void task_Init(void *pvParameters) {
 
 void task_1ms(void){
 	Emonitor_Main_1ms();
-
+	Sensor_Manager_VeryFast();
 }
 
 /*
@@ -181,15 +181,10 @@ void user_init(void) {
 	resetInfo = system_get_rst_info();
 	Emonitor_SetResetReason(resetInfo->reason);
 	DBG("Reset exccause:%d reason:%d\n",resetInfo->exccause,resetInfo->reason);
-	//Case on WDT reset perform some clean up
-	if( (REASON_SOFT_WDT_RST == resetInfo->reason) || (REASON_WDT_RST == resetInfo->reason) ||
-	    (REASON_EXCEPTION_RST == resetInfo->reason))
+	//Case on not external reset wait for reset
+	if(REASON_EXT_SYS_RST != resetInfo->reason)
 	{
-		//Try to fix things
-		DBG("System Restart\n");
-		//Wifi_Manager_CleanUp();
-		//system_restore();
-		//system_restart();
+		while(true){}
 	}
 
 	DBG("About to create task\n");

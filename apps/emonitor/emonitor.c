@@ -302,6 +302,11 @@ void Emonitor_Main_1000ms(void) {
 				{
 					Append(length,buffer,"Analog_%02X:%d,",(i+1),Sensor_Manager_GetAnalogValue());
 				}
+				//MHZ14 CO2 Sensor
+				if(Sensor_Manager_HasCO2Sensor())
+				{
+					Append(length,buffer,"Meter_C02:%d,",Sensor_Manager_GetCO2());
+				}
 				//Add Uptime
 				Append(length,buffer,"uptime:%d",Emonitor_uptime);
 				//End of Emoncsm send Url
@@ -415,12 +420,11 @@ void Emonitor_Main_1000ms(void) {
 			PRINT_EMON("(EM) ###################################\n");
 			PRINT_EMON("(EM) ###################################\n");
 			//Trigger reset
-			taskENTER_CRITICAL();
 			while(1)
 			{
-
+				//Disable status led, this will trigger EXT reset
+				pinMode(LED_BUILTIN,INPUT);
 			}
-			taskEXIT_CRITICAL();
 		}
 	}
 }

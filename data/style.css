@@ -228,6 +228,12 @@ button {
     text-align: right;
 }
 
+.fixwidthLong {
+    display: inline-block;
+    width: 140px;
+    text-align: right;
+}
+
 .box {
     padding-top: 5px;
     padding-bottom: 5px;

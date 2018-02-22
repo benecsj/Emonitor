@@ -10,6 +10,7 @@ Includes
 #include "spiffs_manager.h"
 #include "Wifi_Manager.h"
 #include "Sensor_Manager.h"
+#include "Emonitor.h"
 
 /***********************************************************************************************************************
 Defines
@@ -25,12 +26,7 @@ Global variables and functions
 
 void Cpi_Reset(uint8* params,uint8 lenght, uint8* response) {
 	//Trigger reset
-	taskENTER_CRITICAL();
-	while(1)
-	{
-
-	}
-	taskEXIT_CRITICAL();
+	Emonitor_Request(2);
 }
 
 void Cpi_NvM(uint8* params, uint8 lenght, uint8* response) {

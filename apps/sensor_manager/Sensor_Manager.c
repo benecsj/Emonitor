@@ -93,7 +93,8 @@ void Sensor_Manager_Init() {
 #endif
 	//Init pulse counters
 	Sensor_Manager_ResetPulseCounters();
-
+	//Init CO2 sensor
+	MHZ14_Init();
 	//Init temp sensors
     /*Load default invalid temp values*/
     uint8 CS_i;
@@ -106,6 +107,11 @@ void Sensor_Manager_Init() {
     //Init SW pulseCounter
     pulseState = (system_adc_read()>512);
 
+}
+
+void Sensor_Manager_VeryFast() {
+    //MHZ14 CO2 Sensor
+    MHZ14_Feed(digitalRead(MHZ14_INPUT_PIN));
 }
 
 void Sensor_Manager_Fast() {
@@ -129,13 +135,15 @@ void Sensor_Manager_Fast() {
     {
        	pulseState = 1;
     }
-
 }
 
 void Sensor_Manager_Main() {
 	uint8 i;
     /*Read DS18B20 sensors*/
     SENSOR_MANAGER_DS18B20Measure();
+
+    // MHZ14 CO2 Sensor
+    MHZ14_Main();
 
     //Temp sensor rescan timing
     Sensor_Manager_Timing = (Sensor_Manager_Timing + 1) % TEMP_RESCAN_PERIOD;
@@ -150,7 +158,10 @@ void Sensor_Manager_Main() {
     }
 
     DBG_SENSOR("(SensMan)I0:%d I1:%d I2:%d I3:%d  A:%d\n",digitalRead(PULSE_INPUT0),digitalRead(PULSE_INPUT1),digitalRead(PULSE_INPUT2),digitalRead(PULSE_INPUT3),APP_PortMon_analogValues[0]);
-
+    if(MHZ14_IsValid())
+    {
+    	DBG_SENSOR("(SensMan)CO2: %d ppm\n",MHZ14_GetMeasurement());
+    }
 }
 
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 0)

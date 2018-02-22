@@ -15,6 +15,8 @@
 #include "c_types.h"
 #include "stdint.h"
 
+
+#include "MHZ14.h"
 /**********************************************************************************
  * Defines
  **********************************************************************************/
@@ -28,7 +30,7 @@
 extern void Sensor_Manager_Init();
 extern void Sensor_Manager_Main();
 extern void Sensor_Manager_Fast();
-
+extern void Sensor_Manager_VeryFast();
 extern void Sensor_Manager_Get_TempSensorData(uint8* count, uint8** ids,sint16** temperatures );
 extern uint32 Sensor_Manager_GetPulseCount(uint8 id);
 extern uint32 Sensor_Manager_GetPulseLevel(uint8 id);
@@ -41,5 +43,8 @@ extern sint16 APP_SensMan_DS18B20TempList[];
 
 #define Sensor_Manager_GetTempHealth()	(Sensor_Manager_ErrorCounter)
 #define Sensor_Manager_GetTempCount()	(SENSOR_MANAGER_DS18B20Count)
+
+#define Sensor_Manager_HasCO2Sensor()		MHZ14_IsValid()
+#define Sensor_Manager_GetCO2()				MHZ14_GetMeasurement()
 
 #endif /* APP_SENSOR_MANAGER_H_ */

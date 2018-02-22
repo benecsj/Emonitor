@@ -1,0 +1,98 @@
+<html>
+
+<head>
+
+<title>Emonitor_%emon_id%</title>
+  
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+<meta name="description" content="Emonitor">
+<meta name="author" content="Emonitor">
+<meta name="theme-color" content="#000000" />
+
+<meta charset="UTF-8" />
+<link rel="stylesheet" type="text/css" href="style.css">
+</head> 
+
+<script>
+function fullscreen() {
+    var conf = true;//confirm("Fullscreen mode?");
+    var docelem = document.documentElement;
+
+    if (conf == true) {
+        if (docelem.requestFullscreen) {
+            docelem.requestFullscreen();
+        }
+        else if (docelem.mozRequestFullScreen) {
+            docelem.mozRequestFullScreen();
+        }
+        else if (docelem.webkitRequestFullScreen) {
+            docelem.webkitRequestFullScreen();
+        }
+        else if (docelem.msRequestFullscreen) {
+            docelem.msRequestFullscreen();
+        }
+    }
+}
+            
+function clockUpdate(){
+    currentdate = new Date(); 
+    console.log("clockUpdate");
+    document.getElementById("time_text").innerHTML = minTwoDigits(currentdate.getHours()) + ":" +minTwoDigits(currentdate.getMinutes());
+    document.getElementById("date_text").innerHTML = minTwoDigits(currentdate.getUTCDate())+"/"+minTwoDigits(currentdate.getMonth()+1)+"/"+currentdate.getFullYear();
+}
+function minTwoDigits(n) {return (n < 10 ? '0' : '') + n;}
+</script>
+
+<style>
+.textLarge {
+    font-size: 380px;
+    color: #66CCFF;
+    font-weight: bold;
+    font-family: Arial,"sans-serif";
+    text-align: center;
+    margin: 0;
+}
+.textSmall {
+    font-size: 100px;
+    color: #66CCFF;
+    font-weight: bold;
+    font-family: Arial,"sans-serif";
+    margin: 0;
+    padding-left :20px;
+}
+</style>
+
+<body onLoad="pageloaded();">
+  <div id="page" style="background: black">
+  
+    <ul style="background: black">
+      <li><a href="/index.html">Home</a></li>
+      <li class="dropdown">
+        <a href="javascript:void(0)" class="dropbtn">Navigate</a>
+        <div class="dropdown-content">
+          <a href="/status.html">Status</a>
+        </div>
+      </li>
+    </ul>
+  
+  <div>
+  <t class="textLarge" id="time_text" onclick="fullscreen()"></t><br>
+  <div>
+  <t class="textSmall" id="date_text" style="font-size: 70px;"></t>
+  <t class="textSmall"></t>
+  <t class="textSmall" data-bind="text: status.getTemp.value(4)">00.0</t><t class="textSmall">C</t>
+  <t class="textSmall"></t>
+  <t class="textSmall" data-bind="text: status.meter_co2">000</t><t class="textSmall"></t>
+</div>
+
+  <script src="libs.js" type="text/javascript"></script>
+  <script src="emonitor.js" type="text/javascript"></script>
+
+</body>
+
+</html>
