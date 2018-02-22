@@ -37,6 +37,7 @@ function fullscreen() {
             docelem.msRequestFullscreen();
         }
     }
+    document.getElementById("menu").style.visibility = 'hidden';
 }
             
 function clockUpdate(){
@@ -69,8 +70,8 @@ function minTwoDigits(n) {return (n < 10 ? '0' : '') + n;}
 
 <body onLoad="pageloaded();">
   <div id="page" style="background: black">
-  
-    <ul style="background: black">
+
+    <ul style="background: black" id="menu">
       <li><a href="/index.html">Home</a></li>
       <li class="dropdown">
         <a href="javascript:void(0)" class="dropbtn">Navigate</a>
@@ -79,13 +80,13 @@ function minTwoDigits(n) {return (n < 10 ? '0' : '') + n;}
         </div>
       </li>
     </ul>
-  
+    
   <div>
   <t class="textLarge" id="time_text" onclick="fullscreen()"></t><br>
   <div>
   <t class="textSmall" id="date_text" style="font-size: 70px;"></t>
   <t class="textSmall"></t>
-  <t class="textSmall" data-bind="text: status.getTemp.value(4)">00.0</t><t class="textSmall">C</t>
+  <t class="textSmall" data-bind="text: status.getTemp.value(4)">00.0</t><t class="textSmall" style="padding-left :0px;">C</t>
   <t class="textSmall"></t>
   <t class="textSmall" data-bind="text: status.meter_co2">000</t><t class="textSmall"></t>
 </div>
