@@ -827,6 +827,7 @@ int ICACHE_FLASH_ATTR httpdConnectCb(ConnTypePtr conn, char *remIp, int remPort)
 	DBG_HTTPS("(HS) Conn req from  %d.%d.%d.%d:%d, using pool slot %d\n", remIp[0]&0xff, remIp[1]&0xff, remIp[2]&0xff, remIp[3]&0xff, remPort, i);
 	if (i==HTTPD_MAX_CONNECTIONS) {
 		DBG_HTTPS("(HS) Aiee, conn pool overflow!\n");
+		httpdPlatDisconnect(conn);
 		httpdPlatUnlock();
 		return 0;
 	}

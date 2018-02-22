@@ -196,6 +196,7 @@ function EmonitorViewModel() {
   var updateTimer = null;
   var updateTime = 1 * 1000;
   var pendingRequest = false;
+  var pendingTimeOut = 0;
   var cycleCount = 0;
   self.status = new StatusViewModel();
 
@@ -228,14 +229,20 @@ function EmonitorViewModel() {
       updateTimer = null;
     }
     //Status page
-    if(self.statusEnabled || self.clockEnabled)
+    if(self.statusEnabled)
     {
         if(pendingRequest == false) 
         {
         pendingRequest = true;
           self.status.update(function () { 
               pendingRequest = false;
+              pendingTimeOut = 0;
           })
+        }
+        else
+        {
+            pendingTimeOut++;
+            if(pendingTimeOut>30){pendingRequest=false;}
         }
     }
     //Wait page
@@ -248,8 +255,12 @@ function EmonitorViewModel() {
     //Clock page
     if(self.clockEnabled)
     {
+          self.status.update(function () { 
+          clockReceived();
+          })
         clockUpdate();
     }
+    
     console.log("Cycle:"+cycleCount);cycleCount++;
 
     updateTimer = setTimeout(self.update, updateTime);

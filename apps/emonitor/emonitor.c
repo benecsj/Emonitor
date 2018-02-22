@@ -84,14 +84,15 @@ void Emonitor_Preinit(void) {
 
 	//Init UART
 	UART_SetBaudrate(UART0, BIT_RATE_115200);
-	//Init Status LED
-	pinMode(LED_BUILTIN,OUTPUT);
-	pinMode(PULSE_INPUT3,INPUT);
-	digitalWrite(LED_BUILTIN,1);
 	//Init flash button
 	pinMode(FLASH_BUTTON,INPUT);
     //Disable Wifi
     init_esp_wifi();
+}
+
+void Emonitor_EnableStatusLed(void) {
+	pinMode(LED_BUILTIN,OUTPUT);
+	digitalWrite(LED_BUILTIN,1);
 }
 
 void Emonitor_Init(void){

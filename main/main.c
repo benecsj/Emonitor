@@ -141,7 +141,8 @@ void task_10ms(void *pvParameters) {
  * Slow task
  */
 void task_1000ms(void *pvParameters) {
-	vTaskDelay(1000 / portTICK_RATE_MS);
+	vTaskDelay(4000 / portTICK_RATE_MS);
+	Emonitor_EnableStatusLed();
 	for (;;) {
 
 		Emonitor_Main_1000ms();
@@ -184,7 +185,7 @@ void user_init(void) {
 	//Case on not external reset wait for reset
 	if(REASON_EXT_SYS_RST != resetInfo->reason)
 	{
-		while(true){}
+		return;
 	}
 
 	DBG("About to create task\n");
