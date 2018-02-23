@@ -150,6 +150,7 @@ void task_1000ms(void *pvParameters) {
 		NVM_Main();
 		Sensor_Manager_Main();
 		Wifi_Manager_Main();
+		httpd_Main();
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 }

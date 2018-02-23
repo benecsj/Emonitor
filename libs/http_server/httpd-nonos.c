@@ -82,7 +82,7 @@ void ICACHE_FLASH_ATTR httpdPlatInit(int port, int maxConnCt) {
 	httpdConn.proto.tcp=&httpdTcp;
 	espconn_regist_connectcb(&httpdConn, platConnCb);
 	ret = espconn_accept(&httpdConn);
-	DBG_HTTPS("(HS)< espconn_accept [%d][%d] >\n", ret,espconn_tcp_get_max_con_allow(&httpdConn));
+	//DBG2_HTTPS("(HS)< espconn_accept [%d][%d] >\n", ret,espconn_tcp_get_max_con());
 }
 
 

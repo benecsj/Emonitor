@@ -72,6 +72,26 @@ static const ICACHE_RODATA_ATTR MimeMap mimeTypes[]={
 	{NULL, "text/html"}, //default value
 };
 
+void ICACHE_FLASH_ATTR httpd_Main(void) {
+	int i;
+	//Connection safety timeout
+	/*
+	uint32 time = 0;
+	int port = 0;
+	for (i=0; i<HTTPD_MAX_CONNECTIONS; i++)
+	{
+		taskENTER_CRITICAL();
+		if (connData[i]!=NULL)
+		{
+			connData[i]->time = connData[i]->time +1;
+			time = connData[i]->time;
+			port = connData[i]->remote_port;
+		}
+		taskEXIT_CRITICAL();
+
+	}*/
+}
+
 //Returns a static char* to a mime type for a given url to a file.
 const char ICACHE_FLASH_ATTR *httpdGetMimetype(char *url) {
 	int i=0;
@@ -826,7 +846,7 @@ int ICACHE_FLASH_ATTR httpdConnectCb(ConnTypePtr conn, char *remIp, int remPort)
 	}
 	DBG_HTTPS("(HS) Conn req from  %d.%d.%d.%d:%d, using pool slot %d\n", remIp[0]&0xff, remIp[1]&0xff, remIp[2]&0xff, remIp[3]&0xff, remPort, i);
 	if (i==HTTPD_MAX_CONNECTIONS) {
-		DBG_HTTPS("(HS) Aiee, conn pool overflow!\n");
+		DBG2_HTTPS("(HS) Conn pool overflow!\n");
 		httpdPlatDisconnect(conn);
 		httpdPlatUnlock();
 		return 0;

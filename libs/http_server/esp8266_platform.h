@@ -40,16 +40,22 @@
 typedef struct espconn* ConnTypePtr;
 
 
-#if DEBUG_HTTP_SERVER
+#if DEBUG_HTTP_SERVER == 1
 #define DBG_HTTPS(...) printf(__VA_ARGS__)
+#define DBG2_HTTPS(...) printf(__VA_ARGS__)
 #else
 #define DBG_HTTPS(...)
 #endif
 
-#define HTTPD_ALIGNMENT 4
+#ifndef DBG2_HTTPS
+#if DEBUG_HTTP_SERVER == 2
+#define DBG2_HTTPS(...) printf(__VA_ARGS__)
+#else
+#define DBG2_HTTPS(...)
+#endif
+#endif
 
-#define HTTPD_REDIRECT_TO_HOSTNAME_BUFFER 1024
-#define HTTPD_MAX_POSTBUFF_LEN 1024
+#define HTTPD_ALIGNMENT 4
 
 #define HTTP_EMPTYCOUNT 550000
 #define HTTP_TOTALRAM	81920
