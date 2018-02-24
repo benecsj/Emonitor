@@ -14,11 +14,8 @@ static esp_tcp httpdTcp;
 
 //Set/clear global httpd lock.
 //Not needed on nonoos.
-void ICACHE_FLASH_ATTR httpdPlatLock() {
-}
-void ICACHE_FLASH_ATTR httpdPlatUnlock() {
-}
-
+void ICACHE_FLASH_ATTR httpdPlatLock() {}
+void ICACHE_FLASH_ATTR httpdPlatUnlock() {}
 
 static void ICACHE_FLASH_ATTR platReconCb(void *arg, sint8 err) {
 	//From ESP8266 SDK
@@ -82,7 +79,7 @@ void ICACHE_FLASH_ATTR httpdPlatInit(int port, int maxConnCt) {
 	httpdConn.proto.tcp=&httpdTcp;
 	espconn_regist_connectcb(&httpdConn, platConnCb);
 	ret = espconn_accept(&httpdConn);
-	//DBG2_HTTPS("(HS)< espconn_accept [%d][%d] >\n", ret,espconn_tcp_get_max_con());
 }
+
 
 #endif
