@@ -150,10 +150,6 @@ option {
   padding: 20px;
 }
 
-#update {
-    background-color: red;
-}
-
 .small-text{
 font-size: 10px;
 word-wrap: break-word;
@@ -260,54 +256,6 @@ button {
     text-align: center;
     color: #b6b6b6;
     margin: -12px 0 0 0;
-}
-
-/*----------------*/
-
-#footer-small-scrn {
-    width: 100%;
-    font-weight: bold;
-    font-family: Arial,"sans-serif";
-    font-size: 15px;
-    text-align: center;
-    padding: 5px;
-    color: #bcbcbc;
-}
-
-#footer-large-scrn {
-    display: none;
-}
-
-@media screen and (min-width: 1024px) {
-
-#footer-small-scrn {
-    display: none;
-}
-}
-
-@media screen and (min-width: 1024px) {
-
-#footer-large-scrn {
-    position: fixed;
-    display: block;
-    width: 100%;
-    font-weight: bold;
-    font-family: Arial,"sans-serif";
-    font-size: 15px;
-    text-align: center;
-    padding: 5px;
-    color: #bcbcbc;
-    bottom: 0;
-    background-color: #ffffff;
-}
-}
-
-#footer-large-scrn a, #footer-small-scrn a {
-    color: #0699fa;
-}
-
-#footer-large-scrn span, #footer-small-scrn span {
-    color: #777777;
 }
 
 .loading {
