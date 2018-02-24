@@ -11,12 +11,17 @@
 <meta name="description" content="Emonitor">
 <meta name="author" content="Emonitor">
 <meta name="theme-color" content="#000000" />
-
 <meta charset="UTF-8" />
 <link rel="stylesheet" type="text/css" href="style.css">
-</head> 
+</head>
 
-<body onLoad="pageloaded();">
+<script>
+function loadCheck() {
+if ((window.getComputedStyle(document.getElementById('body')).color !== 'rgb(85, 85, 85)')||(typeof pageloaded !== 'function')) {
+window.location.reload();}else{pageloaded();}}
+</script>
+
+<body id="body" onLoad="loadCheck();">
   <div id="page">
   
     <ul>

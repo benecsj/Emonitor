@@ -142,7 +142,7 @@ static void ICACHE_FLASH_ATTR httpdRetireConn(HttpdConnData *conn) {
 		do {
 			j=i;
 			i=i->next;
-			if (j!=NULL) aligned_free(j);
+			if (j!=NULL) free(j);
 		} while (i!=NULL);
 	}
 
@@ -450,9 +450,9 @@ void ICACHE_FLASH_ATTR httpdFlushSendBuffer(HttpdConnData *conn) {
 					DBG_HTTPS("(HS) httpdFlushSendBuffer FINISH\n");
 					return;
 				}
-				HttpSendBacklogItem *i=aligned_malloc(sizeof(HttpSendBacklogItem)+conn->priv->sendBuffLen);
+				HttpSendBacklogItem *i=malloc(sizeof(HttpSendBacklogItem)+conn->priv->sendBuffLen);
 				if (i==NULL) {
-					DBG_HTTPS("(HS) Backlog: aligned_malloc failed, out of memory!\n");
+					DBG_HTTPS("(HS) Backlog: malloc failed, out of memory!\n");
 					return;
 				}
 				memcpy(i->data, conn->priv->sendBuff, conn->priv->sendBuffLen);
@@ -518,7 +518,7 @@ void ICACHE_FLASH_ATTR httpdContinue(HttpdConnData * conn) {
 			HttpSendBacklogItem *next=conn->priv->sendBacklog->next;
 			httpdPlatSendData(conn->conn, conn->priv->sendBacklog->data, conn->priv->sendBacklog->len);
 			conn->priv->sendBacklogSize-=conn->priv->sendBacklog->len;
-			if (conn->priv->sendBacklog!=NULL) aligned_free(conn->priv->sendBacklog);
+			if (conn->priv->sendBacklog!=NULL) free(conn->priv->sendBacklog);
 			conn->priv->sendBacklog=next;
 		}
 		else
