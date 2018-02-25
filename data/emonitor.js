@@ -1,34 +1,21 @@
-// Work out the endpoint to use, for dev you can change to point at a remote ESP
-// and run the HTML/JS from file, no need to upload to the ESP to test
-
-//var reference = window.location.hostname;
 var reference = window.location.href ;
 var hostName = reference.substr(0,reference.lastIndexOf("/"));
 
-
-// Convert string to number, divide by scale, return result
-// as a string with specified precision
 function scaleString(string, scale, precision) {
   var tmpval = parseInt(string) / scale;
   return tmpval.toFixed(precision);
 }
 
 function BaseViewModel(defaults, remoteUrl, mappings) {
-  if(mappings === undefined){
-   mappings = {};
-  }
+  if(mappings === undefined){mappings = {};}
   var self = this;
   self.remoteUrl = remoteUrl;
-
-  // Observable properties
   ko.mapping.fromJS(defaults, mappings, self);
   self.fetching = ko.observable(false);
 }
 
 BaseViewModel.prototype.update = function (after) {
-  if(after === undefined){
-   after = function () { };
-  }
+  if(after === undefined){after = function () { };}
   var self = this;
   self.fetching(true);
   $.get(self.remoteUrl+"?t="+Date.now(), function (data) {
@@ -44,39 +31,39 @@ function StatusViewModel() {
   var self = this;
 
   BaseViewModel.call(self, {
-    "st_uptime": null,
-    "st_timing": null,
-    "st_conn": null,
-    "st_heap": null,
-    "st_bck": null,
-    "st_rst": null,
-    "meter_co2": null,
-    "pc_01": "0|0",
-    "pc_02": "0|0",
-    "pc_03": "0|0",
-    "pc_04": "0|0",
-    "pc_05": "0|0",
-    "temp_health": null,
-    "temp_count": 0,
-    "ds18_01": "          | . ",
-    "ds18_02": "          | . ",
-    "ds18_03": "          | . ",
-    "ds18_04": "          | . ",
-    "ds18_05": "          | . ",
-    "ds18_06": "          | . ",
-    "ds18_07": "          | . ",
-    "ds18_08": "          | . ",
-    "ds18_09": "          | . ",
-    "ds18_10": "          | . ",
-    "ds18_11": "          | . ",
-    "ds18_12": "          | . ",
-    "ds18_13": "          | . ",
-    "ds18_14": "          | . ",
-    "ds18_15": "          | . ",
-    "ds18_16": "          | . ",
-    "st_wifi": null,
-    "st_signal": null,
-    "st_ip" : null
+"st_uptime": null,
+"st_timing": null,
+"st_conn": null,
+"st_heap": null,
+"st_bck": null,
+"st_rst": null,
+"meter_co2": null,
+"pc_01": "0|0",
+"pc_02": "0|0",
+"pc_03": "0|0",
+"pc_04": "0|0",
+"pc_05": "0|0",
+"temp_health": null,
+"temp_count": 0,
+"ds18_01": "          | . ",
+"ds18_02": "          | . ",
+"ds18_03": "          | . ",
+"ds18_04": "          | . ",
+"ds18_05": "          | . ",
+"ds18_06": "          | . ",
+"ds18_07": "          | . ",
+"ds18_08": "          | . ",
+"ds18_09": "          | . ",
+"ds18_10": "          | . ",
+"ds18_11": "          | . ",
+"ds18_12": "          | . ",
+"ds18_13": "          | . ",
+"ds18_14": "          | . ",
+"ds18_15": "          | . ",
+"ds18_16": "          | . ",
+"st_wifi": null,
+"st_signal": null,
+"st_ip" : null
   }, hostName + '/status.json');
 
     this.getCounter = ko.observable(0);
@@ -181,18 +168,15 @@ StatusViewModel.prototype.constructor = StatusViewModel;
 
 function factoryReset(){if(confirm("Are you sure?")){window.location.replace("wait.html?reset=1");}}
 function restart(){window.location.replace("wait.html?restart=1");}
-//---------------------------------------------------------------------------
+
 function EmonitorViewModel() {
   var self = this;
-
   self.initialised = ko.observable(false);
   self.updating = ko.observable(false);
-
   self.statusEnabled = reference.includes("status.html");
   self.clockEnabled = reference.includes("clock.html");
   self.indexEnabled = reference.endsWith("index.html");
   self.waitEnabled = reference.includes("wait.html");
-  
   var updateTimer = null;
   var updateTime = 1 * 1000;
   var pendingRequest = false;
@@ -200,69 +184,46 @@ function EmonitorViewModel() {
   var cycleCount = 0;
   self.status = new StatusViewModel();
 
-  // -----------------------------------------------------------------------
   // Initialise the app
-  // -----------------------------------------------------------------------
   self.start = function () {
-    self.updating(true);
-
     delay = 1;
     if(self.statusEnabled){delay = 1;updateTime = 300;}
     if(self.clockEnabled){delay = 1;updateTime = 10000;}
     if(self.waitEnabled){delay = 5000;}
-
     updateTimer = setTimeout(self.update, delay);
-    
-    self.updating(false);
   };
 
-  // -----------------------------------------------------------------------
   // Get the updated state
-  // -----------------------------------------------------------------------
-  self.update = function () {
-    if (self.updating()) {
-      return;
-    }
+  self.update = function (){
+    if (self.updating()) {return;}
     self.updating(true);
-    if (null !== updateTimer) {
-      clearTimeout(updateTimer);
-      updateTimer = null;
-    }
+    if (null !== updateTimer){
+        clearTimeout(updateTimer);
+        updateTimer = null;}
     //Status page
-    if(self.statusEnabled)
-    {
-        if(pendingRequest == false) 
-        {
-        pendingRequest = true;
-          self.status.update(function () { 
-              pendingRequest = false;
-              pendingTimeOut = 0;
-          })
-        }
-        else
-        {
+    if(self.statusEnabled){
+        if(pendingRequest == false){
+            pendingRequest = true;
+            self.status.update(function () { 
+                pendingRequest = false;
+                pendingTimeOut = 0;})
+        }else{
             pendingTimeOut++;
             if(pendingTimeOut>30){pendingRequest=false;}
         }
     }
     //Wait page
-    if(self.waitEnabled)
-    {
-        self.status.update(function () { 
-            window.location.replace("index.html");
-        })
+    if(self.waitEnabled){
+        self.status.update(function () {
+            window.location.replace("index.html");})
     }
     //Clock page
-    if(self.clockEnabled)
-    {
-          self.status.update(function () { 
-          clockReceived();
-          })
+    if(self.clockEnabled){
+        self.status.update(function () {
+            clockReceived();})
         clockUpdate();
     }
-    
     console.log("Cycle:"+cycleCount);cycleCount++;
-
     updateTimer = setTimeout(self.update, updateTime);
     self.updating(false);
     self.initialised(true);    
@@ -270,7 +231,6 @@ function EmonitorViewModel() {
 }
 
 function pageloaded(){
-  // Activates knockout.js
   var emonitor = new EmonitorViewModel();
   ko.applyBindings(emonitor);
   emonitor.start();
