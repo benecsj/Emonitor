@@ -26,12 +26,13 @@ function loadCheck() {
 loadScript("https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js",false,2,function(j){
 loadScript("https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js",false,2,function(k){
 loadScript("https://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min.js",(window.ko == null),2,function(m){
-loadScript("jquery.min.js",(window.jQuery != null),150,function(){
-loadScript("knockout-min.js",(window.ko != null),150,function(){
-loadScript("knockout.mapping.min.js",((window.ko == null)||(window.ko.mapping != null)),150,function(){
+loadScript("emonitor.js",false,50,function(){
+loadScript("jquery.min.js",(window.jQuery != null),100,function(){
+loadScript("knockout-min.js",(window.ko != null),50,function(){
+loadScript("knockout.mapping.min.js",((window.ko == null)||(window.ko.mapping != null)),50,function(){
 if ((window.getComputedStyle(document.getElementById('body')).color !== 'rgb(85, 85, 85)')||(typeof pageloaded !== 'function') || (window.ko == null) || (window.ko.mapping == null)) {
 window.location.reload();}else{pageloaded();}
-});});});});});});}
+});});});});});});});}
 </script>
 <body id="body" onLoad="loadCheck();">
   <div id="page">
@@ -126,9 +127,5 @@ window.location.reload();}else{pageloaded();}
     </form>
   </div>  
 </div>
-
-  <script src="emonitor.js" type="text/javascript"></script>
-  
 </body>
-
 </html>
