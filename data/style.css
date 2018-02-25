@@ -64,7 +64,7 @@ textarea {
 
 .fadeIn {
     text-align: center;
-    animation: keyFramesFadeIn 500ms step-end both;
+    animation: keyFramesFadeIn 1000ms step-end both;
 }
 
 @keyframes keyFramesFadeIn {
