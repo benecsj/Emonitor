@@ -92,11 +92,17 @@ void Wifi_Manager_Init(void)
 
 void Wifi_Manager_Main(void)
 {
-	WifiManager_ScanTiming++;
-	if(WifiManager_ScanTiming == WIFI_SCAN_TIMING)
+	//Only scan if connected
+	if(Wifi_Manager_IsConnected() == 1)
 	{
-		WifiManager_ScanTiming = 0;
-		Wifi_Manager_UpdateLevel();
+		//Scan timing
+		WifiManager_ScanTiming++;
+		if(WifiManager_ScanTiming == WIFI_SCAN_TIMING)
+		{
+			WifiManager_ScanTiming = 0;
+			//Trigger scan
+			Wifi_Manager_UpdateLevel();
+		}
 	}
 }
 
@@ -138,6 +144,7 @@ void ICACHE_FLASH_ATTR Wifi_Manager_ScanDone(void *arg, STATUS status)
 
 void Wifi_Manager_UpdateLevel(void)
 {
+	//Check if scan is not already running
 	if(WifiManager_ScanRunning == 0)
 	{
 		WifiManager_ScanRunning = 1;

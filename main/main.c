@@ -30,6 +30,7 @@
 /******************************************************************************
 * Defines
 \******************************************************************************/
+#define DELAY_MS(a)  	vTaskDelay(a / portTICK_RATE_MS);
 
 /******************************************************************************
 * Implementations
@@ -93,10 +94,12 @@ uint32 counter;
  * Init task
  */
 void task_Init(void *pvParameters) {
-	Emonitor_StartTimer();
-	vTaskDelay(10 / portTICK_RATE_MS);
+	DELAY_MS(10);
+	//--------------------------------
 	//Init pins handler
 	Init_Pins();
+	//Start 1ms task timer
+	Emonitor_StartTimer();
 	//Init NvM
 	NVM_Init();
 	//Spiffs init
@@ -111,29 +114,39 @@ void task_Init(void *pvParameters) {
 	Sensor_Manager_Init();
 	//Http client init
 	httpclient_Init();
-	vTaskDelay(5000 / portTICK_RATE_MS);
+	//--------------------------------
+	//Delay Http server init
+	DELAY_MS(5000);
+	//--------------------------------
 	//Http server init
 	Http_Server_Init();
+	//--------------------------------
 	//Finished
 	DBG("Init finished!!!\n-------------------------\n");
 	//Exit from the task
 	vTaskDelete( NULL );
 }
 
+/*
+ * Very fast task
+ */
 void task_1ms(void){
+	//------------------
 	Emonitor_Main_1ms();
 	Sensor_Manager_VeryFast();
+	//------------------
 }
 
 /*
  * Fast task
  */
 void task_10ms(void *pvParameters) {
-	vTaskDelay(1000 / portTICK_RATE_MS);
+	DELAY_MS(1000);
 	for (;;) {
+		//------------------
 		Sensor_Manager_Fast();
-		//Emonitor_Main_1ms();
-		vTaskDelay(10 / portTICK_RATE_MS);
+		//------------------
+		DELAY_MS(10);
 	}
 }
 
@@ -141,17 +154,17 @@ void task_10ms(void *pvParameters) {
  * Slow task
  */
 void task_1000ms(void *pvParameters) {
-	vTaskDelay(4000 / portTICK_RATE_MS);
+	DELAY_MS(4000);
 	Emonitor_EnableStatusLed();
 	for (;;) {
-
+		//------------------
 		Emonitor_Main_1000ms();
 		Remote_Control_Main();
 		NVM_Main();
 		Sensor_Manager_Main();
 		Wifi_Manager_Main();
-		httpd_Main();
-		vTaskDelay(1000 / portTICK_RATE_MS);
+		//------------------
+		DELAY_MS(1000);
 	}
 }
 
@@ -159,7 +172,7 @@ void task_1000ms(void *pvParameters) {
  * Background task
  */
 void task_background(void *pvParameters) {
-	vTaskDelay(100 / portTICK_RATE_MS);
+	DELAY_MS(100);
 	for (;;) {
 		Emonitor_Main_Background();
 	}
@@ -172,8 +185,11 @@ void task_background(void *pvParameters) {
  * Returns      : none
  *******************************************************************************/
 void user_init(void) {
+	//Local variables
 	struct rst_info* resetInfo;
-	//Init application
+	xTaskHandle t;
+
+	//Pre Init main application
 	Emonitor_Preinit();
 
 	//Get general statuses
@@ -183,20 +199,15 @@ void user_init(void) {
 	resetInfo = system_get_rst_info();
 	Emonitor_SetResetReason(resetInfo->reason);
 	DBG("Reset exccause:%d reason:%d\n",resetInfo->exccause,resetInfo->reason);
-	//Case on not external reset wait for reset
-	if(REASON_EXT_SYS_RST != resetInfo->reason)
-	{
-		return;
-	}
 
+	//Case on not external reset wait for reset
+	if(REASON_EXT_SYS_RST != resetInfo->reason)	{return;}
+
+	//Start freeRTOS tasks
 	DBG("About to create task\n");
-	xTaskHandle t;
 	xTaskCreate(task_Init, "init", 1024, NULL, (configMAX_PRIORITIES-1), &t);
 	xTaskCreate(task_1000ms, "1000ms", 1024, NULL, 1, &t);
 	xTaskCreate(task_10ms, "10ms", 512, NULL, (configMAX_PRIORITIES-2), &t);
 	xTaskCreate(task_background, "bgnd", 512, NULL, 0, &t);
-
-
-
 }
 

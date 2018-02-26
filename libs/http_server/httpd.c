@@ -72,26 +72,6 @@ static const ICACHE_RODATA_ATTR MimeMap mimeTypes[]={
 	{NULL, "text/html"}, //default value
 };
 
-void ICACHE_FLASH_ATTR httpd_Main(void) {
-	int i;
-	//Connection safety timeout
-	/*
-	uint32 time = 0;
-	int port = 0;
-	for (i=0; i<HTTPD_MAX_CONNECTIONS; i++)
-	{
-		taskENTER_CRITICAL();
-		if (connData[i]!=NULL)
-		{
-			connData[i]->time = connData[i]->time +1;
-			time = connData[i]->time;
-			port = connData[i]->remote_port;
-		}
-		taskEXIT_CRITICAL();
-
-	}*/
-}
-
 //Returns a static char* to a mime type for a given url to a file.
 const char ICACHE_FLASH_ATTR *httpdGetMimetype(char *url) {
 	int i=0;
