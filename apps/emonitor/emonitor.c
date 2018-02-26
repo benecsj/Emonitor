@@ -46,10 +46,7 @@ uint32 Emonitor_resetReason = 0;
 uint32 Emonitor_timing = 0;
 
 uint32 Emonitor_uptime = 0;
-
-uint8 Emonitor_flashButton = 0;
 uint32 Emonitor_flashButtonCounter = 0;
-uint8 Emonitor_buttonState = 0;
 Emonitor_Request Emonitor_requestState = EMONITOR_REQ_NONE;
 Emonitor_Connection_Status Emonitor_connectionStatus = EMONITOR_NOT_CONNECTED;
 
@@ -163,9 +160,18 @@ void Emonitor_Main_1ms(void) {
 
 #if (EMONITOR_TIMING_TEST == 0)
 	//Calculate led state
-	switch(Emonitor_buttonState)
+	if(Emonitor_flashButtonCounter > LONG_PRESS_MIN)
 	{
-	case 0:
+		Emonitor_statusCounter= (Emonitor_statusCounter+1)%LED_TIMING_RESET;
+		ledValue = Emonitor_statusCounter <(LED_TIMING_RESET/2);
+	}
+	else if(Emonitor_flashButtonCounter > SHORT_PRESS_MIN)
+	{
+		Emonitor_statusCounter= (Emonitor_statusCounter+1)%LED_TIMING_NORMAL;
+		ledValue = Emonitor_statusCounter <(LED_TIMING_NORMAL/2);
+	}
+	else
+	{
 		Emonitor_statusCounter= (Emonitor_statusCounter+1)%LED_TIMING_NORMAL;
 		ledValue = (Emonitor_statusCounter <(LED_TIMING_NORMAL-2));
 		if((Emonitor_statusCounter == (LED_TIMING_NORMAL-150)) && (Emonitor_connectionStatus == EMONITOR_CONNECTED))
@@ -177,15 +183,6 @@ void Emonitor_Main_1ms(void) {
 			Emonitor_statusCounter= (Emonitor_statusCounter)%2;
 			ledValue = Emonitor_statusCounter == 0;
 		}
-		break;
-	case 1:
-		Emonitor_statusCounter= (Emonitor_statusCounter+1)%LED_TIMING_NORMAL;
-		ledValue = Emonitor_statusCounter <(LED_TIMING_NORMAL/2);
-		break;
-	case 2:
-		Emonitor_statusCounter= (Emonitor_statusCounter+1)%LED_TIMING_RESET;
-		ledValue = Emonitor_statusCounter <(LED_TIMING_RESET/2);
-		break;
 	}
 #else
 	Emonitor_statusCounter= (Emonitor_statusCounter+1)%2;
@@ -194,36 +191,25 @@ void Emonitor_Main_1ms(void) {
 	//Toggle led
 	digitalWrite(LED_BUILTIN, (ledValue));
 
-	//Read flash button
-	Emonitor_flashButton = (digitalRead(FLASH_BUTTON) == 0);
-	//Process button state
-	if(Emonitor_flashButton == 1)
+	//Process flash button state
+	if(digitalRead(FLASH_BUTTON) == BUTTON_PRESSED)
 	{
 		Emonitor_flashButtonCounter = Emonitor_flashButtonCounter + 1;
 	}
 	else
 	{
+		//Check counter, based on count trigger request
+		if(Emonitor_flashButtonCounter > LONG_PRESS_MIN)
+		{
+			Emonitor_Request(EMONITOR_REQ_CLEAR);
+		}
+		else if(Emonitor_flashButtonCounter > SHORT_PRESS_MIN)
+		{
+			Emonitor_Request(EMONITOR_REQ_HOTSPOT);
+		}
+		//Clear counter
 		Emonitor_flashButtonCounter = 0;
 	}
-
-	taskENTER_CRITICAL();
-	if(Emonitor_flashButtonCounter == 0)
-	{
-		Emonitor_buttonState = 0;
-	}
-	else if(Emonitor_flashButtonCounter == 100)
-	{
-
-		Emonitor_buttonState = 1;
-		Emonitor_requestState = EMONITOR_REQ_HOTSPOT;
-
-	}
-	else if(Emonitor_flashButtonCounter == 8000)
-	{
-		Emonitor_buttonState = 2;
-		Emonitor_requestState = EMONITOR_REQ_CLEAR;
-	}
-	taskEXIT_CRITICAL();
 }
 
 /******************************************************************************
@@ -237,7 +223,6 @@ void Emonitor_Main_1000ms(void) {
 	uint16 length = 0;
 	char buffer[500];
 	char http[10] = {0};
-	uint8 buttonState;
 	uint8 ip[4];
 	uint8 tempCount;
 	uint8* ids;
@@ -327,32 +312,22 @@ void Emonitor_Main_1000ms(void) {
 		Emonitor_StoreTiming(Emonitor_timing);
 	}
 
-	//Handle button action
-	taskENTER_CRITICAL();
-	buttonState = Emonitor_buttonState;
-	taskEXIT_CRITICAL();
-	if(buttonState != Emonitor_requestState)
+	//Process requests
+	switch(Emonitor_requestState)
 	{
-		//Only process when button is released
-		if(buttonState == 0)
-		{
-			switch(Emonitor_requestState)
-			{
-			case EMONITOR_REQ_HOTSPOT:
-				DBG_EMON("(EM) ENABLE HOTSPOT\n");
-				Wifi_Manager_EnableHotspot(1);
-				NvM_RequestSave();
-				//Clear processed request
-				Emonitor_Request(EMONITOR_REQ_RESTART);
-				break;
-			case EMONITOR_REQ_CLEAR:
-				DBG_EMON("(EM) FACTORY RESET\n");
-				NvM_RequestClear();
-				//Enter shutdown request
-				Emonitor_Request(EMONITOR_REQ_RESTART);
-				break;
-			}
-		}
+	case EMONITOR_REQ_HOTSPOT:
+		DBG_EMON("(EM) ENABLE HOTSPOT\n");
+		Wifi_Manager_EnableHotspot(1);
+		NvM_RequestSave();
+		//Clear processed request
+		Emonitor_Request(EMONITOR_REQ_RESTART);
+		break;
+	case EMONITOR_REQ_CLEAR:
+		DBG_EMON("(EM) FACTORY RESET\n");
+		NvM_RequestClear();
+		//Enter shutdown request
+		Emonitor_Request(EMONITOR_REQ_RESTART);
+		break;
 	}
 
 	//Check connections status

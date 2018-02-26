@@ -71,6 +71,8 @@
 #define LED_TIMING_NORMAL		500
 #define LED_TIMING_RESET		100
 #define DEFAULT_SEND_TIMING		10
+#define SHORT_PRESS_MIN			100
+#define LONG_PRESS_MIN			8000
 
 //Sensor manager
 #define OWP_CHANNELS_COUNT 		2
