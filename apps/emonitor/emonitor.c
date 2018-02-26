@@ -22,7 +22,7 @@
 * Defines
 \******************************************************************************/
 
-#define Append(length,buffer,format,...) length += sprintf(&buffer[length],format,__VA_ARGS__)
+#define Append(length,buffer,...) length += sprintf(&buffer[length],__VA_ARGS__)
 
 #if DEBUG_EMONITOR
 #define DBG_EMON(...) printf(__VA_ARGS__)
@@ -39,7 +39,7 @@
 
 uint32 Emonitor_counter = 0;
 uint32 Emonitor_counterMirror = 0;
-uint32 Emonitor_statusCounter = 0;
+uint32 Emonitor_LEDCounter = 0;
 
 uint32 Emonitor_resetReason = 0;
 
@@ -55,7 +55,7 @@ sint32 Emonitor_connectionCounter = 0;
 uint32 Emonitor_freeRam = 0;
 
 // Emonitor user parameters
-uint32 Emonitor_nodeId = 0;
+uint32 Emonitor_nodeId = INVALID_ID;
 char Emonitor_url[100] = {0};
 char Emonitor_key[33] = {0xFF};
 uint32 Emonitor_SendPeroid = 0;
@@ -96,15 +96,15 @@ void Emonitor_Init(void){
     //Check if has valid url and key
 	uint8 urlLength = strlen(Emonitor_url);
 	uint8 apiKeyLength = strlen(Emonitor_key);
-	if ((urlLength <= 4) || (urlLength == 100))
+	if ((urlLength <= URL_MIN_LENGTH) || (urlLength == URL_MAX_LENGTH))
 	{
 		sprintf(Emonitor_url,"%s",DEFAULT_SERVER_ADDRESS);
 	}
-	if (apiKeyLength > 32 || Emonitor_key[0] == 0xFF )
+	if (apiKeyLength > API_KEY_LENGTH || Emonitor_key[0] == 0xFF )
 	{
 		sprintf(Emonitor_key,"%s",DEFAULT_API_KEY);
 	}
-	if(Emonitor_nodeId == 0)
+	if(Emonitor_nodeId == INVALID_ID)
 	{
 		Emonitor_nodeId = Emonitor_GetDefaultId();
 	}
@@ -162,31 +162,31 @@ void Emonitor_Main_1ms(void) {
 	//Calculate led state
 	if(Emonitor_flashButtonCounter > LONG_PRESS_MIN)
 	{
-		Emonitor_statusCounter= (Emonitor_statusCounter+1)%LED_TIMING_RESET;
-		ledValue = Emonitor_statusCounter <(LED_TIMING_RESET/2);
+		Emonitor_LEDCounter= (Emonitor_LEDCounter+1)%LED_TIMING_RESET;
+		ledValue = Emonitor_LEDCounter <(LED_TIMING_RESET/2);
 	}
 	else if(Emonitor_flashButtonCounter > SHORT_PRESS_MIN)
 	{
-		Emonitor_statusCounter= (Emonitor_statusCounter+1)%LED_TIMING_NORMAL;
-		ledValue = Emonitor_statusCounter <(LED_TIMING_NORMAL/2);
+		Emonitor_LEDCounter= (Emonitor_LEDCounter+1)%LED_TIMING_NORMAL;
+		ledValue = Emonitor_LEDCounter <(LED_TIMING_NORMAL/2);
 	}
 	else
 	{
-		Emonitor_statusCounter= (Emonitor_statusCounter+1)%LED_TIMING_NORMAL;
-		ledValue = (Emonitor_statusCounter <(LED_TIMING_NORMAL-2));
-		if((Emonitor_statusCounter == (LED_TIMING_NORMAL-150)) && (Emonitor_connectionStatus == EMONITOR_CONNECTED))
+		Emonitor_LEDCounter= (Emonitor_LEDCounter+1)%LED_TIMING_NORMAL;
+		ledValue = (Emonitor_LEDCounter <(LED_TIMING_NORMAL-2));
+		if((Emonitor_LEDCounter == (LED_TIMING_NORMAL-150)) && (Emonitor_connectionStatus == EMONITOR_CONNECTED))
 		{
 			ledValue = 0 ;
 		}
-		if(Wifi_Manager_IsConnected() == 0)
+		if(Wifi_Manager_IsConnected() == false)
 		{
-			Emonitor_statusCounter= (Emonitor_statusCounter)%2;
-			ledValue = Emonitor_statusCounter == 0;
+			Emonitor_LEDCounter= (Emonitor_LEDCounter)%2;
+			ledValue = Emonitor_LEDCounter == 0;
 		}
 	}
 #else
-	Emonitor_statusCounter= (Emonitor_statusCounter+1)%2;
-	ledValue = Emonitor_statusCounter == 0;
+	Emonitor_LEDCounter= (Emonitor_LEDCounter+1)%2;
+	ledValue = Emonitor_LEDCounter;
 #endif
 	//Toggle led
 	digitalWrite(LED_BUILTIN, (ledValue));
@@ -194,11 +194,12 @@ void Emonitor_Main_1ms(void) {
 	//Process flash button state
 	if(digitalRead(FLASH_BUTTON) == BUTTON_PRESSED)
 	{
-		Emonitor_flashButtonCounter = Emonitor_flashButtonCounter + 1;
+		//Button being pressed, count press time
+		Emonitor_flashButtonCounter++;
 	}
-	else
+	else //Button released
 	{
-		//Check counter, based on count trigger request
+		//Check press time
 		if(Emonitor_flashButtonCounter > LONG_PRESS_MIN)
 		{
 			Emonitor_Request(EMONITOR_REQ_CLEAR);
@@ -207,7 +208,7 @@ void Emonitor_Main_1ms(void) {
 		{
 			Emonitor_Request(EMONITOR_REQ_HOTSPOT);
 		}
-		//Clear counter
+		//Clear button press time
 		Emonitor_flashButtonCounter = 0;
 	}
 }
@@ -222,7 +223,6 @@ void Emonitor_Main_1000ms(void) {
 	uint8 i;
 	uint16 length = 0;
 	char buffer[500];
-	char http[10] = {0};
 	uint8 ip[4];
 	uint8 tempCount;
 	uint8* ids;
@@ -236,8 +236,6 @@ void Emonitor_Main_1000ms(void) {
 	Emonitor_freeRam = system_get_free_heap_size();
 	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
 	PRINT_EMON("(EM) U(%d) T(%d) I(%d) C(%d) H(%d) S(%d) R(%d) S(%d) H(%d)\n", Emonitor_uptime,Emonitor_timing,ip[3],Emonitor_connectionCounter,Emonitor_freeRam,freeStack,Emonitor_counter,Wifi_Manager_GetSignalLevel(),Sensor_Manager_GetTempHealth());
-	//DBG_EMON("(EM) Pulse0(%d) Pulse1(%d) Pulse2(%d) Pulse3(%d) \n",Sensor_Manager_GetPulseCount(0),Sensor_Manager_GetPulseCount(1),Sensor_Manager_GetPulseCount(2),Sensor_Manager_GetPulseCount(3));
-	//Connection status led update
 
 
 	taskENTER_CRITICAL();
@@ -246,22 +244,23 @@ void Emonitor_Main_1000ms(void) {
 	taskEXIT_CRITICAL();
 
 	if((Emonitor_timing+1) >= Emonitor_SendPeroid){
-		if(Wifi_Manager_IsConnected() == 1)
+		if(Wifi_Manager_IsConnected())
 		{
 			//Check if strings have a valid length
 			uint8 urlLength = strlen(Emonitor_url);
 			uint8 apiKeyLength = strlen(Emonitor_key);
+			//Check if url already has http:// text if not append it
 			if(strncmp(Emonitor_url,"http://",7) != 0)
 			{
-				sprintf(http,"http://");
+				Append(length,buffer,"http://");
 			}
-
-			if ((urlLength > 4) && (apiKeyLength == 32))
+			//Check url and user key
+			if ((urlLength > URL_MIN_LENGTH) && (apiKeyLength == API_KEY_LENGTH))
 			{
 				DBG_EMON("----------------Emonitor Send Data-------------\n");
 				Sensor_Manager_Get_TempSensorData(&tempCount,&ids,&temperatures);
 				//Start of Emoncsm send Url
-				Append(length,buffer,"%s%s/input/post.json?node=%d&json={",http,Emonitor_url,Emonitor_nodeId);
+				Append(length,buffer,"%s/input/post.json?node=%d&json={",Emonitor_url,Emonitor_nodeId);
 				//Add freeram
 				Append(length,buffer,"freeram:%d,",Emonitor_freeRam);
 				//Add pulse counters
@@ -294,17 +293,17 @@ void Emonitor_Main_1000ms(void) {
 				//Send out Emoncsm Data
 				http_get(buffer, "", Emonitor_callback);
 			}
-			else
+			else  //Invalid user parameters
 			{
 				DBG_EMON("(EM) Not valid userkey / server values found [%d][%d]\n",urlLength,apiKeyLength);
 			}
 		}
-		else
+		else	//No wifi connection therefore so no user connection possible
 		{
 			Emonitor_connectionStatus = EMONITOR_NOT_CONNECTED;
 		}
 	}
-	else
+	else //Waiting to send
 	{
 		//Emonitor send timing
 		Emonitor_timing++;
@@ -317,10 +316,9 @@ void Emonitor_Main_1000ms(void) {
 	{
 	case EMONITOR_REQ_HOTSPOT:
 		DBG_EMON("(EM) ENABLE HOTSPOT\n");
-		Wifi_Manager_EnableHotspot(1);
-		NvM_RequestSave();
+		Wifi_Manager_EnableHotspot(TRUE);
 		//Clear processed request
-		Emonitor_Request(EMONITOR_REQ_RESTART);
+		Emonitor_Request(EMONITOR_REQ_SAVE);
 		break;
 	case EMONITOR_REQ_CLEAR:
 		DBG_EMON("(EM) FACTORY RESET\n");
@@ -328,75 +326,59 @@ void Emonitor_Main_1000ms(void) {
 		//Enter shutdown request
 		Emonitor_Request(EMONITOR_REQ_RESTART);
 		break;
-	}
-
-	//Check connections status
-	if(Emonitor_connectionStatus == EMONITOR_CONNECTED)
-	{
-		Emonitor_connectionCounter = Emonitor_connectionCounter +1;
-
-		if(Emonitor_connectionCounter == TIMEOUT_TURNOFF_APP)
-		{
-			//Check if it turned on
-			if(Wifi_Manager_GetEnableHotspot() == 1)
-			{
-				DBG_EMON("(EM) COMM OK DISABLE HOTSPOT\n");
-				//Turn off AccesPoint
-				Wifi_Manager_EnableHotspot(0);
-				NvM_RequestSave();
-				Emonitor_Request(EMONITOR_REQ_RESTART);
-			}
-		}
-
-	}
-	else
-	{
-		Emonitor_connectionCounter = Emonitor_connectionCounter - 1;
-
-		if(Emonitor_connectionCounter == -TIMEOUT_TURNON_AP)
-		{
-			//Check if it turned off
-			if(Wifi_Manager_GetEnableHotspot() == 0)
-			{
-				DBG_EMON("(EM) COMM TIMEOUT ENABLE HOTSPOT\n");
-				//Turn on AccesPoint
-				Wifi_Manager_EnableHotspot(1);
-				NvM_RequestSave();
-				Emonitor_Request(EMONITOR_REQ_RESTART);
-			}
-		}
-		//Check if too long no successfull send was performed
-		if(Emonitor_connectionCounter < -TIMEOUT_RESET_NO_COMM)
-		{
-			DBG_EMON("(EM) COMM TIMEOUT RESET\n");
-			Emonitor_Request(EMONITOR_REQ_RESTART);
-		}
-	}
-
-	//Save was requested
-	if(Emonitor_requestState == EMONITOR_REQ_SAVE)
-	{
+	case EMONITOR_REQ_SAVE:
 		DBG_EMON("(EM) SAVE REQUESTED\n");
 		NvM_RequestSave();
 		//Change to reset request
 		Emonitor_Request(EMONITOR_REQ_RESTART);
-	}
-
-	//In a shutdown state
-	if(Emonitor_requestState == EMONITOR_REQ_RESTART)
-	{
+		break;
+	case EMONITOR_REQ_RESTART:
 		//Wait until NvM is done
 		if(NvM_IsBusy() == FALSE)
 		{
+			DBG_EMON("(EM) RESTART REQUESTED\n");
 			PRINT_EMON("(EM) ###################################\n");
 			PRINT_EMON("(EM) ###################################\n");
-			//Trigger reset
-			while(1)
-			{
-				//Disable status led, this will trigger EXT reset
-				pinMode(LED_BUILTIN,INPUT);
-			}
+			//Disable status led, this will trigger EXT reset
+			pinMode(LED_BUILTIN,INPUT);
+			//Do nothing
+			while(1){}
 		}
+		break;
+	}
+
+	//Check connections status and increment counter
+	Emonitor_connectionCounter = Emonitor_connectionCounter + ((Emonitor_connectionStatus == EMONITOR_CONNECTED)? 1 : -1);
+	//Based on counter value perform task if needed
+	switch(Emonitor_connectionCounter)
+	{
+	//TURN OFF ACCESS POINT
+	case TIMEOUT_TURNOFF_APP:
+		//Check if hotspot turned on
+		if(Wifi_Manager_GetEnableHotspot() == ON)
+		{
+			DBG_EMON("(EM) COMM OK DISABLE HOTSPOT\n");
+			//Turn off AccesPoint
+			Wifi_Manager_EnableHotspot(OFF);
+			Emonitor_Request(EMONITOR_REQ_SAVE);
+		}
+		break;
+	//TURN ON ACCESS POINT
+	case -TIMEOUT_TURNON_AP:
+		//Check if hotspot turned off
+		if(Wifi_Manager_GetEnableHotspot() == OFF)
+		{
+			DBG_EMON("(EM) COMM TIMEOUT ENABLE HOTSPOT\n");
+			//Turn on AccesPoint
+			Wifi_Manager_EnableHotspot(ON);;
+			Emonitor_Request(EMONITOR_REQ_SAVE);
+		}
+		break;
+	//NO COMM RESET
+	case -TIMEOUT_RESET_NO_COMM:
+		DBG_EMON("(EM) COMM TIMEOUT RESET\n");
+		Emonitor_Request(EMONITOR_REQ_RESTART);
+		break;
 	}
 }
 

@@ -93,7 +93,7 @@ void Wifi_Manager_Init(void)
 void Wifi_Manager_Main(void)
 {
 	//Only scan if connected
-	if(Wifi_Manager_IsConnected() == 1)
+	if(Wifi_Manager_IsConnected())
 	{
 		//Scan timing
 		WifiManager_ScanTiming++;

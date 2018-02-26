@@ -60,7 +60,7 @@
 #define FLASH_BUTTON    D3
 
 //Remote(Serial) Control
-#define REMOTE_CONTROL_ENABLE	1
+#define REMOTE_CONTROL_ENABLE	(ON)
 #define REMOTE_TX_SIZE			150
 #define REMOTE_RX_SIZE			50
 
@@ -89,13 +89,13 @@
 #define HTTPD_MAX_CONNECTIONS   			3
 
 //Development flags
-#define EMONITOR_TIMING_TEST    0
-#define DEBUG_SENSOR_MANAGER 	0
-#define DEBUG_EMONITOR 			1
-#define DEBUG_HTTP_CLIENT 		0
+#define EMONITOR_TIMING_TEST    (OFF)
+#define DEBUG_SENSOR_MANAGER 	(OFF)
+#define DEBUG_EMONITOR 			(OFF)
+#define DEBUG_HTTP_CLIENT 		(OFF)
 #define DEBUG_HTTP_SERVER 		2
-#define DEBUG_WIFI_MANAGER		0
-#define DEBUG_MHZ14				0
+#define DEBUG_WIFI_MANAGER		(OFF)
+#define DEBUG_MHZ14				(OFF)
 
 #endif
 

@@ -25,6 +25,10 @@ typedef enum
 }Emonitor_Request;
 
 #define BUTTON_PRESSED	0
+#define INVALID_ID		0
+#define URL_MIN_LENGTH  4
+#define URL_MAX_LENGTH  100
+#define API_KEY_LENGTH	32
 
 /******************************************************************************
 * Prototypes

@@ -189,7 +189,7 @@ function EmonitorViewModel() {
     delay = 1;
     if(self.statusEnabled){delay = 1;updateTime = 300;}
     if(self.clockEnabled){delay = 1;updateTime = 10000;}
-    if(self.waitEnabled){delay = 5000;}
+    if(self.waitEnabled){delay = 10000;}
     updateTimer = setTimeout(self.update, delay);
   };
 
