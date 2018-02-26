@@ -27,20 +27,19 @@ uint8 remote_recBuffer[100];
 * Implementations
 \******************************************************************************/
 LOCAL void
-uart0_rx_intr_handler(void *para)
+Remote_Control_UART0_Handler(void *para)
 {
-    /* uart0 and uart1 intr combine togther, when interrupt occur, see reg 0x3ff20020, bit2, bit0 represents
-    * uart1 and uart0 respectively
-    */
     uint8 received;
     uint8 uart_no = UART0;
     uint8 buf_idx = 0;
-
+    //Read status
     uint32 uart_intr_status = READ_PERI_REG(UART_INT_ST(uart_no)) ;
-
+    //Process while have interrupts
     while (uart_intr_status != 0x0) {
+    	//UART ERROR
         if (UART_FRM_ERR_INT_ST == (uart_intr_status & UART_FRM_ERR_INT_ST)) {
             WRITE_PERI_REG(UART_INT_CLR(uart_no), UART_FRM_ERR_INT_CLR);
+        //UART RX
         } else if ( (UART_RXFIFO_TOUT_INT_ST == (uart_intr_status & UART_RXFIFO_TOUT_INT_ST)) ||
         		    (UART_RXFIFO_FULL_INT_ST == (uart_intr_status & UART_RXFIFO_FULL_INT_ST)) )  {
         	remote_recLength = (READ_PERI_REG(UART_STATUS(UART0)) >> UART_RXFIFO_CNT_S)&UART_RXFIFO_CNT;
@@ -54,48 +53,56 @@ uart0_rx_intr_handler(void *para)
             Cpi_RxHandler();
 
             WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_TOUT_INT_CLR);
+            WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR);
+        //UART TX
         } else if (UART_TXFIFO_EMPTY_INT_ST == (uart_intr_status & UART_TXFIFO_EMPTY_INT_ST)) {
             WRITE_PERI_REG(UART_INT_CLR(uart_no), UART_TXFIFO_EMPTY_INT_CLR);
             CLEAR_PERI_REG_MASK(UART_INT_ENA(UART0), UART_TXFIFO_EMPTY_INT_ENA);
+        //OTHER
         } else {
-            //skip
+            //Clear all unused flags
+        	 CLEAR_PERI_REG_MASK(UART_INT_ENA(UART0), 0x1FF);
         }
-
+        //Read status
         uart_intr_status = READ_PERI_REG(UART_INT_ST(uart_no)) ;
     }
 }
 
 /******************************************************************************
- * FunctionName : Emonitor_init
- * Description  : Init emonitor application
+ * FunctionName : Remote_Control_Init
+ * Description  : Init Remote Control application
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
 void Remote_Control_Init(void) {
+#if(REMOTE_CONTROL_ENABLE ==1)
 	//Init UART
-
+	//Setup interrupts
     UART_IntrConfTypeDef uart_intr;
     uart_intr.UART_IntrEnMask = UART_RXFIFO_TOUT_INT_ENA | UART_FRM_ERR_INT_ENA | UART_RXFIFO_FULL_INT_ENA | UART_TXFIFO_EMPTY_INT_ENA;
     uart_intr.UART_RX_FifoFullIntrThresh = 10;
     uart_intr.UART_RX_TimeOutIntrThresh = 2;
     uart_intr.UART_TX_FifoEmptyIntrThresh = 20;
     UART_IntrConfig(UART0, &uart_intr);
-    UART_intr_handler_register(uart0_rx_intr_handler, NULL);
+    //Register interrupthandler
+    UART_intr_handler_register(Remote_Control_UART0_Handler, NULL);
+    //Enable Uart
     ETS_UART_INTR_ENABLE();
-
     //Init command processer
     Cpi_Init();
-
+#endif
 }
 
 /******************************************************************************
  * FunctionName : Remote_Control_Main
- * Description  : Slow Main
+ * Description  : Remote Control Main
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
 void Remote_Control_Main(void) {
+#if(REMOTE_CONTROL_ENABLE ==1)
 	Cpi_Main();
+#endif
 }
 
 

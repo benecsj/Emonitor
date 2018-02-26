@@ -21,6 +21,7 @@ Includes
 #include "c_types.h"
 #include "stdint.h"
 #include "CPI_Config.h"
+#include "user_config.h"
 
 /***********************************************************************************************************************
 Defines 

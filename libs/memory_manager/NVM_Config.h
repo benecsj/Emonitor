@@ -12,7 +12,6 @@
 /*DATA ACCESS*/
 #include "NVM_NonVolatileMemory.h"
 
-extern uint8 NVM_test_value;
 extern uint8 Emonitor_ledControl;
 extern uint8 WifiManager_enableHotspot;
 extern uint32 Emonitor_nodeId;
@@ -28,7 +27,6 @@ extern char WifiManager_AP_PASSWORD[65];
 /*DATA BLOCKS*/
 #define NVM_CFG_STORAGE	\
 	/*	Variable                    Size	   */\
-	NVM_DATA(NVM_test_value,       sizeof(NVM_test_value))\
 	NVM_DATA(Emonitor_ledControl,       sizeof(Emonitor_ledControl))\
 	NVM_DATA(WifiManager_enableHotspot,       sizeof(WifiManager_enableHotspot))\
 	NVM_DATA(Emonitor_nodeId,       sizeof(Emonitor_nodeId))\

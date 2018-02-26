@@ -14,8 +14,8 @@
 #define CPI_OPERATION_MODE  CPI_MODE_INTERRUPT /* CPI_MODE_INTERRUPT / CPI_MODE_POLLING */
 
 /* Message Size */
-#define CPI_RX_MAX_FRAME_SIZE   50
-#define CPI_TX_MAX_FRAME_SIZE   150
+#define CPI_RX_MAX_FRAME_SIZE   REMOTE_RX_SIZE
+#define CPI_TX_MAX_FRAME_SIZE   REMOTE_TX_SIZE
 
 /* Callbacks definitions */
 /* Command Events*/
