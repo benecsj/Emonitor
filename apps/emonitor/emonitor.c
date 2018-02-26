@@ -47,8 +47,6 @@ uint32 Emonitor_timing = 0;
 
 uint32 Emonitor_uptime = 0;
 
-uint8 Emonitor_ledControl = 0;
-
 uint8 Emonitor_flashButton = 0;
 uint32 Emonitor_flashButtonCounter = 0;
 uint8 Emonitor_buttonState = 0;
@@ -178,7 +176,6 @@ void Emonitor_Main_1ms(void) {
 			Emonitor_statusCounter= (Emonitor_statusCounter)%2;
 			ledValue = Emonitor_statusCounter == 0;
 		}
-		ledValue = ledValue || Emonitor_ledControl;
 		break;
 	case 1:
 		Emonitor_statusCounter= (Emonitor_statusCounter+1)%LED_TIMING_NORMAL;

@@ -27,7 +27,6 @@ extern char WifiManager_AP_PASSWORD[65];
 /*DATA BLOCKS*/
 #define NVM_CFG_STORAGE	\
 	/*	Variable                    Size	   */\
-	NVM_DATA(Emonitor_ledControl,       sizeof(Emonitor_ledControl))\
 	NVM_DATA(WifiManager_enableHotspot,       sizeof(WifiManager_enableHotspot))\
 	NVM_DATA(Emonitor_nodeId,       sizeof(Emonitor_nodeId))\
 	NVM_DATA(Emonitor_SendPeroid,       sizeof(Emonitor_SendPeroid))\
