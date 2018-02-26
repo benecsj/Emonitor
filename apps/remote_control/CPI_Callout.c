@@ -23,7 +23,7 @@ Global variables and functions
 
 void Cpi_Reset(uint8* params,uint8 lenght, uint8* response) {
 	//Trigger reset
-	Emonitor_Request(2);
+	Emonitor_Request(EMONITOR_REQ_RESTART);
 }
 
 void Cpi_NvM(uint8* params, uint8 lenght, uint8* response) {

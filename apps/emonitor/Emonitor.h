@@ -5,6 +5,26 @@
 #include "c_types.h"
 
 /******************************************************************************
+* Typedefs
+\******************************************************************************/
+
+typedef enum
+{
+	EMONITOR_NOT_CONNECTED =0,
+	EMONITOR_CONNECTED =1
+}Emonitor_Connection_Status;
+
+typedef enum
+{
+	EMONITOR_REQ_NONE = 0,
+	EMONITOR_REQ_HOTSPOT = 1,
+	EMONITOR_REQ_CLEAR = 2,
+	EMONITOR_REQ_RESTART = 3,
+	EMONITOR_REQ_SAVE = 4
+
+}Emonitor_Request;
+
+/******************************************************************************
 * Prototypes
 \******************************************************************************/
 
@@ -22,13 +42,17 @@ extern uint32 Emonitor_nodeId;
 extern uint32 Emonitor_SendPeroid;
 extern char Emonitor_url[100];
 extern char Emonitor_key[33];
-extern uint8 Emonitor_requestState;
+extern Emonitor_Request Emonitor_requestState;
 extern uint32 Emonitor_uptime;
 extern uint32 Emonitor_timing;
 extern sint32 Emonitor_connectionCounter;
 extern uint32 Emonitor_freeRam;
 extern uint32 Emonitor_counterMirror;
 extern uint32 Emonitor_resetReason;
+
+/******************************************************************************
+* Defines
+\******************************************************************************/
 
 #define Emonitor_SetResetReason(a) (Emonitor_resetReason = a)
 #define Emonitor_GetResetReason() (Emonitor_resetReason)
@@ -48,7 +72,7 @@ extern uint32 Emonitor_resetReason;
 #define Emonitor_GetKey()	(Emonitor_key)
 #define Emonitor_SetKey(a)	Emonitor_key[sprintf(Emonitor_key,"%s",a)]=0;
 
-#define Emonitor_Request(a)	Emonitor_requestState = a;
+#define Emonitor_Request(a)	Emonitor_requestState = a
 
 #endif
 

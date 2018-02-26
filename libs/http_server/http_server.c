@@ -223,11 +223,11 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 						}
 						//RESET REQUEST
 						else if (strcmp(name, "restart")==0) {
-							Emonitor_Request(3);
+							Emonitor_Request(EMONITOR_REQ_RESTART);
 						}
 						//RESET REQUEST
 						else if (strcmp(name, "reset")==0) {
-							Emonitor_Request(2);
+							Emonitor_Request(EMONITOR_REQ_CLEAR);
 						}
 					}
 				}
@@ -237,7 +237,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 				if(saveNeeded == TRUE)
 				{
 					//request save after update
-					Emonitor_Request(4);
+					Emonitor_Request(EMONITOR_REQ_SAVE);
 				}
 			}
 		}

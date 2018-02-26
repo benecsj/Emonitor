@@ -89,7 +89,7 @@
 //Development flags
 #define EMONITOR_TIMING_TEST    0
 #define DEBUG_SENSOR_MANAGER 	0
-#define DEBUG_EMONITOR 			0
+#define DEBUG_EMONITOR 			1
 #define DEBUG_HTTP_CLIENT 		0
 #define DEBUG_HTTP_SERVER 		2
 #define DEBUG_WIFI_MANAGER		0

@@ -50,13 +50,14 @@ uint32 Emonitor_uptime = 0;
 uint8 Emonitor_flashButton = 0;
 uint32 Emonitor_flashButtonCounter = 0;
 uint8 Emonitor_buttonState = 0;
-uint8 Emonitor_requestState = 0;
-uint8 Emonitor_connectionStatus = 1;
+Emonitor_Request Emonitor_requestState = EMONITOR_REQ_NONE;
+Emonitor_Connection_Status Emonitor_connectionStatus = EMONITOR_NOT_CONNECTED;
 
 sint32 Emonitor_connectionCounter = 0;
 
 uint32 Emonitor_freeRam = 0;
 
+// Emonitor user parameters
 uint32 Emonitor_nodeId = 0;
 char Emonitor_url[100] = {0};
 char Emonitor_key[33] = {0xFF};
@@ -145,7 +146,7 @@ uint32_t Emonitor_RestoreTiming(void){
 	  //plausibity check
 	  if(timingValue > Emonitor_SendPeroid*2)
 	  {
-		  timingValue = Emonitor_SendPeroid -10;
+		  timingValue = Emonitor_SendPeroid/2;
 	  }
 
 	  return timingValue;
@@ -167,7 +168,7 @@ void Emonitor_Main_1ms(void) {
 	case 0:
 		Emonitor_statusCounter= (Emonitor_statusCounter+1)%LED_TIMING_NORMAL;
 		ledValue = (Emonitor_statusCounter <(LED_TIMING_NORMAL-2));
-		if((Emonitor_statusCounter == (LED_TIMING_NORMAL-150)) && (Emonitor_connectionStatus == 0))
+		if((Emonitor_statusCounter == (LED_TIMING_NORMAL-150)) && (Emonitor_connectionStatus == EMONITOR_CONNECTED))
 		{
 			ledValue = 0 ;
 		}
@@ -214,13 +215,13 @@ void Emonitor_Main_1ms(void) {
 	{
 
 		Emonitor_buttonState = 1;
-		Emonitor_requestState = 1;
+		Emonitor_requestState = EMONITOR_REQ_HOTSPOT;
 
 	}
 	else if(Emonitor_flashButtonCounter == 8000)
 	{
 		Emonitor_buttonState = 2;
-		Emonitor_requestState = 2;
+		Emonitor_requestState = EMONITOR_REQ_CLEAR;
 	}
 	taskEXIT_CRITICAL();
 }
@@ -259,13 +260,7 @@ void Emonitor_Main_1000ms(void) {
 	Emonitor_counter = 0;
 	taskEXIT_CRITICAL();
 
-	//Emonitor sending
-	taskENTER_CRITICAL();
-	Emonitor_timing++;
-	taskEXIT_CRITICAL();
-	//Store timing value
-	Emonitor_StoreTiming(Emonitor_timing);
-	if(Emonitor_timing >= Emonitor_SendPeroid){
+	if((Emonitor_timing+1) >= Emonitor_SendPeroid){
 		if(Wifi_Manager_IsConnected() == 1)
 		{
 			//Check if strings have a valid length
@@ -321,8 +316,15 @@ void Emonitor_Main_1000ms(void) {
 		}
 		else
 		{
-			Emonitor_connectionStatus = 1;
+			Emonitor_connectionStatus = EMONITOR_NOT_CONNECTED;
 		}
+	}
+	else
+	{
+		//Emonitor send timing
+		Emonitor_timing++;
+		//Store timing value
+		Emonitor_StoreTiming(Emonitor_timing);
 	}
 
 	//Handle button action
@@ -336,29 +338,25 @@ void Emonitor_Main_1000ms(void) {
 		{
 			switch(Emonitor_requestState)
 			{
-			case 1:
+			case EMONITOR_REQ_HOTSPOT:
 				DBG_EMON("(EM) ENABLE HOTSPOT\n");
 				Wifi_Manager_EnableHotspot(1);
 				NvM_RequestSave();
 				//Clear processed request
-				taskENTER_CRITICAL();
-				Emonitor_requestState = 3;
-				taskEXIT_CRITICAL();
+				Emonitor_Request(EMONITOR_REQ_RESTART);
 				break;
-			case 2:
+			case EMONITOR_REQ_CLEAR:
 				DBG_EMON("(EM) FACTORY RESET\n");
 				NvM_RequestClear();
 				//Enter shutdown request
-				taskENTER_CRITICAL();
-				Emonitor_requestState = 3;
-				taskEXIT_CRITICAL();
+				Emonitor_Request(EMONITOR_REQ_RESTART);
 				break;
 			}
 		}
 	}
 
 	//Check connections status
-	if(Emonitor_connectionStatus == 0)
+	if(Emonitor_connectionStatus == EMONITOR_CONNECTED)
 	{
 		Emonitor_connectionCounter = Emonitor_connectionCounter +1;
 
@@ -371,7 +369,7 @@ void Emonitor_Main_1000ms(void) {
 				//Turn off AccesPoint
 				Wifi_Manager_EnableHotspot(0);
 				NvM_RequestSave();
-				Emonitor_requestState = 3;
+				Emonitor_Request(EMONITOR_REQ_RESTART);
 			}
 		}
 
@@ -389,28 +387,28 @@ void Emonitor_Main_1000ms(void) {
 				//Turn on AccesPoint
 				Wifi_Manager_EnableHotspot(1);
 				NvM_RequestSave();
-				Emonitor_requestState = 3;
+				Emonitor_Request(EMONITOR_REQ_RESTART);
 			}
 		}
 		//Check if too long no successfull send was performed
 		if(Emonitor_connectionCounter < -TIMEOUT_RESET_NO_COMM)
 		{
 			DBG_EMON("(EM) COMM TIMEOUT RESET\n");
-			Emonitor_requestState = 3;
+			Emonitor_Request(EMONITOR_REQ_RESTART);
 		}
 	}
 
 	//Save was requested
-	if(Emonitor_requestState == 4)
+	if(Emonitor_requestState == EMONITOR_REQ_SAVE)
 	{
 		DBG_EMON("(EM) SAVE REQUESTED\n");
 		NvM_RequestSave();
 		//Change to reset request
-		Emonitor_requestState = 3;
+		Emonitor_Request(EMONITOR_REQ_RESTART);
 	}
 
 	//In a shutdown state
-	if(Emonitor_requestState == 3)
+	if(Emonitor_requestState == EMONITOR_REQ_RESTART)
 	{
 		//Wait until NvM is done
 		if(NvM_IsBusy() == FALSE)
@@ -449,15 +447,13 @@ void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, 
 
 		if(http_status == 200)
 		{
-			Emonitor_connectionStatus = 0;
+			Emonitor_connectionStatus = EMONITOR_CONNECTED;
 			//Send was successfull clear timer
-			taskENTER_CRITICAL();
 			Emonitor_timing = 0;
-			taskEXIT_CRITICAL();
 		}
 		else
 		{
-			Emonitor_connectionStatus = 1;
+			Emonitor_connectionStatus = EMONITOR_NOT_CONNECTED;
 		}
 	}
 }
