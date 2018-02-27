@@ -86,5 +86,4 @@ uint8 D18_DS18B20_CopyScratchpad( uint8 with_power_extern,
 //Copy values from DS18x20 eeprom to scratchpad
 uint8 D18_DS18B20_RecallE2( uint8 id[] );
 
-
 #endif /* D18_DS18B20_TEMP_SENSOR_H_ */

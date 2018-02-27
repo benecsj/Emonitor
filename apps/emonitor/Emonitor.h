@@ -50,10 +50,10 @@ extern char Emonitor_url[100];
 extern char Emonitor_key[33];
 extern Emonitor_Request Emonitor_requestState;
 extern uint32 Emonitor_uptime;
-extern uint32 Emonitor_timing;
+extern uint32 Emonitor_sendTimer;
 extern sint32 Emonitor_connectionCounter;
 extern uint32 Emonitor_freeRam;
-extern uint32 Emonitor_counterMirror;
+extern uint32 Emonitor_backgroundRuntime;
 extern uint32 Emonitor_resetReason;
 
 /******************************************************************************
@@ -63,10 +63,10 @@ extern uint32 Emonitor_resetReason;
 #define Emonitor_SetResetReason(a) (Emonitor_resetReason = a)
 #define Emonitor_GetResetReason() (Emonitor_resetReason)
 #define Emonitor_GetUptime()	(Emonitor_uptime)
-#define Emonitor_GetSendTiming()	(Emonitor_timing)
+#define Emonitor_GetSendTiming()	(Emonitor_sendTimer)
 #define Emonitor_GetConnectionCounter()	(Emonitor_connectionCounter)
 #define Emonitor_GetFreeRam()	(Emonitor_freeRam)
-#define Emonitor_GetBackgroundCount()	(Emonitor_counterMirror)
+#define Emonitor_GetBackgroundCount()	(Emonitor_backgroundRuntime)
 
 #define Emonitor_GetNodeId()  (Emonitor_nodeId)
 #define Emonitor_SetNodeId(a)  (Emonitor_nodeId = a)

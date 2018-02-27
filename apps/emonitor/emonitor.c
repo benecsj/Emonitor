@@ -21,39 +21,44 @@
 /******************************************************************************
 * Defines
 \******************************************************************************/
-
-#define Append(length,buffer,...) length += sprintf(&buffer[length],__VA_ARGS__)
-
 #if DEBUG_EMONITOR
 #define DBG_EMON(...) printf(__VA_ARGS__)
 #else
 #define DBG_EMON(...)
 #endif
 
-
 #define PRINT_EMON(...) printf(__VA_ARGS__)
 
+#define APPEND(...)				  length += sprintf(&buffer[length],__VA_ARGS__)
+
+#define PRINT_TEMPID "%02X%02X%02X%02X%02X"
+#define PRINT_TEMP	 "%c%d.%d"
+#define JSON_START	 "&json={"
+#define JSON_NEXT	 ","
+#define JSON_DIV	 ":"
+#define JSON_END	 "}"
+#define READ_ID		 ids[(i*8)+1],ids[(i*8)+2],ids[(i*8)+3],ids[(i*8)+4],ids[(i*8)+7]
+#define READ_TEMP	 sign,abs(temperatures[i]/10),abs(temperatures[i]%10)
 /******************************************************************************
 * Variables
 \******************************************************************************/
 
-uint32 Emonitor_counter = 0;
-uint32 Emonitor_counterMirror = 0;
+//Timing and counters
+uint32 Emonitor_backgroundCounter = 0;
 uint32 Emonitor_LEDCounter = 0;
+uint32 Emonitor_sendTimer = 0;
+uint32 Emonitor_buttonCounter = 0;
 
-uint32 Emonitor_resetReason = 0;
-
-uint32 Emonitor_timing = 0;
-
-uint32 Emonitor_uptime = 0;
-uint32 Emonitor_flashButtonCounter = 0;
-Emonitor_Request Emonitor_requestState = EMONITOR_REQ_NONE;
+//statuses
 Emonitor_Connection_Status Emonitor_connectionStatus = EMONITOR_NOT_CONNECTED;
-
 sint32 Emonitor_connectionCounter = 0;
-
 uint32 Emonitor_freeRam = 0;
+uint32 Emonitor_uptime = 0;
+uint32 Emonitor_resetReason = 0;
+uint32 Emonitor_backgroundRuntime = 0;
 
+//Control
+Emonitor_Request Emonitor_requestState = EMONITOR_REQ_NONE;
 // Emonitor user parameters
 uint32 Emonitor_nodeId = INVALID_ID;
 char Emonitor_url[100] = {0};
@@ -66,6 +71,7 @@ uint32 Emonitor_SendPeroid = 0;
 extern void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, char * response_headers, int body_size);
 extern uint32_t Emonitor_GetDefaultId(void);
 extern void task_1ms(void);
+extern uint32 Emonitor_GetBackgroundRuntime(void);
 /******************************************************************************
 * Implementations
 \******************************************************************************/
@@ -113,7 +119,7 @@ void Emonitor_Init(void){
 		Emonitor_SendPeroid = DEFAULT_SEND_TIMING;
 	}
 	//Restore timing
-	Emonitor_timing = Emonitor_RestoreTiming();
+	Emonitor_sendTimer = Emonitor_RestoreTiming();
 }
 
 void Emonitor_StartTimer(void){
@@ -160,12 +166,12 @@ void Emonitor_Main_1ms(void) {
 
 #if (EMONITOR_TIMING_TEST == 0)
 	//Calculate led state
-	if(Emonitor_flashButtonCounter > LONG_PRESS_MIN)
+	if(Emonitor_buttonCounter > LONG_PRESS_MIN)
 	{
 		Emonitor_LEDCounter= (Emonitor_LEDCounter+1)%LED_TIMING_RESET;
 		ledValue = Emonitor_LEDCounter <(LED_TIMING_RESET/2);
 	}
-	else if(Emonitor_flashButtonCounter > SHORT_PRESS_MIN)
+	else if(Emonitor_buttonCounter > SHORT_PRESS_MIN)
 	{
 		Emonitor_LEDCounter= (Emonitor_LEDCounter+1)%LED_TIMING_NORMAL;
 		ledValue = Emonitor_LEDCounter <(LED_TIMING_NORMAL/2);
@@ -195,21 +201,21 @@ void Emonitor_Main_1ms(void) {
 	if(digitalRead(FLASH_BUTTON) == BUTTON_PRESSED)
 	{
 		//Button being pressed, count press time
-		Emonitor_flashButtonCounter++;
+		Emonitor_buttonCounter++;
 	}
 	else //Button released
 	{
 		//Check press time
-		if(Emonitor_flashButtonCounter > LONG_PRESS_MIN)
+		if(Emonitor_buttonCounter > LONG_PRESS_MIN)
 		{
 			Emonitor_Request(EMONITOR_REQ_CLEAR);
 		}
-		else if(Emonitor_flashButtonCounter > SHORT_PRESS_MIN)
+		else if(Emonitor_buttonCounter > SHORT_PRESS_MIN)
 		{
 			Emonitor_Request(EMONITOR_REQ_HOTSPOT);
 		}
 		//Clear button press time
-		Emonitor_flashButtonCounter = 0;
+		Emonitor_buttonCounter = 0;
 	}
 }
 
@@ -232,18 +238,18 @@ void Emonitor_Main_1000ms(void) {
 	Emonitor_uptime++;
 	//Get local ip address
 	Wifi_Manager_GetIp(ip);
+	//Get background time
+	Emonitor_backgroundRuntime = Emonitor_GetBackgroundRuntime();
 	//Free ram and stack
 	Emonitor_freeRam = system_get_free_heap_size();
 	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
-	PRINT_EMON("(EM) U(%d) T(%d) I(%d) C(%d) H(%d) S(%d) R(%d) S(%d) H(%d)\n", Emonitor_uptime,Emonitor_timing,ip[3],Emonitor_connectionCounter,Emonitor_freeRam,freeStack,Emonitor_counter,Wifi_Manager_GetSignalLevel(),Sensor_Manager_GetTempHealth());
 
+	//Print out status
+	PRINT_EMON("(EM) U(%d) T(%d) I(%d) C(%d) H(%d) S(%d) R(%d) S(%d) H(%d)\n", Emonitor_uptime,Emonitor_sendTimer,ip[3],Emonitor_connectionCounter,Emonitor_freeRam,freeStack,Emonitor_backgroundRuntime,Wifi_Manager_GetSignalLevel(),Sensor_Manager_GetTempHealth());
 
-	taskENTER_CRITICAL();
-	Emonitor_counterMirror = Emonitor_counter;
-	Emonitor_counter = 0;
-	taskEXIT_CRITICAL();
-
-	if((Emonitor_timing+1) >= Emonitor_SendPeroid){
+	//Send timing
+	if((Emonitor_sendTimer+1) >= Emonitor_SendPeroid){
+		//Check if got network connection
 		if(Wifi_Manager_IsConnected())
 		{
 			//Check if strings have a valid length
@@ -252,7 +258,7 @@ void Emonitor_Main_1000ms(void) {
 			//Check if url already has http:// text if not append it
 			if(strncmp(Emonitor_url,"http://",7) != 0)
 			{
-				Append(length,buffer,"http://");
+				APPEND("http://");
 			}
 			//Check url and user key
 			if ((urlLength > URL_MIN_LENGTH) && (apiKeyLength == API_KEY_LENGTH))
@@ -260,35 +266,37 @@ void Emonitor_Main_1000ms(void) {
 				DBG_EMON("----------------Emonitor Send Data-------------\n");
 				Sensor_Manager_Get_TempSensorData(&tempCount,&ids,&temperatures);
 				//Start of Emoncsm send Url
-				Append(length,buffer,"%s/input/post.json?node=%d&json={",Emonitor_url,Emonitor_nodeId);
+				APPEND("%s/input/post.json?node=%d",Emonitor_url,Emonitor_nodeId);
+				//\\\\\\\\\\\\\\\\\\
+				//Start Json frame
+				APPEND(JSON_START);
+				//\\\\\\\\\\\\\\\\\\\\\\\\\\\
+				//Add ip (only single time per connection)
+				if (Emonitor_connectionStatus == EMONITOR_NOT_CONNECTED) {
+					APPEND("ip" 				JSON_DIV 	"%d" 		JSON_NEXT	,ip[3]);}
 				//Add freeram
-				Append(length,buffer,"freeram:%d,",Emonitor_freeRam);
+					APPEND("freeram" 			JSON_DIV 	"%d"		JSON_NEXT	,Emonitor_freeRam);
 				//Add pulse counters
-				for(i=0;i<SENSOR_MANAGER_PULSE_COUNTERS;i++)
-				{
-					 Append(length,buffer,"Pulse_%02X:%d,",(i+1),Sensor_Manager_GetPulseCount(i));
-				}
+				for(i = 0 ; i < SENSOR_MANAGER_PULSE_COUNTERS ; i++ ){
+					APPEND("Pulse_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetPulseCount(i));}
 				//Add temperatures
-				for(i=0;i<tempCount;i++)
-				{
+				for(i = 0 ; i < tempCount ; i++ ){
 					char sign = (temperatures[i]<0 ? '-':'+');
-					 Append(length,buffer,"Temp_%02X%02X%02X%02X%02X:%c%d.%d,",ids[(i*8)+1],ids[(i*8)+2],ids[(i*8)+3],ids[(i*8)+4],ids[(i*8)+7],sign,abs(temperatures[i]/10),abs(temperatures[i]%10));
-				}
+					APPEND("Temp_" PRINT_TEMPID JSON_DIV 	PRINT_TEMP 	JSON_NEXT	,READ_ID, READ_TEMP);}
 				//Add analog reads
-				for(i=0;i<SENSOR_MANAGER_ANALOGCHANNELS_COUNT;i++)
-				{
-					Append(length,buffer,"Analog_%02X:%d,",(i+1),Sensor_Manager_GetAnalogValue());
-				}
+				for(i = 0 ; i < SENSOR_MANAGER_ANALOGCHANNELS_COUNT ; i++ ){
+					APPEND("Analog_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetAnalogValue());}
 				//MHZ14 CO2 Sensor
-				if(Sensor_Manager_HasCO2Sensor())
-				{
-					Append(length,buffer,"Meter_C02:%d,",Sensor_Manager_GetCO2());
-				}
+				if(Sensor_Manager_HasCO2Sensor()){
+					APPEND("Meter_C02" 			JSON_DIV 	"%d" 		JSON_NEXT	,Sensor_Manager_GetCO2());}
 				//Add Uptime
-				Append(length,buffer,"uptime:%d",Emonitor_uptime);
-				//End of Emoncsm send Url
-				Append(length,buffer,"}&apikey=%s",Emonitor_key);
-
+					APPEND("uptime" 			JSON_DIV 	"%d"		/*LAST*/	,Emonitor_uptime);
+				//\\\\\\\\\\\\\\\\\\\\\\\\\\\
+				//Finish Json frame
+				APPEND(JSON_END);
+				//\\\\\\\\\\\\\\\
+				//End request with apikey
+				APPEND("&apikey=%s",Emonitor_key);
 
 				//Send out Emoncsm Data
 				http_get(buffer, "", Emonitor_callback);
@@ -306,9 +314,9 @@ void Emonitor_Main_1000ms(void) {
 	else //Waiting to send
 	{
 		//Emonitor send timing
-		Emonitor_timing++;
+		Emonitor_sendTimer++;
 		//Store timing value
-		Emonitor_StoreTiming(Emonitor_timing);
+		Emonitor_StoreTiming(Emonitor_sendTimer);
 	}
 
 	//Process requests
@@ -389,29 +397,48 @@ void Emonitor_Main_1000ms(void) {
  * Returns      : none
  *******************************************************************************/
 void Emonitor_Main_Background(void) {
+	//Just measure background runtime
 	taskENTER_CRITICAL();
-	Emonitor_counter++;
+	Emonitor_backgroundCounter++;
 	taskEXIT_CRITICAL();
+}
+
+uint32 Emonitor_GetBackgroundRuntime(void)
+{
+	//Return value
+	uint32 returnValue;
+	//Get background count value and reset it
+	taskENTER_CRITICAL();
+	returnValue = Emonitor_backgroundCounter;
+	Emonitor_backgroundCounter = 0;
+	taskEXIT_CRITICAL();
+	//Return background time
+	return returnValue;
 }
 
 void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, char * response_headers, int body_size)
 {
 	DBG_EMON("HTTP status=%d\n", http_status);
+	//Check for generic HTTP error
 	if (http_status != HTTP_STATUS_GENERIC_ERROR) {
 		DBG_EMON("HTTP headers (%d)\n", strlen(response_headers));
 		DBG_EMON("HTTP body (%d)\n", body_size);
 		DBG_EMON("HTTP body=\"%s\"\n", response_body); // FIXME: this does not handle binary data.
-
+		//Check if HTTP OK received
 		if(http_status == 200)
 		{
 			Emonitor_connectionStatus = EMONITOR_CONNECTED;
-			//Send was successfull clear timer
-			Emonitor_timing = 0;
+			//Send was successful clear send timer
+			Emonitor_sendTimer = 0;
 		}
 		else
 		{
 			Emonitor_connectionStatus = EMONITOR_NOT_CONNECTED;
 		}
+	}
+	else
+	{
+		Emonitor_connectionStatus = EMONITOR_NOT_CONNECTED;
 	}
 }
 
