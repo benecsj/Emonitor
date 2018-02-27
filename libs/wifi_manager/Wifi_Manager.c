@@ -5,7 +5,7 @@
 
 LOCAL void ICACHE_FLASH_ATTR on_wifi_connect(){
 	DBG_WM("Connected\n");
-    //Store current ip address
+    //Trigger level measurement
 	Wifi_Manager_UpdateLevel();
 }
 
@@ -13,16 +13,16 @@ LOCAL void ICACHE_FLASH_ATTR on_wifi_disconnect(uint8 reason){
 	DBG_WM("Disconnect %d\n", reason);
 }
 
+//Configured parameters
 uint8 WifiManager_enableHotspot = 1;
 char WifiManager_STA_SSID[33] = {0xFF};
 char WifiManager_STA_PASSWORD[65] = {0xFF};
 char WifiManager_AP_SSID[33] = {0};
 char WifiManager_AP_PASSWORD[65] = {0xFF};
-
+//Signal level scanning
 struct scan_config WifiManager_ScanConfig;
 sint8 WifiManager_SignalLevel = 0;
-uint8 WifiManager_ScanRunning = 0;
-
+uint8 WifiManager_ScanRunning = OFF;
 uint8 WifiManager_ScanTiming = 0;
 
 void Wifi_Manager_Init(void)
@@ -43,13 +43,13 @@ void Wifi_Manager_Init(void)
 	textLength = strlen(WifiManager_AP_SSID);
 	if((textLength == 0) || (textLength>32))
 	{
-		Wifi_Manager_GetDefaultValues(WifiManager_AP_SSID,NULL);
+		Wifi_Manager_GetDefaultId(WifiManager_AP_SSID);
 
 	}
 	textLength = strlen(WifiManager_AP_PASSWORD);
 	if(textLength>64 || WifiManager_AP_PASSWORD[0]== 0xFF )
 	{
-		Wifi_Manager_GetDefaultValues(NULL,WifiManager_AP_PASSWORD);
+		Wifi_Manager_GetDefaultPassword(WifiManager_AP_PASSWORD);
 
 	}
 
@@ -139,15 +139,15 @@ void ICACHE_FLASH_ATTR Wifi_Manager_ScanDone(void *arg, STATUS status)
 		  WifiManager_SignalLevel = 0;
 		  DBG_WM("scan fail !!!\r\n");
 	  }
-	  WifiManager_ScanRunning = 0;
+	  WifiManager_ScanRunning = OFF;
 }
 
 void Wifi_Manager_UpdateLevel(void)
 {
 	//Check if scan is not already running
-	if(WifiManager_ScanRunning == 0)
+	if(WifiManager_ScanRunning == OFF)
 	{
-		WifiManager_ScanRunning = 1;
+		WifiManager_ScanRunning = ON;
 		WifiManager_ScanConfig.ssid = WifiManager_STA_SSID;
 		(void)wifi_station_scan(&WifiManager_ScanConfig, Wifi_Manager_ScanDone);
 	}
@@ -168,43 +168,30 @@ void Wifi_Manager_GetIp(uint8 ip[4])
 
 void Wifi_Manager_EnableHotspot(uint8 enable)
 {
-	//Check if state was changed
-	if(WifiManager_enableHotspot != enable)
-	{
-		//Perform execution of the operation
-		if(enable == 1)
-		{
-			//start_wifi_ap(WifiManager_AP_SSID, WifiManager_AP_PASSWORD);
-		}
-		else
-		{
-			//stop_wifi_ap();
-		}
-	}
-	//Store request
 	WifiManager_enableHotspot = enable;
-
 }
 
-void Wifi_Manager_GetDefaultValues(char* id, char * pass)
+void Wifi_Manager_GetDefaultId(char* id)
 {
 	spiffs* fs = spiffs_get_fs();
 	spiffs_file fd;
 	s32_t length = 0;
-	if(id != NULL)
-	{
-		fd = SPIFFS_open(fs, "/id", SPIFFS_RDONLY, 0);
-		length = SPIFFS_read(fs, fd, (u8_t *)id, 32);
-		SPIFFS_close(fs, fd);
-		id[length-1] = 0;
-	}
-	if(pass != NULL)
-	{
-		fd = SPIFFS_open(fs, "/pass", SPIFFS_RDONLY, 0);
-		length = SPIFFS_read(fs, fd, (u8_t *)pass, 64);
-		SPIFFS_close(fs, fd);
-		pass[length-1] = 0;
-	}
+	//Get id from filestorage
+	fd = SPIFFS_open(fs, "/id", SPIFFS_RDONLY, 0);
+	length = SPIFFS_read(fs, fd, (u8_t *)id, 32);
+	SPIFFS_close(fs, fd);
+	id[length-1] = 0;
 }
 
+void Wifi_Manager_GetDefaultPassword(char * pass)
+{
+	spiffs* fs = spiffs_get_fs();
+	spiffs_file fd;
+	s32_t length = 0;
+	//Get password from filestorage
+	fd = SPIFFS_open(fs, "/pass", SPIFFS_RDONLY, 0);
+	length = SPIFFS_read(fs, fd, (u8_t *)pass, 64);
+	SPIFFS_close(fs, fd);
+	pass[length-1] = 0;
+}
 

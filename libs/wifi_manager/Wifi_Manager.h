@@ -17,7 +17,8 @@ extern void Wifi_Manager_GetIp(uint8 ip[4]);
 extern void Wifi_Manager_EnableHotspot(uint8 enable);
 extern void Wifi_Manager_UpdateLevel(void);
 
-extern void Wifi_Manager_GetDefaultValues(char* id, char * pass);
+extern void Wifi_Manager_GetDefaultId(char* id);
+extern void Wifi_Manager_GetDefaultPassword(char * pass);
 
 #define Wifi_Manager_IsConnected	wifi_station_connected
 

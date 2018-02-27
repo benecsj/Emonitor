@@ -444,16 +444,29 @@ void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, 
 
 uint32_t Emonitor_GetDefaultId(void)
 {
-	char buffer[64];
-	spiffs* fs = spiffs_get_fs();
+	char buffer[64] = {0};
+	char *numStart;
+	spiffs* fs;
 	spiffs_file fd;
+
+	//Get id string from filesystem storage
+	fs = spiffs_get_fs();
 	fd = SPIFFS_open(fs, "/id", SPIFFS_RDONLY, 0);
 	SPIFFS_read(fs, fd, (u8_t *)buffer, 64);
 	SPIFFS_close(fs, fd);
 
-	char *ret;
-    ret = strchr((const char *)buffer, '_');
-
-	return( (((uint32)ret[1]-'0')*1000) + (((uint32)ret[2]-'0')*100) + (((uint32)ret[3]-'0')*10) + ((uint32)ret[4]-'0') );
+	//Look for spec char if present
+	numStart = strchr((const char *)buffer, '_');
+    //If char not found then just take start of the buffer
+    if(numStart == NULL)
+    {
+    	numStart = (char*)&buffer[0];
+    }
+    else // '_' found to step next char
+    {
+    	numStart = &numStart[1];
+    }
+    //Return number
+	return(atoi(numStart));
 }
 
