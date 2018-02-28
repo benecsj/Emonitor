@@ -347,6 +347,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 				uint32_t countUsage = HTTP_EMPTYCOUNT - Emonitor_GetBackgroundCount();
 				double usage = ((double)countUsage/(double)HTTP_EMPTYCOUNT)*100;
 				countUsage = usage;
+				if(countUsage>100){ countUsage = 100;}
 				len = sprintf(buff, "%d%", countUsage);
 			}
 			//WIFI CONNECTION
@@ -401,16 +402,6 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 					len = sprintf(buff, "--");
 				}
 			}
-			//PULSE COUNTERS
-			else if (strncmp(token, "pulsc_",6)==0) {
-				    uint32 id = (token[7]-'0')-1;
-				    if(id<5)
-				    {
-						uint32 count = Sensor_Manager_GetPulseCount(id);
-						uint32 level = Sensor_Manager_GetPulseLevel(id);
-						len = sprintf(buff, "<tr><td>0%d</td><td>%d</td><td>%d</td></tr>",(id+1),count,level);
-				    }
-			}
 			//TEMP SENSORS
 			else if (strcmp(token, "temp_health")==0) {
 					uint32 health = Sensor_Manager_GetTempHealth();
@@ -429,18 +420,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 					uint8 count = Sensor_Manager_GetTempCount();
 					len = sprintf(buff, " %d",count);
 			}
-			else if (strncmp(token, "ds18_",5)==0) {
-					uint32 id = ((token[5]-'0')*10)+(token[6]-'0')-1;
-					uint8* ids;
-					uint8 count;
-					sint16* temperatures;
-					Sensor_Manager_Get_TempSensorData(&count,&ids,&temperatures);
-					if(id<count)
-					{
-						char sign = (temperatures[id]<0 ? '-':' ');
-						len = sprintf(buff, "<tr><td>%02X%02X%02X%02X%02X</td><td>%c%d.%dC</td></tr>",ids[(id*8)+1],ids[(id*8)+2],ids[(id*8)+3],ids[(id*8)+4],ids[(id*8)+7],sign,abs(temperatures[id]/10),abs(temperatures[id]%10));
-					}
-			}
+			//RESET SOURCE
 			else if (strcmp(token, "st_rst")==0) {
 				uint32 reset = Emonitor_GetResetReason();
 				switch(reset)
