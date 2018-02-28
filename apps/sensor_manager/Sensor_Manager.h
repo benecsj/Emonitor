@@ -24,6 +24,8 @@
 #define SENSOR_MANAGER_DS18B20MAXCOUNT 16
 #define SENSOR_MANAGER_PULSE_COUNTERS 5
 
+#define Sensor_Manager_INVALID_TEMP    10000
+
 /**********************************************************************************
  * Interfaces
  **********************************************************************************/
@@ -46,5 +48,7 @@ extern sint16 APP_SensMan_DS18B20TempList[];
 
 #define Sensor_Manager_HasCO2Sensor()		MHZ14_IsValid()
 #define Sensor_Manager_GetCO2()				MHZ14_GetMeasurement()
+
+#define Sensor_Manager_IsTempValid(a)	(a != Sensor_Manager_INVALID_TEMP)
 
 #endif /* APP_SENSOR_MANAGER_H_ */

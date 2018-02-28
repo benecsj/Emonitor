@@ -148,11 +148,15 @@ int ICACHE_FLASH_ATTR cgiEspJsonTemplate(HttpdConnData *connData) {
 				uint8* ids;
 				uint8 count;
 				sint16* temperatures;
+				sint16 temperature;
 				Sensor_Manager_Get_TempSensorData(&count,&ids,&temperatures);
 				if(id<count)
 				{
-					char sign = (temperatures[id]<0 ? '-':' ');
-					length += sprintf(&buffer[length],"\"ds18_%02d\":\"%02X%02X%02X%02X%02X|%c%d.%d\",",id+1,ids[(id*8)+1],ids[(id*8)+2],ids[(id*8)+3],ids[(id*8)+4],ids[(id*8)+7],sign,abs(temperatures[id]/10),abs(temperatures[id]%10));
+					temperature = temperatures[id];
+					if(Sensor_Manager_IsTempValid(temperature)) {
+						char sign = (temperature<0 ? '-':' ');
+						length += sprintf(&buffer[length],"\"ds18_%02d\":\"%02X%02X%02X%02X%02X|%c%d.%d\",",id+1,ids[(id*8)+1],ids[(id*8)+2],ids[(id*8)+3],ids[(id*8)+4],ids[(id*8)+7],sign,abs(temperature/10),abs(temperature%10));
+					}
 				}
 			}
 			//TEMP HEALTH

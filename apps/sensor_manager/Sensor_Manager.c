@@ -21,7 +21,6 @@
 #define APP_REPORT_FAIL() (Sensor_Manager_ErrorCounter++)
 #define APP_REPORT_PASS() Sensor_Manager_ErrorCounter = 0
 
-#define Sensor_Manager_INVALID_TEMP 0
 #define Sensor_Manager_MAX_RETRY_COUNT 6
 
 #if DEBUG_SENSOR_MANAGER
@@ -29,6 +28,8 @@
 #else
 #define DBG_SENSOR(...)
 #endif
+
+#define DBG_SENSOR2(...)
 
 /**********************************************************************************
  * Variables
@@ -48,7 +49,7 @@ uint32 Sensor_Manager_PulseCounters[SENSOR_MANAGER_PULSE_COUNTERS] = {};
 
 uint32 Sensor_Manager_ErrorCounter=0;
 
-uint8 pulseState = 1;
+uint8 Sensor_Manager_analogToPulseState = 1;
 
 /**********************************************************************************
  * Function defines
@@ -74,6 +75,8 @@ void Sensor_Manager_PulseCounter3(void);
  **********************************************************************************/
 
 void Sensor_Manager_Init() {
+    uint8 i;
+
 	//Pulse counter input
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 0)
 	pinMode(PULSE_INPUT0,INPUT);
@@ -91,21 +94,21 @@ void Sensor_Manager_Init() {
 	pinMode(PULSE_INPUT3,INPUT);
 	attachInterrupt(PULSE_INPUT3,Sensor_Manager_PulseCounter3,RISING);
 #endif
+
 	//Init pulse counters
 	Sensor_Manager_ResetPulseCounters();
 	//Init CO2 sensor
 	MHZ14_Init();
 	//Init temp sensors
     /*Load default invalid temp values*/
-    uint8 CS_i;
-    for (CS_i = 0; CS_i < SENSOR_MANAGER_DS18B20MAXCOUNT; CS_i++) {
+    for (i = 0; i < SENSOR_MANAGER_DS18B20MAXCOUNT; i++) {
         //Set temp sensor init value
-        SENSOR_MANAGER_DS18B20TempList[CS_i] = Sensor_Manager_INVALID_TEMP;
+        SENSOR_MANAGER_DS18B20TempList[i] = Sensor_Manager_INVALID_TEMP;
     }
     //Search for sensors
     Sensor_Manager_UpdateSensors();
     //Init SW pulseCounter
-    pulseState = (system_adc_read()>512);
+    Sensor_Manager_analogToPulseState = (system_adc_read()>512);
 
 }
 
@@ -125,15 +128,16 @@ void Sensor_Manager_Fast() {
     }
 
     //SW pulse counter
-    if((pulseState == 1) && (APP_PortMon_analogValues[0] < 300))
+    if((Sensor_Manager_analogToPulseState == 1) && (APP_PortMon_analogValues[0] < 300))
     {
-    	pulseState = 0;
-    	Sensor_Manager_PulseCounters[4]++;
-
+    	Sensor_Manager_analogToPulseState = 0;
     }
-    else if((pulseState == 0) && (APP_PortMon_analogValues[0] > 600))
+    else if((Sensor_Manager_analogToPulseState == 0) && (APP_PortMon_analogValues[0] > 600))
     {
-       	pulseState = 1;
+       	Sensor_Manager_analogToPulseState = 1;
+    	//Count rising edge
+       	Sensor_Manager_PulseCounters[4]++;
+
     }
 }
 
@@ -152,11 +156,15 @@ void Sensor_Manager_Main() {
         //Search for sensors again
         Sensor_Manager_UpdateSensors();
     }
+    //Debug info
+    DBG_SENSOR("(SensMan)");
     for(i=0;i<SENSOR_MANAGER_DS18B20Count;i++)
     {
-    	DBG_SENSOR("(SensMan)(%d)%d- %d.%dC - %x%x%x%x%x%x%x%x\n",i,Sensor_Manager_sensorChannels[i],SENSOR_MANAGER_DS18B20TempList[i]/10,abs(SENSOR_MANAGER_DS18B20TempList[i]%10),Sensor_Manager_sensorIDs[(i*8)+0],Sensor_Manager_sensorIDs[(i*8)+1],Sensor_Manager_sensorIDs[(i*8)+2],Sensor_Manager_sensorIDs[(i*8)+3],Sensor_Manager_sensorIDs[(i*8)+4],Sensor_Manager_sensorIDs[(i*8)+5],Sensor_Manager_sensorIDs[(i*8)+6],Sensor_Manager_sensorIDs[(i*8)+7]);
+    	char sign = (SENSOR_MANAGER_DS18B20TempList[i]<0 ? '-':'+');
+    	DBG_SENSOR(" (%d)%c%d.%dC",i,Sensor_Manager_sensorChannels[i],sign,abs(SENSOR_MANAGER_DS18B20TempList[i]/10),abs(SENSOR_MANAGER_DS18B20TempList[i]%10));
+    	//DBG_SENSOR("(SensMan)(%d)%d- %d.%dC - %x%x%x%x%x%x%x%x\n",i,Sensor_Manager_sensorChannels[i],SENSOR_MANAGER_DS18B20TempList[i]/10,abs(SENSOR_MANAGER_DS18B20TempList[i]%10),Sensor_Manager_sensorIDs[(i*8)+0],Sensor_Manager_sensorIDs[(i*8)+1],Sensor_Manager_sensorIDs[(i*8)+2],Sensor_Manager_sensorIDs[(i*8)+3],Sensor_Manager_sensorIDs[(i*8)+4],Sensor_Manager_sensorIDs[(i*8)+5],Sensor_Manager_sensorIDs[(i*8)+6],Sensor_Manager_sensorIDs[(i*8)+7]);
     }
-
+    DBG_SENSOR("\n");
     DBG_SENSOR("(SensMan)I0:%d I1:%d I2:%d I3:%d  A:%d\n",digitalRead(PULSE_INPUT0),digitalRead(PULSE_INPUT1),digitalRead(PULSE_INPUT2),digitalRead(PULSE_INPUT3),APP_PortMon_analogValues[0]);
     if(MHZ14_IsValid())
     {
@@ -278,10 +286,6 @@ void Sensor_Manager_UpdateSensors(void) {
 
         DBG_SENSOR("(SensMan)Sensors found: %d\n", Sensor_Manager_Count);
 
-        //Block preemption
-        //APP_ENTER_CRITICAL();
-        //Block all temp data whil still preparing
-
         //Set new temp count
         SENSOR_MANAGER_DS18B20Count = Sensor_Manager_Count;
         //Copy Ids
@@ -292,8 +296,11 @@ void Sensor_Manager_UpdateSensors(void) {
         for (i = 0; i < SENSOR_MANAGER_DS18B20MAXCOUNT; i++) {
             Sensor_Manager_sensorChannels[i] = Sensor_Manager_sensorChannelsTEMP[i];
         }
-        //Enable preemption
-        //APP_EXIT_CRITICAL();
+
+        //Clear temperatures
+        for (i = 0; i < SENSOR_MANAGER_DS18B20MAXCOUNT; i++) {
+        	SENSOR_MANAGER_DS18B20TempList[i] = Sensor_Manager_INVALID_TEMP;
+        }
 
         /*Init sensors*/
         for (i = 0; i < OWP_CHANNELS_COUNT; i++) {
@@ -302,10 +309,6 @@ void Sensor_Manager_UpdateSensors(void) {
             //Broadcast convert message to all temp sensors
             D18_DS18B20_StartMeasure(D18_DS18B20_POWER_EXTERN, 0);
         }
-        vTaskDelay(500 / portTICK_RATE_MS);
-        //Get temperature  values
-        SENSOR_MANAGER_DS18B20Measure();
-
     }
 }
 
@@ -373,7 +376,7 @@ uint8 SENSOR_MANAGER_DS18B20_Search(void) {
             }
             //Store found sensor channel
             Sensor_Manager_sensorChannelsTEMP[CS_nSensors] = OneWireChannel;
-            DBG_SENSOR("(SensMan)Sensor found: Ch(%d) Id:(%x%x%x)\n",OneWireChannel,Sensor_Manager_sensorIDsTEMP[0],Sensor_Manager_sensorIDsTEMP[1],Sensor_Manager_sensorIDsTEMP[2]);
+            DBG_SENSOR2("(SensMan)Sensor found: Ch(%d) Id:(%x%x%x)\n",OneWireChannel,Sensor_Manager_sensorIDsTEMP[0],Sensor_Manager_sensorIDsTEMP[1],Sensor_Manager_sensorIDsTEMP[2]);
             //Increment sensor count
             CS_nSensors++;
         }
@@ -386,7 +389,7 @@ uint8 SENSOR_MANAGER_DS18B20_Search(void) {
             if (OneWireChannel < OWP_CHANNELS_COUNT) {
                 //Don't stop search
                 diff = OWP_CONST_SEARCH_FIRST;
-                DBG_SENSOR("(SensMan)Search on channel: %d\n", OneWireChannel);
+                DBG_SENSOR2("(SensMan)Search on channel: %d\n", OneWireChannel);
             }
             else
             {

@@ -73,6 +73,7 @@
 #define DEFAULT_SEND_TIMING		10
 #define SHORT_PRESS_MIN			100
 #define LONG_PRESS_MIN			8000
+#define CPU_USAGE_AVERAGE		8
 
 //Sensor manager
 #define OWP_CHANNELS_COUNT 		2

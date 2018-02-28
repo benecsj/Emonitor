@@ -30,7 +30,7 @@
 /******************************************************************************
 * Defines
 \******************************************************************************/
-#define DELAY_MS(a)  	vTaskDelay(a / portTICK_RATE_MS);
+#define DELAY_MS(a)  	vTaskDelay((a) / portTICK_RATE_MS);
 
 /******************************************************************************
 * Implementations
@@ -141,12 +141,14 @@ void task_1ms(void){
  * Fast task
  */
 void task_10ms(void *pvParameters) {
+	uint32 sysTimeMS;
 	DELAY_MS(1000);
 	for (;;) {
 		//------------------
 		Sensor_Manager_Fast();
 		//------------------
-		DELAY_MS(10);
+		sysTimeMS = system_get_time()/1000;
+		DELAY_MS(10-((sysTimeMS)%10));
 	}
 }
 
@@ -154,9 +156,12 @@ void task_10ms(void *pvParameters) {
  * Slow task
  */
 void task_1000ms(void *pvParameters) {
+	uint32 sysTimeMS;
 	DELAY_MS(4000);
 	Emonitor_EnableStatusLed();
 	for (;;) {
+		//timing correction
+
 		//------------------
 		Emonitor_Main_1000ms();
 		Remote_Control_Main();
@@ -164,7 +169,8 @@ void task_1000ms(void *pvParameters) {
 		Sensor_Manager_Main();
 		Wifi_Manager_Main();
 		//------------------
-		DELAY_MS(1000);
+		sysTimeMS = system_get_time()/1000;
+		DELAY_MS(1000-((sysTimeMS)%1000));
 	}
 }
 

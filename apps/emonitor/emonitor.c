@@ -233,13 +233,22 @@ void Emonitor_Main_1000ms(void) {
 	uint8 tempCount;
 	uint8* ids;
 	sint16* temperatures;
+	sint16 temperature;
+	char sign;
 
 	//Uptime counter
 	Emonitor_uptime++;
 	//Get local ip address
 	Wifi_Manager_GetIp(ip);
 	//Get background time
-	Emonitor_backgroundRuntime = Emonitor_GetBackgroundRuntime();
+	if(Emonitor_backgroundRuntime ==0)
+	{
+		Emonitor_backgroundRuntime = Emonitor_GetBackgroundRuntime();
+	}
+	else
+	{
+		Emonitor_backgroundRuntime = ((Emonitor_backgroundRuntime*(CPU_USAGE_AVERAGE-1)) + (Emonitor_GetBackgroundRuntime())) / CPU_USAGE_AVERAGE ;
+	}
 	//Free ram and stack
 	Emonitor_freeRam = system_get_free_heap_size();
 	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
@@ -281,8 +290,12 @@ void Emonitor_Main_1000ms(void) {
 					APPEND("Pulse_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetPulseCount(i));}
 				//Add temperatures
 				for(i = 0 ; i < tempCount ; i++ ){
-					char sign = (temperatures[i]<0 ? '-':'+');
-					APPEND("Temp_" PRINT_TEMPID JSON_DIV 	PRINT_TEMP 	JSON_NEXT	,READ_ID, READ_TEMP);}
+					temperature = temperatures[i];
+					if(Sensor_Manager_IsTempValid(temperature)) {
+						sign = (temperature<0 ? '-':'+');
+						APPEND("Temp_" PRINT_TEMPID JSON_DIV 	PRINT_TEMP 	JSON_NEXT	,READ_ID, READ_TEMP);
+					}
+				}
 				//Add analog reads
 				for(i = 0 ; i < SENSOR_MANAGER_ANALOGCHANNELS_COUNT ; i++ ){
 					APPEND("Analog_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetAnalogValue());}
