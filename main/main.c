@@ -171,6 +171,11 @@ void task_1000ms(void *pvParameters) {
 		//------------------
 		sysTimeMS = system_get_time()/1000;
 		DELAY_MS(1000-((sysTimeMS)%1000));
+		//Let Wifi task running to try to connect
+		if(Wifi_Manager_IsConnected() == FALSE)
+		{
+			DELAY_MS(sysTimeMS%1000);
+		}
 	}
 }
 

@@ -77,7 +77,7 @@
 
 //Sensor manager
 #define OWP_CHANNELS_COUNT 		2
-#define TEMP_RESCAN_PERIOD		2
+#define TEMP_RESCAN_PERIOD		5
 #define MHZ14_INPUT_PIN			PULSE_INPUT0
 
 //Web server
