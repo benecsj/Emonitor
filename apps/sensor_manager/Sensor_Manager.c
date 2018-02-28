@@ -21,8 +21,6 @@
 #define APP_REPORT_FAIL() (Sensor_Manager_ErrorCounter++)
 #define APP_REPORT_PASS() Sensor_Manager_ErrorCounter = 0
 
-#define Sensor_Manager_MAX_RETRY_COUNT 6
-
 #if DEBUG_SENSOR_MANAGER
 #define DBG_SENSOR(...) printf(__VA_ARGS__)
 #else
@@ -268,7 +266,7 @@ void Sensor_Manager_UpdateSensors(void) {
     uint8 Sensor_Manager_Count = SENSOR_MANAGER_DS18B20_Search();
     if (Sensor_Manager_Count > SENSOR_MANAGER_DS18B20Count) {
         //More found so register new sensors
-        Sensor_Manager_RetryCount = Sensor_Manager_MAX_RETRY_COUNT;
+        Sensor_Manager_RetryCount = TEMP_MAX_RETRY_COUNT;
     } else if (Sensor_Manager_Count < SENSOR_MANAGER_DS18B20Count) {
         //Less sensor found so retry
         Sensor_Manager_RetryCount++;
@@ -279,7 +277,7 @@ void Sensor_Manager_UpdateSensors(void) {
     }
 
     //Check if needs to update temp count
-    if (Sensor_Manager_RetryCount >= Sensor_Manager_MAX_RETRY_COUNT) {
+    if (Sensor_Manager_RetryCount >= TEMP_MAX_RETRY_COUNT) {
         Sensor_Manager_RetryCount = 0;
 
         APP_REPORT_FAIL();
