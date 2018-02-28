@@ -61,7 +61,6 @@ uint8 D18_DS18B20_MeasuretoCel(uint8 fc, uint8 *sp,
             meas &= ~(DS18B20_9_BIT_UNDF);
         }
     }
-
     *cel = (uint8) (meas >> 4);
     *cel_frac_bits = (uint8) (meas & 0x000F);
 

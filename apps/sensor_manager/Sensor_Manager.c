@@ -30,6 +30,21 @@
 #define DBG_SENSOR2(...)
 
 /**********************************************************************************
+ * Types
+ **********************************************************************************/
+typedef enum
+{
+	SENSOR_MANAGER_NORMAL,
+	SENSOR_MANAGER_NEW_TEMP_DETECTED,
+	SENSOR_MANAGER_WAIT_FOR_FIRST_CONVERSION,
+}Sensor_Manager_Status;
+
+/**********************************************************************************
+ * Defines
+ **********************************************************************************/
+#define Sensor_Manager_Change_State(a) Sensor_Manager_State = a
+
+/**********************************************************************************
  * Variables
  **********************************************************************************/
 uint8 SENSOR_MANAGER_DS18B20Count;
@@ -49,12 +64,15 @@ uint32 Sensor_Manager_ErrorCounter=0;
 
 uint8 Sensor_Manager_analogToPulseState = 1;
 
+Sensor_Manager_Status Sensor_Manager_State = SENSOR_MANAGER_NORMAL;
+
 /**********************************************************************************
  * Function defines
  **********************************************************************************/
 uint8 SENSOR_MANAGER_DS18B20_Search(void);
 void SENSOR_MANAGER_DS18B20Measure(void);
 void Sensor_Manager_UpdateSensors(void);
+void SENSOR_MANAGER_DS18B20_StartMeasure(void);
 
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 0)
 void Sensor_Manager_PulseCounter0(void);
@@ -141,19 +159,34 @@ void Sensor_Manager_Fast() {
 
 void Sensor_Manager_Main() {
 	uint8 i;
-    /*Read DS18B20 sensors*/
-    SENSOR_MANAGER_DS18B20Measure();
 
-    // MHZ14 CO2 Sensor
-    MHZ14_Main();
+	//Based on state do stuff
+	switch(Sensor_Manager_State)
+	{
+	case SENSOR_MANAGER_NORMAL:
+	    /*Read DS18B20 sensors*/
+	    SENSOR_MANAGER_DS18B20Measure();
+	    //Trigger conversion
+	    SENSOR_MANAGER_DS18B20_StartMeasure();
+		break;
+	case SENSOR_MANAGER_NEW_TEMP_DETECTED:
+		//Trigger measurement start
+		SENSOR_MANAGER_DS18B20_StartMeasure();
+		Sensor_Manager_Change_State(SENSOR_MANAGER_NORMAL);
+		break;
+	}
 
     //Temp sensor rescan timing
-    Sensor_Manager_Timing = (Sensor_Manager_Timing + 1) % TEMP_RESCAN_PERIOD;
+    Sensor_Manager_Timing = (Sensor_Manager_Timing + 1) % (TEMP_RESCAN_PERIOD+1);
     //Is it time to scan
     if (Sensor_Manager_Timing == 0) {
         //Search for sensors again
         Sensor_Manager_UpdateSensors();
     }
+
+    // MHZ14 CO2 Sensor
+    MHZ14_Main();
+
     //Debug info
     DBG_SENSOR("(SensMan)");
     for(i=0;i<SENSOR_MANAGER_DS18B20Count;i++)
@@ -299,14 +332,19 @@ void Sensor_Manager_UpdateSensors(void) {
         for (i = 0; i < SENSOR_MANAGER_DS18B20MAXCOUNT; i++) {
         	SENSOR_MANAGER_DS18B20TempList[i] = Sensor_Manager_INVALID_TEMP;
         }
+        //Change state because of new temp meters
+        Sensor_Manager_Change_State(SENSOR_MANAGER_NEW_TEMP_DETECTED);
+    }
+}
 
-        /*Init sensors*/
-        for (i = 0; i < OWP_CHANNELS_COUNT; i++) {
-            //Select OWP channel
-            OWP_SelectChannel(i);
-            //Broadcast convert message to all temp sensors
-            D18_DS18B20_StartMeasure(D18_DS18B20_POWER_EXTERN, 0);
-        }
+void SENSOR_MANAGER_DS18B20_StartMeasure(void)
+{
+	uint8 i;
+    for (i = 0; i < OWP_CHANNELS_COUNT; i++) {
+        //Select OWP channel
+        OWP_SelectChannel(i);
+        //Broadcast convert message to all temp sensors
+        D18_DS18B20_StartMeasure(D18_DS18B20_POWER_EXTERN, 0);
     }
 }
 
@@ -403,12 +441,7 @@ uint8 SENSOR_MANAGER_DS18B20_Search(void) {
 void SENSOR_MANAGER_DS18B20Measure() {
     //Local variables
     uint8 subzero, cel, cel_frac_bits, i;
-    for (i = 0; i < OWP_CHANNELS_COUNT; i++) {
-        //Select OWP channel
-        OWP_SelectChannel(i);
-        //Broadcast convert message to all temp sensors
-        D18_DS18B20_StartMeasure(D18_DS18B20_POWER_EXTERN, 0);
-    }
+
     //Loop all available sensors
     for (i = 0; i < SENSOR_MANAGER_DS18B20Count; i++) {
         //Get sensor id position

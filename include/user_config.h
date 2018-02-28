@@ -77,8 +77,8 @@
 
 //Sensor manager
 #define OWP_CHANNELS_COUNT 		2
-#define TEMP_RESCAN_PERIOD		4
-#define TEMP_MAX_RETRY_COUNT 	3
+#define TEMP_RESCAN_PERIOD		1
+#define TEMP_MAX_RETRY_COUNT 	5
 #define MHZ14_INPUT_PIN			PULSE_INPUT0
 
 //Web server
@@ -92,7 +92,7 @@
 
 //Development flags
 #define EMONITOR_TIMING_TEST    (OFF)
-#define DEBUG_SENSOR_MANAGER 	(OFF)
+#define DEBUG_SENSOR_MANAGER 	(ON)
 #define DEBUG_EMONITOR 			(OFF)
 #define DEBUG_HTTP_CLIENT 		(OFF)
 #define DEBUG_HTTP_SERVER 		(2)
