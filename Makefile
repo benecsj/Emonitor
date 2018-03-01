@@ -120,7 +120,7 @@ DDEFINES +=				\
 # Required for each makefile to inherit from the parent
 #
 
-INCLUDES := $(INCLUDES) -I $(PDIR)include  -I $(PDIR)apps/emonitor -I $(PDIR)apps/remote_control -I $(PDIR)libs/wifi_manager
+INCLUDES := $(INCLUDES) -I $(PDIR)include -I $(PDIR)apps/emonitor -I $(PDIR)apps/remote_control -I $(PDIR)libs/wifi_manager
 INCLUDES := $(INCLUDES) -I $(PDIR)libs/memory_manager -I $(PDIR)libs/core_lib -I $(PDIR)libs/spiffs_manager -I $(PDIR)libs/crc
 INCLUDES := $(INCLUDES) -I $(PDIR)libs/ds18b20 -I $(PDIR)libs/pins -I $(PDIR)apps/sensor_manager -I $(PDIR)libs/http_client
 INCLUDES := $(INCLUDES) -I $(PDIR)libs/http_server -I $(PDIR)libs/MHZ14 -I $(PDIR)libs/uart -I $(PDIR)libs/hw_timer

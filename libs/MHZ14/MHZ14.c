@@ -5,6 +5,11 @@
 #include "esp_common.h"
 #include "MHZ14.h"
 #include "user_config.h"
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+
 /*Defines*/
 
 #if DEBUG_MHZ14
