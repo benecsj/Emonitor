@@ -9,7 +9,7 @@
 /*Includes*/
 #include "NVM_NonVolatileMemory.h"
 #include "user_config.h"
-#include "md5.h"
+#include "ssl/ssl_crypto.h"
 /*Defines*/
 
 
@@ -68,9 +68,9 @@ void NvM_Restore(void)
 		system_param_load(EMONITOR_PARAM_START_SEC-retry, 0, (void*)&NVM_FrameBuffer, sizeof(NVM_FrameBuffer));
 
 		//Calculate hash for data
-		MD5Init(&mdContext);
-		MD5Update(&mdContext, (unsigned char *)&NVM_FrameBuffer[NVM_DATA_POS_DATA_START], sizeof(NVM_FrameBuffer)-NVM_DATA_POS_DATA_START);
-		MD5Final( (unsigned char*) &hash[0], &mdContext);
+		MD5_Init(&mdContext);
+		MD5_Update(&mdContext, (unsigned char *)&NVM_FrameBuffer[NVM_DATA_POS_DATA_START], sizeof(NVM_FrameBuffer)-NVM_DATA_POS_DATA_START);
+		MD5_Final( (unsigned char*) &hash[0], &mdContext);
 
 		//Compare hash
 		NvM_Counter = 0;
@@ -182,9 +182,9 @@ void NvM_Store(void)
 	NvM_StoreVariables();
 
 	//Calculate hash for data
-	MD5Init(&mdContext);
-	MD5Update(&mdContext, (unsigned char *)&NVM_FrameBuffer[NVM_DATA_POS_DATA_START], sizeof(NVM_FrameBuffer)-NVM_DATA_POS_DATA_START);
-	MD5Final( (unsigned char*) &NVM_FrameBuffer[0], &mdContext);
+	MD5_Init(&mdContext);
+	MD5_Update(&mdContext, (unsigned char *)&NVM_FrameBuffer[NVM_DATA_POS_DATA_START], sizeof(NVM_FrameBuffer)-NVM_DATA_POS_DATA_START);
+	MD5_Final( (unsigned char*) &NVM_FrameBuffer[0], &mdContext);
 
 	//Store complete datablock
 	system_param_save_with_protect(EMONITOR_PARAM_START_SEC, (void*)&NVM_FrameBuffer, sizeof(NVM_FrameBuffer));

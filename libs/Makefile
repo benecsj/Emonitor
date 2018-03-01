@@ -19,10 +19,10 @@ COMPONENTS_libs = hw_timer/hw_timer.a	\
                   memory_manager/memory_manager.a \
                   spiffs_manager/spiffs_manager.a \
                   ds18b20/ds18b20.a \
-                  crc/crc.a  \
                   pins/pins.a \
                   http_client/http_client.a \
                   http_server/http_server.a \
+                  crc/crc.a \
                   uart/uart.a \
                   MHZ14/MHZ14.a
 endif
