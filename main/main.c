@@ -6,11 +6,6 @@
 #include "esp_common.h"
 #include "esp_system.h"
 #include "project_config.h"
-#include "user_config.h"
-
-//OS
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 
 //Libs
 #include "Wifi_Manager.h"
@@ -30,7 +25,7 @@
 /******************************************************************************
 * Defines
 \******************************************************************************/
-#define DELAY_MS(a)  	vTaskDelay((a) / portTICK_RATE_MS);
+#define DELAY_MS(a)  	prj_Delay(a);
 
 /******************************************************************************
 * Implementations
@@ -124,7 +119,7 @@ void task_Init(void *pvParameters) {
 	//Finished
 	DBG("Init finished!!!\n-------------------------\n");
 	//Exit from the task
-	vTaskDelete( NULL );
+	prj_TaskDelete( NULL );
 }
 
 /*
@@ -216,9 +211,9 @@ void user_init(void) {
 
 	//Start freeRTOS tasks
 	DBG("About to create task\n");
-	xTaskCreate(task_Init, "init", 1024, NULL, (configMAX_PRIORITIES-1), &t);
-	xTaskCreate(task_1000ms, "1000ms", 1024, NULL, 1, &t);
-	xTaskCreate(task_10ms, "10ms", 512, NULL, (configMAX_PRIORITIES-2), &t);
-	xTaskCreate(task_background, "bgnd", 512, NULL, 0, &t);
+	prj_createTask(task_Init, "init", 1024, NULL, (configMAX_PRIORITIES-1), &t);
+	prj_createTask(task_1000ms, "1000ms", 1024, NULL, 1, &t);
+	prj_createTask(task_10ms, "10ms", 512, NULL, (configMAX_PRIORITIES-2), &t);
+	prj_createTask(task_background, "bgnd", 512, NULL, 0, &t);
 }
 

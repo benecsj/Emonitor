@@ -26,10 +26,47 @@
 #define __PROJECT_CONFIG_H__
 
 /******************************************************************************
+* Includes
+\******************************************************************************/
+#include "c_types.h"
+#include "esp_libc.h"
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+
+#include "user_config.h"
+
+/******************************************************************************
 * Defines
 \******************************************************************************/
-
+#define NULL_PTR	NULL
 #define DBG printf
+
+#define prj_malloc(a)		os_malloc(a)
+#define prj_free(a)			os_free(a)
+//#define prj_malloc(a)		NULL_PTR
+//#define prj_free(a)			NULL_PTR
+
+#define prj_Delay(a)  	vTaskDelay((a) / portTICK_RATE_MS)
+//#define prj_Delay(a)
+
+#define	prj_ENTER_CRITICAL()	taskENTER_CRITICAL()
+#define	prj_EXIT_CRITICAL()		taskEXIT_CRITICAL()
+//#define	prj_ENTER_CRITICAL()
+//#define	prj_EXIT_CRITICAL()
+
+#define	prj_DisableInt()		PortDisableInt_NoNest()
+#define prj_EnableInt()			PortEnableInt_NoNest()
+//#define	prj_DisableInt()
+//#define prj_EnableInt()
+
+#define prj_createTask			xTaskCreate
+//#define prj_createTask(a,...)		a(NULL_PTR)
+
+#define prj_TaskDelete			vTaskDelete
+//#define prj_TaskDelete(a)
+
 
 #endif
 

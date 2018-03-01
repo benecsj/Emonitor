@@ -3,7 +3,7 @@
 #include "pins.h"
 #include "pwm.h"
 #include "esp8266/ets_sys.h"
-#include "freertos/FreeRTOS.h"
+#include "project_config.h"
 
 #define MODIFY_PERI_REG(reg, mask, val) WRITE_PERI_REG(reg, (READ_PERI_REG(reg) & (~mask)) | (uint32) val)
 
@@ -226,14 +226,14 @@ void pins_intr_state_set(uint32 i, GPIO_INT_TYPE intr_state)
 {
     uint32 pin_reg;
 
-    portENTER_CRITICAL();
+    prj_ENTER_CRITICAL();
 
     pin_reg = GPIO_REG_READ(GPIO_PIN_ADDR(i));
     pin_reg &= (~GPIO_PIN_INT_TYPE_MASK);
     pin_reg |= (intr_state << GPIO_PIN_INT_TYPE_LSB);
     GPIO_REG_WRITE(GPIO_PIN_ADDR(i), pin_reg);
 
-    portEXIT_CRITICAL();
+    prj_EXIT_CRITICAL();
 }
 
 void pins_intr_handler_register(void *fn, void *arg)

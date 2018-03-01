@@ -12,7 +12,7 @@
 #include "D18_DS18B20_Temp_Sensor.h"
 #include "OWP_One_Wire_Protocol_Driver.h"
 #include "CRC_crc8.h"
-#include "user_config.h"
+#include "project_config.h"
 
 /**********************************************************************************
  * Defines
@@ -206,41 +206,41 @@ void Sensor_Manager_Main() {
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 0)
 void Sensor_Manager_PulseCounter0(void)
 {
-	PortDisableInt_NoNest();
+	prj_DisableInt();
 	Sensor_Manager_PulseCounters[0]++;
-	PortEnableInt_NoNest();
+	prj_EnableInt();
 }
 #endif
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 1)
 void Sensor_Manager_PulseCounter1(void)
 {
-	PortDisableInt_NoNest();
+	prj_DisableInt();
 	Sensor_Manager_PulseCounters[1]++;
-	PortEnableInt_NoNest();
+	prj_EnableInt();
 }
 #endif
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 2)
 void Sensor_Manager_PulseCounter2(void)
 {
-	PortDisableInt_NoNest();
+	prj_DisableInt();
 	Sensor_Manager_PulseCounters[2]++;
-	PortEnableInt_NoNest();
+	prj_EnableInt();
 }
 #endif
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 3)
 void Sensor_Manager_PulseCounter3(void)
 {
-	PortDisableInt_NoNest();
+	prj_DisableInt();
 	Sensor_Manager_PulseCounters[3]++;
-	PortEnableInt_NoNest();
+	prj_EnableInt();
 }
 #endif
 
 uint32 Sensor_Manager_GetPulseCount(uint8 id)
 {
-	taskENTER_CRITICAL();
+	prj_ENTER_CRITICAL();
 	uint32 tempValue = Sensor_Manager_PulseCounters[id];
-	taskEXIT_CRITICAL();
+	prj_EXIT_CRITICAL();
 	return tempValue;
 }
 

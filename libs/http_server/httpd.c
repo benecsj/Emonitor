@@ -122,7 +122,7 @@ static void ICACHE_FLASH_ATTR httpdRetireConn(HttpdConnData *conn) {
 		do {
 			j=i;
 			i=i->next;
-			if (j!=NULL) free(j);
+			if (j!=NULL) prj_free(j);
 		} while (i!=NULL);
 	}
 
@@ -338,7 +338,7 @@ int ICACHE_FLASH_ATTR cgiRedirectToHostname(HttpdConnData *connData) {
 	//Check hostname; pass on if the same
 	if (strcmp(connData->hostName, (char*)connData->cgiArg)==0) return HTTPD_CGI_NOTFOUND;
 	//Not the same. Redirect to real hostname.
-	//buff=aligned_malloc(strlen((char*)connData->cgiArg)+sizeof(hostFmt));
+	//buff=aligned_prj_malloc(strlen((char*)connData->cgiArg)+sizeof(hostFmt));
 	uint8 buffer[HTTPD_REDIRECT_TO_HOSTNAME_BUFFER];
 	buff = (char*)&buffer;
 	if (buff==NULL) {
@@ -348,7 +348,7 @@ int ICACHE_FLASH_ATTR cgiRedirectToHostname(HttpdConnData *connData) {
 	sprintf(buff, hostFmt, (char*)connData->cgiArg);
 	DBG_HTTPS("(HS) Redirecting to hostname url %s\n", buff);
 	httpdRedirect(connData, buff);
-	//aligned_free(buff);
+	//aligned_prj_free(buff);
 	return HTTPD_CGI_DONE;
 }
 
@@ -430,9 +430,9 @@ void ICACHE_FLASH_ATTR httpdFlushSendBuffer(HttpdConnData *conn) {
 					DBG_HTTPS("(HS) httpdFlushSendBuffer FINISH\n");
 					return;
 				}
-				HttpSendBacklogItem *i=malloc(sizeof(HttpSendBacklogItem)+conn->priv->sendBuffLen);
+				HttpSendBacklogItem *i=prj_malloc(sizeof(HttpSendBacklogItem)+conn->priv->sendBuffLen);
 				if (i==NULL) {
-					DBG_HTTPS("(HS) Backlog: malloc failed, out of memory!\n");
+					DBG_HTTPS("(HS) Backlog: prj_malloc failed, out of memory!\n");
 					return;
 				}
 				memcpy(i->data, conn->priv->sendBuff, conn->priv->sendBuffLen);
@@ -464,7 +464,7 @@ void ICACHE_FLASH_ATTR httpdCgiIsDone(HttpdConnData *conn) {
 		conn->priv->headPos=0;
 		conn->post->len=-1;
 		conn->priv->flags=0;
-		//if (conn->post->buff) aligned_free(conn->post->buff);
+		//if (conn->post->buff) aligned_prj_free(conn->post->buff);
 		conn->post->buff=NULL;
 		conn->post->buffLen=0;
 		conn->post->received=0;
@@ -498,7 +498,7 @@ void ICACHE_FLASH_ATTR httpdContinue(HttpdConnData * conn) {
 			HttpSendBacklogItem *next=conn->priv->sendBacklog->next;
 			httpdPlatSendData(conn->conn, conn->priv->sendBacklog->data, conn->priv->sendBacklog->len);
 			conn->priv->sendBacklogSize-=conn->priv->sendBacklog->len;
-			if (conn->priv->sendBacklog!=NULL) free(conn->priv->sendBacklog);
+			if (conn->priv->sendBacklog!=NULL) prj_free(conn->priv->sendBacklog);
 			conn->priv->sendBacklog=next;
 		}
 		else
@@ -678,7 +678,7 @@ static void ICACHE_FLASH_ATTR httpdParseHeader(char *h, HttpdConnData *conn) {
 
 //Make a connection 'live' so we can do all the things a cgi can do to it.
 //ToDo: Also make httpdRecvCb/httpdContinue use these?
-//ToDo: Fail if aligned_malloc fails?
+//ToDo: Fail if aligned_prj_malloc fails?
 void ICACHE_FLASH_ATTR httpdConnSendStart(HttpdConnData *conn) {
 	DBG_HTTPS("(HS) httpdConnSendStart START\n");
 	httpdPlatLock();
@@ -690,7 +690,7 @@ void ICACHE_FLASH_ATTR httpdConnSendStart(HttpdConnData *conn) {
 void ICACHE_FLASH_ATTR httpdConnSendFinish(HttpdConnData *conn) {
 	DBG_HTTPS("(HS) httpdConnSendFinish START\n");
 	if (conn->conn) httpdFlushSendBuffer(conn);
-	//aligned_free(conn->priv->sendBuff);
+	//aligned_prj_free(conn->priv->sendBuff);
 	httpdPlatUnlock();
 }
 
@@ -784,7 +784,6 @@ void ICACHE_FLASH_ATTR httpdRecvCb(ConnTypePtr rconn, char *remIp, int remPort, 
 		}
 	}
 	if (conn->conn) httpdFlushSendBuffer(conn);
-	//aligned_free(sendBuff);
 	httpdPlatUnlock();
 	DBG_HTTPS("(HS) httpdRecvCb END\n");
 }

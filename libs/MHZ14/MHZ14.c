@@ -4,11 +4,7 @@
 #include "stdint.h"
 #include "esp_common.h"
 #include "MHZ14.h"
-#include "user_config.h"
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
+#include "project_config.h"
 
 /*Defines*/
 

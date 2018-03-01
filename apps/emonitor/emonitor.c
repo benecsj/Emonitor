@@ -3,7 +3,6 @@
 \******************************************************************************/
 
 #include "project_config.h"
-#include "user_config.h"
 
 #include "Emonitor.h"
 
@@ -409,9 +408,9 @@ void Emonitor_Main_1000ms(void) {
  *******************************************************************************/
 void Emonitor_Main_Background(void) {
 	//Just measure background runtime
-	taskENTER_CRITICAL();
+	prj_ENTER_CRITICAL();
 	Emonitor_backgroundCounter++;
-	taskEXIT_CRITICAL();
+	prj_EXIT_CRITICAL();
 }
 
 uint32 Emonitor_GetBackgroundRuntime(void)
@@ -419,10 +418,10 @@ uint32 Emonitor_GetBackgroundRuntime(void)
 	//Return value
 	uint32 returnValue;
 	//Get background count value and reset it
-	taskENTER_CRITICAL();
+	prj_ENTER_CRITICAL();
 	returnValue = Emonitor_backgroundCounter;
 	Emonitor_backgroundCounter = 0;
-	taskEXIT_CRITICAL();
+	prj_EXIT_CRITICAL();
 	//Return background time
 	return returnValue;
 }
