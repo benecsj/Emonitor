@@ -52,11 +52,17 @@ void Wifi_Manager_Init(void)
 		Wifi_Manager_GetDefaultPassword(WifiManager_AP_PASSWORD);
 
 	}
+    //Set hotspot value
+	if((WifiManager_enableHotspot == 0xFF) || (WifiManager_enableHotspot == 1))
+	{
+		WifiManager_enableHotspot = 1;
+	}
 
 	DBG_WM("(WF) STA SSID: [%s]\n",WifiManager_STA_SSID);
 	DBG_WM("(WF) STA PASS: [%s]\n",WifiManager_STA_PASSWORD);
 	DBG_WM("(WF) AP  SSID: [%s]\n",WifiManager_AP_SSID);
 	DBG_WM("(WF) AP  PASS: [%s]\n",WifiManager_AP_PASSWORD);
+	DBG_WM("(WF) AP  %s\n",((WifiManager_enableHotspot ==1) ? "ENABLED" : "DISABLED"));
 
 	//Clear default configs from Wifi if present
 	if(wifi_get_opmode() != 0x0)
@@ -77,16 +83,7 @@ void Wifi_Manager_Init(void)
     ////stop_wifi_station();
     ////stop_wifi_ap();
 
-    //Set hotspot value
-    if(WifiManager_enableHotspot == 0xFF)
-    {
-    	WifiManager_enableHotspot = 1;
-    }
 
-	if(WifiManager_enableHotspot == 1)
-	{
-		DBG_WM("(WF) AP  ENABLED\n",WifiManager_AP_PASSWORD);
-	}
 
 }
 

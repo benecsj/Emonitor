@@ -1,6 +1,5 @@
 #include "c_types.h"
 #include "esp_common.h"
-#include "gpio.h"
 #include "pins.h"
 #include "pwm.h"
 #include "esp8266/ets_sys.h"
@@ -181,31 +180,31 @@ extern void attachInterrupt(uint8 pin, voidFuncPtr handler, int mode)
     
     if (mode == RISING)
     {
-        gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_POSEDGE);
+        pins_intr_state_set(pin, GPIO_PIN_INTR_POSEDGE);
     }
     else if (mode == FALLING)
     {
-        gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_NEGEDGE);
+        pins_intr_state_set(pin, GPIO_PIN_INTR_NEGEDGE);
     }
     else if (mode == CHANGE)
     {
-        gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_ANYEDGE);
+        pins_intr_state_set(pin, GPIO_PIN_INTR_ANYEDGE);
     }
     else
     {
-        gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_DISABLE);
+        pins_intr_state_set(pin, GPIO_PIN_INTR_DISABLE);
     }
 }
 
 extern void detachInterrupt(uint8 pin)
 {
     g_handlers[pin] = 0;
-    gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_DISABLE);
+    pins_intr_state_set(pin, GPIO_PIN_INTR_DISABLE);
 }
 
 void Init_Pins(void)
 {
-	gpio_intr_handler_register(&interrupt_handler, NULL);
+	pins_intr_handler_register(&interrupt_handler, NULL);
 	_xt_isr_unmask(1<<ETS_GPIO_INUM);
 }
 
@@ -221,4 +220,23 @@ void pins_pwm_init(uint32 pin_number,uint32 period, uint32 duty)
 
 	pwm_init(period, pwm_duty, 1, pwm_info);
 	pwm_start();
+}
+
+void pins_intr_state_set(uint32 i, GPIO_INT_TYPE intr_state)
+{
+    uint32 pin_reg;
+
+    portENTER_CRITICAL();
+
+    pin_reg = GPIO_REG_READ(GPIO_PIN_ADDR(i));
+    pin_reg &= (~GPIO_PIN_INT_TYPE_MASK);
+    pin_reg |= (intr_state << GPIO_PIN_INT_TYPE_LSB);
+    GPIO_REG_WRITE(GPIO_PIN_ADDR(i), pin_reg);
+
+    portEXIT_CRITICAL();
+}
+
+void pins_intr_handler_register(void *fn, void *arg)
+{
+    _xt_isr_attach(ETS_GPIO_INUM, fn, arg);
 }

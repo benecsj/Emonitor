@@ -63,6 +63,7 @@ extern uint32 Emonitor_resetReason;
 #define Emonitor_SetResetReason(a) (Emonitor_resetReason = a)
 #define Emonitor_GetResetReason() (Emonitor_resetReason)
 #define Emonitor_GetUptime()	(Emonitor_uptime)
+#define Emonitor_IncUptime()	Emonitor_uptime++
 #define Emonitor_GetSendTiming()	(Emonitor_sendTimer)
 #define Emonitor_GetConnectionCounter()	(Emonitor_connectionCounter)
 #define Emonitor_GetFreeRam()	(Emonitor_freeRam)

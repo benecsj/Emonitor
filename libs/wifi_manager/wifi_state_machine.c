@@ -149,6 +149,7 @@ WIFI_MODE ICACHE_FLASH_ATTR init_esp_wifi(){
     wifi_set_event_handler_cb(wifi_event_handler_cb);
     WIFI_MODE mode = 0; //wifi_get_opmode_default();
     wifi_set_mode(mode);
+    //system_phy_set_max_tpw(82);
     return mode;
 }
 
@@ -187,6 +188,9 @@ bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){
             return false;
         }
     }
+
+    //wifi_station_set_reconnect_policy(true);
+
     return wifi_station_connect();
 }
 
@@ -244,9 +248,6 @@ bool ICACHE_FLASH_ATTR start_wifi_ap(const char * ssid, const char * pass, uint8
         config.ssid_hidden = FALSE;
         config.beacon_interval = 1000;
     }
-
-
-
 
     wifi_softap_set_config_current(&config);
     wifi_set_opmode(STATIONAP_MODE);

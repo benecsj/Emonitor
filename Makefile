@@ -63,29 +63,19 @@ LINKFLAGS_eagle.app.v6 = \
 	-lcirom \
 	-lcrypto	\
 	-lespconn	\
-	-lespnow	\
 	-lfreertos	\
 	-lgcc					\
 	-lhal					\
-	-ljson	\
 	-llwip	\
 	-lmain	\
-	-lmesh	\
-	-lmirom	\
 	-lnet80211	\
-	-lnopoll	\
 	-lphy	\
 	-lpp	\
-	-lpwm	\
-	-lsmartconfig	\
 	-lspiffs	\
 	-lmbedtls               \
     -lopenssl               \
 	-lwpa	\
-	-lwps		\
 	-lssl	\
-	-lupgrade\
-	-ldriver \
 	$(DEP_LIBS_eagle.app.v6)					\
 	-Wl,--end-group
 
@@ -133,7 +123,7 @@ DDEFINES +=				\
 INCLUDES := $(INCLUDES) -I $(PDIR)include  -I $(PDIR)apps/emonitor -I $(PDIR)apps/remote_control -I $(PDIR)libs/wifi_manager
 INCLUDES := $(INCLUDES) -I $(PDIR)libs/memory_manager -I $(PDIR)libs/core_lib -I $(PDIR)libs/spiffs_manager -I $(PDIR)libs/crc
 INCLUDES := $(INCLUDES) -I $(PDIR)libs/ds18b20 -I $(PDIR)libs/pins -I $(PDIR)apps/sensor_manager -I $(PDIR)libs/http_client
-INCLUDES := $(INCLUDES) -I $(PDIR)libs/http_server -I $(PDIR)libs/MHZ14
+INCLUDES := $(INCLUDES) -I $(PDIR)libs/http_server -I $(PDIR)libs/MHZ14 -I $(PDIR)libs/uart -I $(PDIR)libs/hw_timer
 sinclude $(SDK_PATH)/Makefile
 
 .PHONY: FORCE

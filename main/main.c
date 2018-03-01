@@ -107,11 +107,11 @@ void task_Init(void *pvParameters) {
 	//Emonitor
 	Emonitor_Init();
 	//Init application
-    Remote_Control_Init();
+    //Remote_Control_Init();
 	//Init Wifi
 	Wifi_Manager_Init();
 	//Sensor manager init
-	Sensor_Manager_Init();
+	//Sensor_Manager_Init();
 	//Http client init
 	httpclient_Init();
 	//--------------------------------
@@ -119,7 +119,7 @@ void task_Init(void *pvParameters) {
 	DELAY_MS(5000);
 	//--------------------------------
 	//Http server init
-	Http_Server_Init();
+	//Http_Server_Init();
 	//--------------------------------
 	//Finished
 	DBG("Init finished!!!\n-------------------------\n");
@@ -133,7 +133,7 @@ void task_Init(void *pvParameters) {
 void task_1ms(void){
 	//------------------
 	Emonitor_Main_1ms();
-	Sensor_Manager_VeryFast();
+	//Sensor_Manager_VeryFast();
 	//------------------
 }
 
@@ -145,7 +145,7 @@ void task_10ms(void *pvParameters) {
 	DELAY_MS(1000);
 	for (;;) {
 		//------------------
-		Sensor_Manager_Fast();
+		//Sensor_Manager_Fast();
 		//------------------
 		sysTimeMS = system_get_time()/1000;
 		DELAY_MS(10-((sysTimeMS)%10));
@@ -164,17 +164,19 @@ void task_1000ms(void *pvParameters) {
 
 		//------------------
 		Emonitor_Main_1000ms();
-		Remote_Control_Main();
+		//Remote_Control_Main();
 		NVM_Main();
-		Sensor_Manager_Main();
+		//Sensor_Manager_Main();
 		Wifi_Manager_Main();
 		//------------------
 		sysTimeMS = system_get_time()/1000;
 		DELAY_MS(1000-((sysTimeMS)%1000));
+		Emonitor_IncUptime();
 		//Let Wifi task running to try to connect
 		if(Wifi_Manager_IsConnected() == FALSE)
 		{
 			DELAY_MS((sysTimeMS%1000)+1000);
+			Emonitor_IncUptime();
 		}
 	}
 }

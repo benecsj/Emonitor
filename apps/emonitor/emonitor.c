@@ -236,8 +236,6 @@ void Emonitor_Main_1000ms(void) {
 	sint16 temperature;
 	char sign;
 
-	//Uptime counter
-	Emonitor_uptime++;
 	//Get local ip address
 	Wifi_Manager_GetIp(ip);
 	//Get background time
