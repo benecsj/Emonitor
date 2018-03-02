@@ -57,8 +57,5 @@ typedef struct espconn* ConnTypePtr;
 
 #define HTTPD_ALIGNMENT 4
 
-#define HTTP_EMPTYCOUNT 550000
-#define HTTP_TOTALRAM	81920
-
 extern void* aligned_malloc(size_t required_bytes);
 extern void aligned_free(void *p);

@@ -338,18 +338,13 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 			}
 			//EMONCMS HEAP
 			else if (strcmp(token, "st_heap")==0) {
-				uint32_t usedRAM = (HTTP_TOTALRAM -Emonitor_GetFreeRam())/1024;
 				uint32_t freeRAM = (Emonitor_GetFreeRam())/1024;
-				uint32_t usagePercent = ((double)(usedRAM)/(double)(usedRAM+freeRAM))*100;
+				uint32_t usagePercent = Emonitor_GetRAMUsage();
 				len = sprintf(buff, "%d%% Free: %d kb", usagePercent,freeRAM);
 			}
 			//EMONCMS BACKGROUND COUNT
 			else if (strcmp(token, "st_bck")==0) {
-				uint32_t countUsage = HTTP_EMPTYCOUNT - Emonitor_GetBackgroundCount();
-				double usage = ((double)countUsage/(double)HTTP_EMPTYCOUNT)*100;
-				countUsage = usage;
-				if(countUsage>100){ countUsage = 100;}
-				len = sprintf(buff, "%d%", countUsage);
+				len = sprintf(buff, "%d%", Emonitor_GetCpuUsage());
 			}
 			//WIFI CONNECTION
 			else if (strcmp(token, "st_wifi")==0) {

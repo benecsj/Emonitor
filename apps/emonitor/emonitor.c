@@ -38,6 +38,10 @@
 #define JSON_END	 "}"
 #define READ_ID		 ids[(i*8)+1],ids[(i*8)+2],ids[(i*8)+3],ids[(i*8)+4],ids[(i*8)+7]
 #define READ_TEMP	 sign,abs(temperatures[i]/10),abs(temperatures[i]%10)
+
+#define EMONITOR_EMPTYCOUNT 550000
+#define EMONITOR_TOTALRAM	81920
+
 /******************************************************************************
 * Variables
 \******************************************************************************/
@@ -424,6 +428,22 @@ uint32 Emonitor_GetBackgroundRuntime(void)
 	prj_EXIT_CRITICAL();
 	//Return background time
 	return returnValue;
+}
+
+uint32_t Emonitor_GetCpuUsage(void)
+{
+	uint32_t countUsage = EMONITOR_EMPTYCOUNT - Emonitor_GetBackgroundCount();
+	countUsage = ((double)countUsage/(double)EMONITOR_EMPTYCOUNT)*100;
+	if(countUsage > 100) {countUsage = 100;}
+	return countUsage;
+}
+
+uint32_t Emonitor_GetRAMUsage(void)
+{
+	uint32_t usedRAM = (EMONITOR_TOTALRAM -Emonitor_GetFreeRam())/1024;
+	uint32_t freeRAM = (Emonitor_GetFreeRam())/1024;
+	uint32_t usagePercent = ((double)(usedRAM)/(double)(usedRAM+freeRAM))*100;
+	return usagePercent;
 }
 
 void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, char * response_headers, int body_size)

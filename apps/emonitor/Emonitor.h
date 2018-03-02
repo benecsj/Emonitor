@@ -43,6 +43,8 @@ extern void Emonitor_StartTimer(void);
 extern uint32_t Emonitor_RestoreTiming(void);
 extern void Emonitor_StoreTiming(uint32_t timingValue);
 extern void Emonitor_EnableStatusLed(void);
+extern uint32_t Emonitor_GetCpuUsage(void);
+extern uint32_t Emonitor_GetRAMUsage(void);
 
 extern uint32 Emonitor_nodeId;
 extern uint32 Emonitor_SendPeroid;
