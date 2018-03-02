@@ -57,12 +57,12 @@ int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 			if (connData->cgiArg != NULL) {
 				//Open a different file than provided in http request.
 				//Common usage: {"/", cgiEspFsHook, "/index.html"} will show content of index.html without actual redirect to that file if host root was requested
-				connData->file = SPIFFS_open(fs, (char*)connData->cgiArg, SPIFFS_O_RDONLY, 0);
+				connData->file = SPIFFS_open(fs, (char*)connData->cgiArg, SPIFFS_RDONLY, 0);
 				DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->cgiArg);
 
 			} else {
 				//Open the file so we can read it.
-				connData->file = SPIFFS_open(fs, (char*)connData->url, SPIFFS_O_RDONLY, 0);
+				connData->file = SPIFFS_open(fs, (char*)connData->url, SPIFFS_RDONLY, 0);
 				DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->url);
 			}
 
@@ -142,7 +142,7 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 			}
 			else
 			{
-				tpd->file = SPIFFS_open(fs, (char*)connData->url, SPIFFS_O_RDONLY, 0);
+				tpd->file = SPIFFS_open(fs, (char*)connData->url, SPIFFS_RDONLY, 0);
 				DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",tpd->file,(char*)connData->url);
 				tpd->tplArg=NULL;
 				tpd->tokenPos=-1;
