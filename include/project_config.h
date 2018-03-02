@@ -42,7 +42,11 @@
 * Defines
 \******************************************************************************/
 #define NULL_PTR	NULL
+#if PRJ_ENV == OS
 #define DBG printf
+#else
+#define DBG os_printf
+#endif
 
 #if PRJ_ENV == OS
 #define prj_malloc(a)		os_malloc(a)
@@ -54,7 +58,8 @@
 
 #if PRJ_ENV == OS
 #define prj_Delay(a)  	vTaskDelay((a) / portTICK_RATE_MS)
-//#define prj_Delay(a)
+#else
+#define prj_Delay(a)
 #endif
 
 #if PRJ_ENV == OS

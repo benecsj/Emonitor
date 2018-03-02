@@ -3,14 +3,20 @@
 \******************************************************************************/
 
 //Common
+#include "project_config.h"
+#if PRJ_ENV == OS
 #include "esp_common.h"
 #include "esp_system.h"
-#include "project_config.h"
+#else
+#include "ets_sys.h"
+#include "osapi.h"
+#endif
 
 #if PRJ_ENV == NOS
 #include "user_interface.h"
 #endif
 
+#if PRJ_ENV == OS
 //Libs
 #include "Wifi_Manager.h"
 #include "wifi_state_machine.h"
@@ -25,7 +31,7 @@
 #include "Emonitor.h"
 #include "remote_control.h"
 #include "Sensor_Manager.h"
-
+#endif
 /******************************************************************************
 * Defines
 \******************************************************************************/
@@ -34,6 +40,29 @@
 /******************************************************************************
 * Implementations
 \******************************************************************************/
+
+#if PRJ_ENV == NOS
+void Emonitor_Main_1000ms(void){};
+void NVM_Main(void){};
+void Sensor_Manager_Main(void){};
+void Wifi_Manager_Main(void){};
+void Emonitor_IncUptime(void){};
+bool Wifi_Manager_IsConnected(void){return 0;};
+void Emonitor_Preinit(void){};
+void Emonitor_SetResetReason(uint8 a){};
+void Init_Pins(void){};
+void Emonitor_StartTimer(void){};
+void NVM_Init(void){};
+void spiffs_init(void){};
+void Emonitor_Init(void){};
+void Remote_Control_Init(void){};
+void Wifi_Manager_Init(void){};
+void Sensor_Manager_Init(void){};
+void httpclient_Init(void){};
+void Http_Server_Init(void){};
+void Emonitor_EnableStatusLed(void){};
+void Remote_Control_Main(void){};
+#endif
 
 /******************************************************************************
  * FunctionName : user_rf_cal_sector_set
@@ -120,6 +149,7 @@ void task_Init(void *pvParameters) {
 	//Http server init
 	Http_Server_Init();
 	//--------------------------------
+	Emonitor_EnableStatusLed();
 	//Finished
 	DBG("Init finished!!!\n-------------------------\n");
 	//Exit from the task
@@ -157,7 +187,6 @@ void task_10ms(void *pvParameters) {
 void task_1000ms(void *pvParameters) {
 	uint32 sysTimeMS;
 	DELAY_MS(4000);
-	Emonitor_EnableStatusLed();
 	for (;;) {
 		//------------------
 		Emonitor_Main_1000ms();
@@ -221,3 +250,9 @@ void user_init(void) {
 	prj_createTask(task_background, "bgnd", 512, NULL, 0, &t);
 }
 
+#if PRJ_ENV == NOS
+void ICACHE_FLASH_ATTR
+user_rf_pre_init(void)
+{
+}
+#endif
