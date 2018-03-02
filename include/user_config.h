@@ -25,6 +25,11 @@
 #ifndef __USER_CONFIG_H__
 #define __USER_CONFIG_H__
 
+//ENVIROMENT
+#define NOS			0
+#define OS			1
+#define PRJ_ENV		OS
+
 //WIFI
 #define DEFAULT_STA_SSID 		"BOCI"
 #define DEFAULT_STA_PASSWORD 	"fucking6"

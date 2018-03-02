@@ -28,45 +28,74 @@
 /******************************************************************************
 * Includes
 \******************************************************************************/
+#include "user_config.h"
+
+#if PRJ_ENV == OS
 #include "c_types.h"
 #include "esp_libc.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-
-#include "user_config.h"
-
+#endif
 /******************************************************************************
 * Defines
 \******************************************************************************/
 #define NULL_PTR	NULL
 #define DBG printf
 
+#if PRJ_ENV == OS
 #define prj_malloc(a)		os_malloc(a)
 #define prj_free(a)			os_free(a)
-//#define prj_malloc(a)		NULL_PTR
-//#define prj_free(a)			NULL_PTR
+#else
+#define prj_malloc(a)		NULL_PTR
+#define prj_free(a)			NULL_PTR
+#endif
 
+#if PRJ_ENV == OS
 #define prj_Delay(a)  	vTaskDelay((a) / portTICK_RATE_MS)
 //#define prj_Delay(a)
+#endif
 
+#if PRJ_ENV == OS
 #define	prj_ENTER_CRITICAL()	taskENTER_CRITICAL()
 #define	prj_EXIT_CRITICAL()		taskEXIT_CRITICAL()
-//#define	prj_ENTER_CRITICAL()
-//#define	prj_EXIT_CRITICAL()
+#else
+#define	prj_ENTER_CRITICAL()
+#define	prj_EXIT_CRITICAL()
+#endif
 
+#if PRJ_ENV == OS
 #define	prj_DisableInt()		PortDisableInt_NoNest()
 #define prj_EnableInt()			PortEnableInt_NoNest()
-//#define	prj_DisableInt()
-//#define prj_EnableInt()
+#else
+#define	prj_DisableInt()
+#define prj_EnableInt()
+#endif
 
+#if PRJ_ENV == OS
 #define prj_createTask			xTaskCreate
-//#define prj_createTask(a,...)		a(NULL_PTR)
+#else
+#define prj_createTask(a,...)		a(NULL_PTR)
+#endif
 
+#if PRJ_ENV == OS
 #define prj_TaskDelete			vTaskDelete
-//#define prj_TaskDelete(a)
+#else
+#define prj_TaskDelete(a)
+#endif
 
+#if PRJ_ENV == OS
+#define prj_TaskHandle			xTaskHandle
+#else
+#define prj_TaskHandle				uint32
+#endif
+
+#if PRJ_ENV == OS
+#define prj_flash_size_map			flash_size_map
+#else
+#define prj_flash_size_map			enum flash_size_map
+#endif
 
 #endif
 

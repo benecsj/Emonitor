@@ -7,6 +7,10 @@
 #include "esp_system.h"
 #include "project_config.h"
 
+#if PRJ_ENV == NOS
+#include "user_interface.h"
+#endif
+
 //Libs
 #include "Wifi_Manager.h"
 #include "wifi_state_machine.h"
@@ -44,7 +48,7 @@
  * Returns      : rf cal sector
  *******************************************************************************/
 uint32 user_rf_cal_sector_set(void) {
-	flash_size_map size_map = system_get_flash_size_map();
+	prj_flash_size_map size_map = system_get_flash_size_map();
 	uint32 rf_cal_sec = 0;
 
 	switch (size_map) {
@@ -193,7 +197,7 @@ void task_background(void *pvParameters) {
 void user_init(void) {
 	//Local variables
 	struct rst_info* resetInfo;
-	xTaskHandle t;
+	prj_TaskHandle t;
 
 	//Pre Init main application
 	Emonitor_Preinit();
