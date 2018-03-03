@@ -2,10 +2,6 @@
 * Includes
 \******************************************************************************/
 
-//Common
-#include "esp_common.h"
-#include "user_config.h"
-
 #include "spiffs_manager.h"
 
 

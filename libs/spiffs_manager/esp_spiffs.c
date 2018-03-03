@@ -1,5 +1,5 @@
-#include "esp_common.h"
-#include "esp_spiffs.h"
+
+#include "spiffs_manager.h"
 
 #include <fcntl.h>
 #include <stdio.h>

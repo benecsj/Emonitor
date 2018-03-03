@@ -3,7 +3,6 @@
 #include "pins.h"
 #include "pwm.h"
 
-#include "eagle_soc.h"
 #define MODIFY_PERI_REG(reg, mask, val) WRITE_PERI_REG(reg, (READ_PERI_REG(reg) & (~mask)) | (uint32) val)
 
 #define PINCOUNT 16
