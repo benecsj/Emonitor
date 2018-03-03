@@ -11,6 +11,7 @@
 
 //Libs
 #include "pins.h"
+#include "MHZ14.h"
 #include "uart.h"
 #include "spiffs_manager.h"
 #include "NVM_NonVolatileMemory.h"
@@ -358,6 +359,9 @@ void user_init(void) {
 #if PRJ_ENV == NOS
 	//Init UART
 	UART_SetBaudrate(UART0, BIT_RATE_115200);
+	//Delay
+	os_delay_us(10000);
+	os_printf("\n----------------------------------------------\n");
 	//Init flash button
 	pinMode(FLASH_BUTTON,INPUT);
 
@@ -366,6 +370,10 @@ void user_init(void) {
 
 	pinMode(PULSE_INPUT0,INPUT);
 	attachInterrupt(PULSE_INPUT0,testCallback,RISING);
+
+	MHZ14_Init();
+	MHZ14_Main();
+	MHZ14_Feed(0);
 
 #endif
 

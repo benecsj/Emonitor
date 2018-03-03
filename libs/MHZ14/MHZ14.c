@@ -1,15 +1,13 @@
 
 /*Includes*/
-#include "c_types.h"
-#include "stdint.h"
-#include "esp_common.h"
-#include "MHZ14.h"
 #include "project_config.h"
+#include "MHZ14.h"
+
 
 /*Defines*/
 
 #if DEBUG_MHZ14
-#define DBG_MHZ14(...) printf(__VA_ARGS__)
+#define DBG_MHZ14(...) os_printf(__VA_ARGS__)
 #else
 #define DBG_MHZ14(...)
 #endif

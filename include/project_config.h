@@ -97,7 +97,7 @@
 #if PRJ_ENV == OS
 #define prj_createTask			xTaskCreate
 #else
-#define prj_createTask(a,...)		a(NULL_PTR)
+#define prj_createTask(a,...)
 #endif
 
 #if PRJ_ENV == OS
