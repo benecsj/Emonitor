@@ -1,0 +1,6 @@
+http://sub.nanona.fi/esp8266/hello-world.html
+
+https://www.penninkhof.com/2015/03/how-to-program-an-esp8266/
+
+
+
