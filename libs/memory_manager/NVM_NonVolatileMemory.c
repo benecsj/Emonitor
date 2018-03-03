@@ -7,13 +7,13 @@
 
 
 /*Includes*/
+#include "project_config.h"
 #include "NVM_NonVolatileMemory.h"
-#include "user_config.h"
 #include "ssl/ssl_crypto.h"
 /*Defines*/
 
 
-#define NVM_DEBUG printf
+#define NVM_DEBUG os_printf
 
 #define NVM_DATA(a,b)	NvM_DataInfoList[NvM_DataBlockCount].VariablePointer=(uint8*)&a;NvM_DataInfoList[NvM_DataBlockCount].Size=b;NvM_DataBlockCount++;
 

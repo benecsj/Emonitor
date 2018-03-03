@@ -4,13 +4,6 @@
 
 //Common
 #include "project_config.h"
-#if PRJ_ENV == OS
-#include "esp_common.h"
-#include "esp_system.h"
-#else
-#include "ets_sys.h"
-#include "osapi.h"
-#endif
 
 #if PRJ_ENV == NOS
 #include "user_interface.h"
@@ -20,10 +13,11 @@
 #include "pins.h"
 #include "uart.h"
 #include "spiffs_manager.h"
+#include "NVM_NonVolatileMemory.h"
 #if PRJ_ENV == OS
 #include "Wifi_Manager.h"
 #include "wifi_state_machine.h"
-#include "NVM_NonVolatileMemory.h"
+
 
 
 #include "httpclient.h"
@@ -48,7 +42,6 @@
 
 #if PRJ_ENV == NOS
 void Emonitor_Main_1000ms(void){};
-void NVM_Main(void){};
 void Sensor_Manager_Main(void){};
 void Wifi_Manager_Main(void){};
 void Emonitor_IncUptime(void){};
@@ -56,7 +49,6 @@ bool Wifi_Manager_IsConnected(void){return 0;};
 void Emonitor_Preinit(void){};
 void Emonitor_SetResetReason(uint8 a){};
 void Emonitor_StartTimer(void){};
-void NVM_Init(void){};
 void Emonitor_Init(void){};
 void Remote_Control_Init(void){};
 void Wifi_Manager_Init(void){};
@@ -69,6 +61,18 @@ void Sensor_Manager_Fast(void){};
 void Emonitor_Main_Background(void){};
 void Emonitor_Main_1ms(void){};
 void Sensor_Manager_VeryFast(void){};
+
+uint8 Emonitor_ledControl;
+uint8 WifiManager_enableHotspot;
+uint32 Emonitor_nodeId;
+uint32 Emonitor_SendPeroid;
+char Emonitor_url[100];
+char Emonitor_key[33];
+char WifiManager_STA_SSID[33];
+char WifiManager_STA_PASSWORD[65];
+char WifiManager_AP_SSID[33];
+char WifiManager_AP_PASSWORD[65];
+
 #endif
 
 /******************************************************************************
