@@ -8,14 +8,7 @@
 #ifndef OWP_CONFIG_H_
 #define OWP_CONFIG_H_
 
-#include "c_types.h"
-#include "stdint.h"
-
-#include "pins.h"
 #include "project_config.h"
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 
 /*Critical session*/
 #define OWP_ENTER_CRITICAL()  prj_ENTER_CRITICAL()//vTaskSuspendAll()

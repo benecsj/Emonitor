@@ -6,9 +6,7 @@
  */
 
 #include "OWP_One_Wire_Protocol_Driver.h"
-
-#include "esp_common.h"
-
+#include "pins.h"
 
 uint8 OWP_Channels[OWP_CHANNELS_COUNT]={ONEWIRE_BUS_0,ONEWIRE_BUS_1};
 uint8 OWP_Selected_Channel = 0;

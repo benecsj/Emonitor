@@ -15,6 +15,8 @@
 #include "uart.h"
 #include "spiffs_manager.h"
 #include "NVM_NonVolatileMemory.h"
+#include "D18_DS18B20_Temp_Sensor.h"
+#include "OWP_One_Wire_Protocol_Driver.h"
 #if PRJ_ENV == OS
 #include "Wifi_Manager.h"
 #include "wifi_state_machine.h"
@@ -357,6 +359,9 @@ void user_init(void) {
 	prj_TaskHandle t;
 
 #if PRJ_ENV == NOS
+    uint8 id[OWP_CONST_ROMCODE_SIZE];
+    uint8 diff;
+
 	//Init UART
 	UART_SetBaudrate(UART0, BIT_RATE_115200);
 	//Delay
@@ -374,6 +379,9 @@ void user_init(void) {
 	MHZ14_Init();
 	MHZ14_Main();
 	MHZ14_Feed(0);
+	OWP_SelectChannel(0);
+	D18_DS18B20_FindSensor(&diff, &id[0]);
+	os_printf("ID: %02X%02X%02X%02X%02X%02X%02X%02X\n",id[0],id[1],id[2],id[3],id[4],id[5],id[6],id[7]);
 
 #endif
 

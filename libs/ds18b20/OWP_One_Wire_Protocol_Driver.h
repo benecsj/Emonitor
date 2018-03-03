@@ -10,8 +10,6 @@
 
 /*Includes*/
 #include "OWP_Config.h"
-#include "c_types.h"
-#include "stdint.h"
 
 /*Defines*/
 
