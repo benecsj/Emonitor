@@ -116,5 +116,11 @@
 #define prj_flash_size_map			enum flash_size_map
 #endif
 
+#if PRJ_ENV == OS
+#define LOOP						while(TRUE);
+#else
+#define LOOP						while(FALSE);
+#endif
+
 #endif
 

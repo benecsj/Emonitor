@@ -65,6 +65,8 @@ void httpclient_Init(void){};
 void Http_Server_Init(void){};
 void Emonitor_EnableStatusLed(void){};
 void Remote_Control_Main(void){};
+void Sensor_Manager_Fast(void){};
+void Emonitor_Main_Background(void){};
 #endif
 
 /******************************************************************************
@@ -186,13 +188,13 @@ void task_1ms(void){
  */
 void task_10ms(void *pvParameters) {
 	uint32 sysTimeMS;
-	for (;;) {
+	do{
 		//------------------
 		Sensor_Manager_Fast();
 		//------------------
 		sysTimeMS = system_get_time()/1000;
 		DELAY_MS(10-((sysTimeMS)%10));
-	}
+	}LOOP
 }
 
 /*
@@ -200,7 +202,7 @@ void task_10ms(void *pvParameters) {
  */
 void task_1000ms(void *pvParameters) {
 	uint32 sysTimeMS;
-	for (;;) {
+	do{
 		//------------------
 		Emonitor_Main_1000ms();
 		Remote_Control_Main();
@@ -217,16 +219,16 @@ void task_1000ms(void *pvParameters) {
 			DELAY_MS((sysTimeMS%1000)+1000);
 			Emonitor_IncUptime();
 		}
-	}
+	}LOOP
 }
 
 /*
  * Background task
  */
 void task_background(void *pvParameters) {
-	for (;;) {
+	do{
 		Emonitor_Main_Background();
-	}
+	}LOOP
 }
 
 /******************************************************************************
