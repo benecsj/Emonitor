@@ -122,5 +122,11 @@
 #define LOOP						while(FALSE);
 #endif
 
+#if PRJ_ENV == OS
+#define TASK(a)						void a(void *pvParameters)
+#else
+#define TASK(a)						static void ICACHE_FLASH_ATTR a(os_event_t *events)
+#endif
+
 #endif
 

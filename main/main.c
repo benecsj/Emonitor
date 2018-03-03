@@ -67,14 +67,16 @@ void Emonitor_EnableStatusLed(void){};
 void Remote_Control_Main(void){};
 void Sensor_Manager_Fast(void){};
 void Emonitor_Main_Background(void){};
+void Emonitor_Main_1ms(void){};
+void Sensor_Manager_VeryFast(void){};
 #endif
 
 /******************************************************************************
 * Declarations
 \******************************************************************************/
-void task_1000ms(void *pvParameters);
-void task_10ms(void *pvParameters);
-void task_background(void *pvParameters);
+TASK(task_10ms);
+TASK(task_1000ms);
+TASK(task_background);
 void task_1ms(void);
 /******************************************************************************
  * FunctionName : user_rf_cal_sector_set
@@ -133,8 +135,8 @@ uint32 counter;
 /*
  * Init task
  */
-void task_Init(void *pvParameters) {
-	prj_TaskHandle t;
+void task_InitA(void)
+{
 	//--------------------------------
 	//Init pins handler
 	Init_Pins();
@@ -155,8 +157,10 @@ void task_Init(void *pvParameters) {
 	//Http client init
 	httpclient_Init();
 	//--------------------------------
-	//Delay init
-	DELAY_MS(5000);
+}
+void task_InitB(void)
+{
+	prj_TaskHandle t;
 	//--------------------------------
 	//Http server init
 	Http_Server_Init();
@@ -169,6 +173,17 @@ void task_Init(void *pvParameters) {
 	prj_createTask(task_1000ms, "1000ms", 1024, NULL, 1, &t);
 	prj_createTask(task_10ms, "10ms", 512, NULL, (configMAX_PRIORITIES-2), &t);
 	prj_createTask(task_background, "bgnd", 512, NULL, 0, &t);
+}
+TASK(task_Init){
+	//Init phase A
+	task_InitA();
+
+	//Delay init
+	DELAY_MS(5000);
+
+	//Init phase B
+	task_InitB();
+
 	//Exit from the task
 	prj_TaskDelete( NULL );
 }
@@ -186,7 +201,7 @@ void task_1ms(void){
 /*
  * Fast task
  */
-void task_10ms(void *pvParameters) {
+TASK(task_10ms) {
 	uint32 sysTimeMS;
 	do{
 		//------------------
@@ -200,7 +215,7 @@ void task_10ms(void *pvParameters) {
 /*
  * Slow task
  */
-void task_1000ms(void *pvParameters) {
+TASK(task_1000ms) {
 	uint32 sysTimeMS;
 	do{
 		//------------------
@@ -225,11 +240,103 @@ void task_1000ms(void *pvParameters) {
 /*
  * Background task
  */
-void task_background(void *pvParameters) {
+TASK(task_background) {
 	do{
 		Emonitor_Main_Background();
 	}LOOP
 }
+
+#if PRJ_ENV == NOS
+
+typedef enum
+{
+	FIRST_CALL,
+	INIT_A,
+	INIT_B,
+	DELAY,
+	CYCLIC
+
+} TimingTask_State;
+
+void ICACHE_FLASH_ATTR
+user_rf_pre_init(void){}
+
+uint32_t a;
+os_event_t taskQueue;
+uint32_t lastCallTime;
+
+uint32_t taskTimingCounters[3] = {0};
+
+TimingTask_State timingState = FIRST_CALL;
+
+
+/*
+ * NONOS timing task
+ */
+static void ICACHE_FLASH_ATTR task_timing(os_event_t *events) {
+	//Get currentime
+	uint32_t currentTime = system_get_time()/1000;
+
+	switch(timingState)
+	{
+	case FIRST_CALL:
+		//Do nothing
+		timingState = INIT_A;
+		break;
+	case INIT_A:
+		//Call init task
+		task_InitA();
+		timingState = DELAY;
+		break;
+	case DELAY:
+		//Delay before starting cyclic tasks
+		taskTimingCounters[0]+= (currentTime-lastCallTime);
+		if(taskTimingCounters[0] >= 5000){
+			taskTimingCounters[0] = 0;
+			timingState = INIT_B;
+		}
+		break;
+	case INIT_B:
+		//Call init task
+		task_InitB();
+		timingState = CYCLIC;
+		break;
+	case CYCLIC:
+		//increment task timing counter
+		taskTimingCounters[0]+= (currentTime-lastCallTime);
+		taskTimingCounters[1]+= (currentTime-lastCallTime);
+		taskTimingCounters[2]+= (currentTime-lastCallTime);
+
+		if(taskTimingCounters[0] >= 1){
+			taskTimingCounters[0] = 0;
+			task_1ms();
+		}
+		if(taskTimingCounters[1] >= 10){
+			taskTimingCounters[1] = 0;
+			task_10ms();
+
+		}
+		if(taskTimingCounters[2] >= 1000){
+			taskTimingCounters[2] = 0;
+			task_1000ms();
+		}
+	    //call background task
+	    task_background();
+
+	    // TEST
+		a++;
+		digitalWrite(LED_BUILTIN,(a%2));
+
+
+		break;
+	}
+    //Store last call time
+    lastCallTime = currentTime;
+    //Cyclic task trigger
+    system_os_post(0, 0, 0 );
+}
+
+#endif
 
 /******************************************************************************
  * FunctionName : user_init
@@ -249,7 +356,7 @@ void user_init(void) {
 	pinMode(FLASH_BUTTON,INPUT);
 
 	pinMode(LED_BUILTIN,OUTPUT);
-	digitalWrite(LED_BUILTIN,0);
+	digitalWrite(LED_BUILTIN,1);
 #endif
 
 
@@ -270,11 +377,11 @@ void user_init(void) {
 	//Start freeRTOS tasks
 	DBG("About to create init task\n");
 	prj_createTask(task_Init, "init", 1024, NULL, (configMAX_PRIORITIES-1), &t);
-}
 
 #if PRJ_ENV == NOS
-void ICACHE_FLASH_ATTR
-user_rf_pre_init(void)
-{
-}
+	//START Emonitor handling task
+    system_os_task(task_timing, 0, &taskQueue, 1);
+    system_os_post(0, 0, 0 );
 #endif
+}
+
