@@ -19,11 +19,12 @@
 //Libs
 #include "pins.h"
 #include "uart.h"
+#include "spiffs_manager.h"
 #if PRJ_ENV == OS
 #include "Wifi_Manager.h"
 #include "wifi_state_machine.h"
 #include "NVM_NonVolatileMemory.h"
-#include "spiffs_manager.h"
+
 
 #include "httpclient.h"
 #include "http_server.h"
@@ -56,7 +57,6 @@ void Emonitor_Preinit(void){};
 void Emonitor_SetResetReason(uint8 a){};
 void Emonitor_StartTimer(void){};
 void NVM_Init(void){};
-void spiffs_init(void){};
 void Emonitor_Init(void){};
 void Remote_Control_Init(void){};
 void Wifi_Manager_Init(void){};

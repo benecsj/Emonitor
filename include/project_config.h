@@ -30,12 +30,14 @@
 \******************************************************************************/
 #include "user_config.h"
 
-#if PRJ_ENV == OS
 #include "c_types.h"
+
+#if PRJ_ENV == OS
 #include "esp_libc.h"
 
 //common
 #include "esp_common.h"
+#include "esp_system.h"
 
 //pins
 #include "esp8266/ets_sys.h"
@@ -47,20 +49,20 @@
 
 //common
 #include "eagle_soc.h"
+#include "mem.h"
+#include "ets_sys.h"
+#include "osapi.h"
 
 //pins
 #include "ets_sys.h"
+#include "gpio.h"
 
 #endif
 /******************************************************************************
 * Defines
 \******************************************************************************/
 #define NULL_PTR	NULL
-#if PRJ_ENV == OS
-#define DBG printf
-#else
 #define DBG os_printf
-#endif
 
 #if PRJ_ENV == OS
 #define prj_malloc(a)		os_malloc(a)

@@ -11,13 +11,22 @@
 // ----------- 8< ------------
 // Following includes are for the linux test build of spiffs
 // These may/should/must be removed/altered/replaced in your target
+#include "project_config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 
+#if PRJ_ENV == NOS
+typedef unsigned   char    u8_t;
+typedef signed     char    s8_t;
+typedef unsigned   short   u16_t;
+typedef signed     short   s16_t;
+typedef unsigned   long    u32_t;
+typedef signed     long    s32_t;
+typedef unsigned long   mem_ptr_t;
+typedef signed __PTRDIFF_TYPE__ intptr_t;
+#endif
 // ----------- >8 ------------
 
 // compile time switches

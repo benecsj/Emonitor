@@ -14,7 +14,7 @@
 \******************************************************************************/
 
 #if DEBUG_SPIFFS
-#define SPIFFSM_DBG(...) printf(__VA_ARGS__)
+#define SPIFFSM_DBG(...) os_printf(__VA_ARGS__)
 #else
 #define SPIFFSM_DBG(...)
 #endif

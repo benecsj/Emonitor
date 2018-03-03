@@ -22,7 +22,7 @@ static s32_t esp_spiffs_readwrite(u32_t addr, u32_t size, u8_t *p, int write)
      */
 
     if (size > fs.cfg.log_page_size) {
-        printf("Invalid size provided to read/write (%d)\n\r", (int) size);
+        SPIFFSM_DBG("Invalid size provided to read/write (%d)\n\r", (int) size);
         return SPIFFS_ERR_NOT_CONFIGURED;
     }
 
@@ -34,7 +34,7 @@ static s32_t esp_spiffs_readwrite(u32_t addr, u32_t size, u8_t *p, int write)
     int res = spi_flash_read(aligned_addr, (u32_t *) tmp_buf, aligned_size);
 
     if (res != 0) {
-        printf("spi_flash_read failed: %d (%d, %d)\n\r", res, (int) aligned_addr,
+        SPIFFSM_DBG("spi_flash_read failed: %d (%d, %d)\n\r", res, (int) aligned_addr,
                (int) aligned_size);
         return res;
     }
@@ -49,7 +49,7 @@ static s32_t esp_spiffs_readwrite(u32_t addr, u32_t size, u8_t *p, int write)
     res = spi_flash_write(aligned_addr, (u32_t *) tmp_buf, aligned_size);
 
     if (res != 0) {
-//	    printf("spi_flash_write failed: %d (%d, %d)\n\r", res,
+//	    SPIFFSM_DBG("spi_flash_write failed: %d (%d, %d)\n\r", res,
 //	              (int) aligned_addr, (int) aligned_size);
         return res;
     }
@@ -74,7 +74,7 @@ static s32_t esp_spiffs_erase(u32_t addr, u32_t size)
      * provides here sector address & sector size
      */
     if (size != fs.cfg.phys_erase_block || addr % fs.cfg.phys_erase_block != 0) {
-        printf("Invalid size provided to esp_spiffs_erase (%d, %d)\n\r",
+        SPIFFSM_DBG("Invalid size provided to esp_spiffs_erase (%d, %d)\n\r",
                (int) addr, (int) size);
         return SPIFFS_ERR_NOT_CONFIGURED;
     }
@@ -107,35 +107,35 @@ s32_t esp_spiffs_init(struct esp_spiffs_config *config)
     cfg.hal_erase_f = esp_spiffs_erase;
 
     if (spiffs_work_buf != NULL) {
-        free(spiffs_work_buf);
+        os_free(spiffs_work_buf);
         spiffs_work_buf = NULL;
     }
-    spiffs_work_buf = malloc(config->log_page_size * 2);
+    spiffs_work_buf = os_malloc(config->log_page_size * 2);
 
     if (spiffs_work_buf == NULL) {
         return -1;
     }
 
     if (spiffs_fd_buf != NULL) {
-        free(spiffs_fd_buf);
+    	os_free(spiffs_fd_buf);
         spiffs_fd_buf = NULL;
     }
-    spiffs_fd_buf = malloc(config->fd_buf_size);
+    spiffs_fd_buf = os_malloc(config->fd_buf_size);
 
     if (spiffs_fd_buf == NULL) {
-        free(spiffs_work_buf);
+    	os_free(spiffs_work_buf);
         return -1;
     }
 
     if (spiffs_cache_buf != NULL) {
-        free(spiffs_cache_buf);
+    	os_free(spiffs_cache_buf);
         spiffs_cache_buf = NULL;
     }
-    spiffs_cache_buf = malloc(config->cache_buf_size);
+    spiffs_cache_buf = os_malloc(config->cache_buf_size);
 
     if (spiffs_cache_buf == NULL) {
-        free(spiffs_work_buf);
-        free(spiffs_fd_buf);
+    	os_free(spiffs_work_buf);
+    	os_free(spiffs_fd_buf);
         return -1;
     }
 
@@ -145,9 +145,9 @@ s32_t esp_spiffs_init(struct esp_spiffs_config *config)
                         0);
 
     if (ret == -1) {
-        free(spiffs_work_buf);
-        free(spiffs_fd_buf);
-        free(spiffs_cache_buf);
+    	os_free(spiffs_work_buf);
+    	os_free(spiffs_fd_buf);
+    	os_free(spiffs_cache_buf);
     }
 
     return ret;        
@@ -157,9 +157,9 @@ void esp_spiffs_deinit(u8_t format)
 {
     if (SPIFFS_mounted(&fs)) {
         SPIFFS_unmount(&fs);
-        free(spiffs_work_buf);
-        free(spiffs_fd_buf);
-        free(spiffs_cache_buf);
+        os_free(spiffs_work_buf);
+        os_free(spiffs_fd_buf);
+        os_free(spiffs_cache_buf);
 
         if (format) {
             SPIFFS_format(&fs);

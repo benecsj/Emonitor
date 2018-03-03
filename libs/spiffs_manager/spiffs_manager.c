@@ -133,7 +133,7 @@ void spiffs_status(void)
 	}
 	SPIFFS_closedir(&spiffsDir);
 
-    SPIFFS_info(fs, &total, &used);
+    SPIFFS_info(fs, (u32_t *)&total, (u32_t*)&used);
     SPIFFSM_DBG("(SPIFFS) Total: %d  Used: %d  Free: %d\n",total,used, total-used);
 
 }

@@ -62,7 +62,7 @@ struct esp_spiffs_config {
   * @return 0         : succeed
   * @return otherwise : fail
   */
-sint32 esp_spiffs_init(struct esp_spiffs_config *config);
+s32_t esp_spiffs_init(struct esp_spiffs_config *config);
 
 /**
   * @brief  Deinitialize spiffs
