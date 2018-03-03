@@ -22,7 +22,7 @@
  *
  */
 
-#include "esp_common.h"
+#include "project_config.h"
 
 #define US_TO_RTC_TIMER_TICKS(t)          \
     ((t) ?          \

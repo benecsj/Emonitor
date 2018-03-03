@@ -8,11 +8,13 @@
 /**********************************************************************************
  * Includes
  **********************************************************************************/
+#include "project_config.h"
 #include "Sensor_Manager.h"
 #include "D18_DS18B20_Temp_Sensor.h"
 #include "OWP_One_Wire_Protocol_Driver.h"
 #include "CRC_crc8.h"
-#include "project_config.h"
+#include "pins.h"
+
 
 /**********************************************************************************
  * Defines

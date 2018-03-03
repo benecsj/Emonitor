@@ -29,7 +29,6 @@
 * Includes
 \******************************************************************************/
 #include "user_config.h"
-
 #include "c_types.h"
 
 #if PRJ_ENV == OS
@@ -51,6 +50,7 @@
 #include "eagle_soc.h"
 #include "mem.h"
 #include "ets_sys.h"
+#include "os_type.h"
 #include "osapi.h"
 
 //pins
