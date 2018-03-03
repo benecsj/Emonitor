@@ -255,20 +255,16 @@ typedef enum
 	INIT_B,
 	DELAY,
 	CYCLIC
-
 } TimingTask_State;
 
-void ICACHE_FLASH_ATTR
-user_rf_pre_init(void){}
+void ICACHE_FLASH_ATTR user_rf_pre_init(void){}
 
-uint32_t a;
+uint32_t a; //TEST
+uint32_t testCounter=0; //TEST
 os_event_t taskQueue;
 uint32_t lastCallTime;
-
 uint32_t taskTimingCounters[3] = {0};
-
 TimingTask_State timingState = FIRST_CALL;
-
 
 /*
  * NONOS timing task
@@ -276,7 +272,7 @@ TimingTask_State timingState = FIRST_CALL;
 static void ICACHE_FLASH_ATTR task_timing(os_event_t *events) {
 	//Get currentime
 	uint32_t currentTime = system_get_time()/1000;
-
+	//Based on state do stuff
 	switch(timingState)
 	{
 	case FIRST_CALL:
@@ -291,7 +287,7 @@ static void ICACHE_FLASH_ATTR task_timing(os_event_t *events) {
 	case DELAY:
 		//Delay before starting cyclic tasks
 		taskTimingCounters[0]+= (currentTime-lastCallTime);
-		if(taskTimingCounters[0] >= 5000){
+		if(taskTimingCounters[0] >= 5){
 			taskTimingCounters[0] = 0;
 			timingState = INIT_B;
 		}
@@ -306,7 +302,7 @@ static void ICACHE_FLASH_ATTR task_timing(os_event_t *events) {
 		taskTimingCounters[0]+= (currentTime-lastCallTime);
 		taskTimingCounters[1]+= (currentTime-lastCallTime);
 		taskTimingCounters[2]+= (currentTime-lastCallTime);
-
+		//Call tasks if needed
 		if(taskTimingCounters[0] >= 1){
 			taskTimingCounters[0] = 0;
 			task_1ms();
@@ -315,18 +311,19 @@ static void ICACHE_FLASH_ATTR task_timing(os_event_t *events) {
 			taskTimingCounters[1] = 0;
 			task_10ms();
 
+		    // TEST
+			a++;
+			digitalWrite(LED_BUILTIN,(a%2));
+
 		}
 		if(taskTimingCounters[2] >= 1000){
 			taskTimingCounters[2] = 0;
 			task_1000ms();
+			os_printf("CALLBACK RECEIVED : %d \n" ,testCounter);
+			testCounter = 0;
 		}
 	    //call background task
 	    task_background();
-
-	    // TEST
-		a++;
-		digitalWrite(LED_BUILTIN,(a%2));
-
 
 		break;
 	}
@@ -334,6 +331,11 @@ static void ICACHE_FLASH_ATTR task_timing(os_event_t *events) {
     lastCallTime = currentTime;
     //Cyclic task trigger
     system_os_post(0, 0, 0 );
+}
+
+void testCallback(void)
+{
+	testCounter++;
 }
 
 #endif
@@ -357,6 +359,10 @@ void user_init(void) {
 
 	pinMode(LED_BUILTIN,OUTPUT);
 	digitalWrite(LED_BUILTIN,1);
+
+	pinMode(PULSE_INPUT0,INPUT);
+	attachInterrupt(PULSE_INPUT0,testCallback,RISING);
+
 #endif
 
 

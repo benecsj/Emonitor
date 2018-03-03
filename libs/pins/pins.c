@@ -154,17 +154,19 @@ extern void analogWrite(uint8 pin, int val)
 
 static voidFuncPtr g_handlers[PINCOUNT] = { 0 };
 
-
 void interrupt_handler(void *arg)
 {
 	int pin;
     uint32 intr_mask = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
     for (pin = 0; intr_mask; intr_mask >>= 1, ++pin)
     {
-        if ((intr_mask & 1) && g_handlers[pin])
+        if ((intr_mask & 1))
         {
             GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, 1 << pin);
-            (*g_handlers[pin])();
+            //Only call function if not NULL_PTR
+            if(g_handlers[pin]) {
+            	(*g_handlers[pin])();
+            }
         }
     }
 }
@@ -243,6 +245,6 @@ void pins_intr_handler_register(void *fn, void *arg)
 #if PRJ_ENV == OS
     _xt_isr_attach(ETS_GPIO_INUM, fn, arg);
 #else
-    gpio_intr_handler_register(fn,arg);
+	ETS_GPIO_INTR_ATTACH(fn,arg);
 #endif
 }
