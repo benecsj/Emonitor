@@ -51,10 +51,7 @@ void spiffs_init(void) {
     //Get File System
     fs = esp_spiffs_get_fs();
 
-    //Show SPIFFS Status
-    uint32 total, used;
-    result = SPIFFS_info(fs, &total, &used);
-    SPIFFSM_DBG("(SPIFFS) Total: %d  Used: %d  Free: %d\n",total,used, total-used);
+    spiffs_status();
 
 }
 
@@ -131,17 +128,17 @@ void spiffs_status(void)
 	uint8 result = 0;
 	uint32 total, used;
 
-	printf("(SPIFFS) File system files:\n");
+	SPIFFSM_DBG("(SPIFFS) File system files:\n");
 	spiffs_DIR spiffsDir;
 	SPIFFS_opendir(fs, "/", &spiffsDir);
 	struct spiffs_dirent spiffsDirEnt;
 	while(SPIFFS_readdir(&spiffsDir, &spiffsDirEnt) != 0) {
-	  printf("%s : %d \n", spiffsDirEnt.name, spiffsDirEnt.size);
+		SPIFFSM_DBG("%s : %d \n", spiffsDirEnt.name, spiffsDirEnt.size);
 	}
 	SPIFFS_closedir(&spiffsDir);
 
     SPIFFS_info(fs, &total, &used);
-	printf("(SPIFFS) Total: %d  Used: %d  Free: %d\n",total,used, total-used);
+    SPIFFSM_DBG("(SPIFFS) Total: %d  Used: %d  Free: %d\n",total,used, total-used);
 
 }
 

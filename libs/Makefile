@@ -24,7 +24,6 @@ COMPONENTS_libs = hw_timer/hw_timer.a	\
                   http_server/http_server.a \
                   crc/crc.a \
                   uart/uart.a \
-                  spiffs/spiffs.a \
                   MHZ14/MHZ14.a
 endif
 
