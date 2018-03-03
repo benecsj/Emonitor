@@ -17,6 +17,8 @@
 #include "NVM_NonVolatileMemory.h"
 #include "D18_DS18B20_Temp_Sensor.h"
 #include "OWP_One_Wire_Protocol_Driver.h"
+#include "hw_timer.h"
+
 #if PRJ_ENV == OS
 #include "Wifi_Manager.h"
 #include "wifi_state_machine.h"
@@ -382,6 +384,10 @@ void user_init(void) {
 	OWP_SelectChannel(0);
 	D18_DS18B20_FindSensor(&diff, &id[0]);
 	os_printf("ID: %02X%02X%02X%02X%02X%02X%02X%02X\n",id[0],id[1],id[2],id[3],id[4],id[5],id[6],id[7]);
+
+    hw_timer_init(NMI_SOURCE,1);
+    hw_timer_set_func(testCallback);
+    hw_timer_arm(1000,1);
 
 #endif
 

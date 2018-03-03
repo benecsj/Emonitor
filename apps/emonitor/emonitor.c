@@ -128,7 +128,7 @@ void Emonitor_Init(void){
 
 void Emonitor_StartTimer(void){
 	//Init timer for fast task
-    hw_timer_init();
+    hw_timer_init(FRC1_SOURCE,TRUE);
     hw_timer_set_func(task_1ms);
     hw_timer_arm(1000,1);
 }

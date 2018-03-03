@@ -23,7 +23,7 @@
  */
 
 #include "project_config.h"
-
+#include "hw_timer.h"
 #define US_TO_RTC_TIMER_TICKS(t)          \
     ((t) ?          \
      (((t) > 0x35A) ?            \
@@ -34,22 +34,22 @@
 #define FRC1_ENABLE_TIMER   BIT7
 #define FRC1_AUTO_LOAD      BIT6
 
-typedef enum {          // timer provided mode
-    DIVDED_BY_1   = 0,  // timer clock
-    DIVDED_BY_16  = 4,  // divided by 16
-    DIVDED_BY_256 = 8,  // divided by 256
-} TIMER_PREDIVED_MODE;
-
-typedef enum {          // timer interrupt mode
-    TM_LEVEL_INT = 1,   // level interrupt
-    TM_EDGE_INT  = 0,   // edge interrupt
-} TIMER_INT_MODE;
-
+#if PRJ_ENV == OS
 #define RTC_REG_WRITE(addr, val)    WRITE_PERI_REG(addr, val)
-
+#endif
 static void (* user_hw_timer_cb)(void) = NULL;
-
 bool frc1_auto_load = false;
+/******************************************************************************
+* FunctionName : hw_timer_set_func
+* Description  : set the func, when trigger timer is up.
+* Parameters   : void (* user_hw_timer_cb_set)(void):
+                        timer callback function,
+* Returns      : NONE
+*******************************************************************************/
+void hw_timer_set_func(void (* user_hw_timer_cb_set)(void))
+{
+    user_hw_timer_cb = user_hw_timer_cb_set;
+}
 
 static void hw_timer_isr_cb(void *arg)
 {
@@ -58,6 +58,13 @@ static void hw_timer_isr_cb(void *arg)
                       DIVDED_BY_16 | TM_EDGE_INT);
     }
 
+    if (user_hw_timer_cb != NULL) {
+        (*(user_hw_timer_cb))();
+    }
+}
+
+static void hw_timer_nmi_cb(void)
+{
     if (user_hw_timer_cb != NULL) {
         (*(user_hw_timer_cb))();
     }
@@ -82,14 +89,9 @@ void hw_timer_arm(uint32 val ,bool req)
     RTC_REG_WRITE(FRC1_LOAD_ADDRESS, US_TO_RTC_TIMER_TICKS(val));
 }
 
-void hw_timer_set_func(void (* user_hw_timer_cb_set)(void))
+void ICACHE_FLASH_ATTR hw_timer_init(FRC1_TIMER_SOURCE_TYPE source_type, u8 req)
 {
-    user_hw_timer_cb = user_hw_timer_cb_set;
-}
-
-void hw_timer_init(void)
-{
-#if 0
+#if PRJ_ENV == NOS
     if (req == 1) {
         RTC_REG_WRITE(FRC1_CTRL_ADDRESS,
                       FRC1_AUTO_LOAD | DIVDED_BY_16 | FRC1_ENABLE_TIMER | TM_EDGE_INT);
@@ -98,11 +100,20 @@ void hw_timer_init(void)
                       DIVDED_BY_16 | FRC1_ENABLE_TIMER | TM_EDGE_INT);
     }
 
-#endif
+    if (source_type == NMI_SOURCE) {
+        ETS_FRC_TIMER1_NMI_INTR_ATTACH(hw_timer_nmi_cb);
+    } else {
+        ETS_FRC_TIMER1_INTR_ATTACH(hw_timer_isr_cb, NULL);
+    }
+
+    TM1_EDGE_INT_ENABLE();
+    ETS_FRC1_INTR_ENABLE();
+#else
     _xt_isr_attach(ETS_FRC_TIMER1_INUM, hw_timer_isr_cb, NULL);
 
     TM1_EDGE_INT_ENABLE();
     _xt_isr_unmask(1 << ETS_FRC_TIMER1_INUM);
+#endif
 }
 
 //-------------------------------Test Code Below--------------------------------------
