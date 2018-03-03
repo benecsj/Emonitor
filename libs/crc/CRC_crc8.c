@@ -7,7 +7,7 @@
 
 
 
-uint8 CRC_crc8 ( uint8 *CS_CS_data_in, uint16 CS_number_of_bytes_to_read ,uint8 crcInit)
+uint8 ICACHE_FLASH_ATTR CRC_crc8 ( uint8 *CS_CS_data_in, uint16 CS_number_of_bytes_to_read ,uint8 crcInit)
 {
 	
 	uint8  CS_crc;

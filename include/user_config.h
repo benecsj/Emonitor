@@ -101,10 +101,10 @@
 #define DEBUG_SENSOR_MANAGER 	(OFF)
 #define DEBUG_EMONITOR 			(ON)
 #define DEBUG_HTTP_CLIENT 		(OFF)
-#define DEBUG_HTTP_SERVER 		(ON)
+#define DEBUG_HTTP_SERVER 		(OFF)
 #define DEBUG_WIFI_MANAGER		(OFF)
 #define DEBUG_MHZ14				(OFF)
-#define DEBUG_SPIFFS 			(ON)
+#define DEBUG_SPIFFS 			(OFF)
 
 #endif
 

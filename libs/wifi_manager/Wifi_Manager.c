@@ -29,7 +29,7 @@ sint8 WifiManager_SignalLevel = 0;
 uint8 WifiManager_ScanRunning = OFF;
 uint8 WifiManager_ScanTiming = 0;
 
-void Wifi_Manager_Init(void)
+void ICACHE_FLASH_ATTR Wifi_Manager_Init(void)
 {
 
 	//Verify Parameters
@@ -92,7 +92,7 @@ void Wifi_Manager_Init(void)
 
 }
 
-void Wifi_Manager_Main(void)
+void ICACHE_FLASH_ATTR Wifi_Manager_Main(void)
 {
 	//Only scan if connected
 	if(Wifi_Manager_IsConnected())
@@ -108,7 +108,7 @@ void Wifi_Manager_Main(void)
 	}
 }
 
-void ICACHE_FLASH_ATTR Wifi_Manager_ScanDone(void *arg, STATUS status)
+void ICACHE_FLASH_ATTR ICACHE_FLASH_ATTR Wifi_Manager_ScanDone(void *arg, STATUS status)
 {
 	  uint8 ssid[33];
 	  char temp[128];
@@ -144,7 +144,7 @@ void ICACHE_FLASH_ATTR Wifi_Manager_ScanDone(void *arg, STATUS status)
 	  WifiManager_ScanRunning = OFF;
 }
 
-void Wifi_Manager_UpdateLevel(void)
+void ICACHE_FLASH_ATTR Wifi_Manager_UpdateLevel(void)
 {
 	//Check if scan is not already running
 	if(WifiManager_ScanRunning == OFF)
@@ -156,24 +156,24 @@ void Wifi_Manager_UpdateLevel(void)
 }
 
 
-void Wifi_Manager_CleanUp(void)
+void ICACHE_FLASH_ATTR Wifi_Manager_CleanUp(void)
 {
     stop_wifi_station();
     stop_wifi_ap();
 }
 
 
-void Wifi_Manager_GetIp(uint8 ip[4])
+void ICACHE_FLASH_ATTR Wifi_Manager_GetIp(uint8 ip[4])
 {
 	wifi_get_ip_address(ip);
 }
 
-void Wifi_Manager_EnableHotspot(uint8 enable)
+void ICACHE_FLASH_ATTR Wifi_Manager_EnableHotspot(uint8 enable)
 {
 	WifiManager_enableHotspot = enable;
 }
 
-void Wifi_Manager_GetDefaultId(char* id)
+void ICACHE_FLASH_ATTR Wifi_Manager_GetDefaultId(char* id)
 {
 	spiffs* fs = spiffs_get_fs();
 	spiffs_file fd;
@@ -185,7 +185,7 @@ void Wifi_Manager_GetDefaultId(char* id)
 	id[length-1] = 0;
 }
 
-void Wifi_Manager_GetDefaultPassword(char * pass)
+void ICACHE_FLASH_ATTR Wifi_Manager_GetDefaultPassword(char * pass)
 {
 	spiffs* fs = spiffs_get_fs();
 	spiffs_file fd;

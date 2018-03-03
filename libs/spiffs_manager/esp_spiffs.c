@@ -14,7 +14,7 @@ static u8_t *spiffs_cache_buf;
 
 #define FLASH_UNIT_SIZE 4
 
-static s32_t esp_spiffs_readwrite(u32_t addr, u32_t size, u8_t *p, int write)
+static s32_t ICACHE_FLASH_ATTR esp_spiffs_readwrite(u32_t addr, u32_t size, u8_t *p, int write)
 {
     /*
      * With proper configurarion spiffs never reads or writes more than
@@ -57,17 +57,17 @@ static s32_t esp_spiffs_readwrite(u32_t addr, u32_t size, u8_t *p, int write)
     return SPIFFS_OK;
 }
 
-static s32_t esp_spiffs_read(u32_t addr, u32_t size, u8_t *dst)
+static s32_t ICACHE_FLASH_ATTR esp_spiffs_read(u32_t addr, u32_t size, u8_t *dst)
 {
     return esp_spiffs_readwrite(addr, size, dst, 0);
 }
 
-static s32_t esp_spiffs_write(u32_t addr, u32_t size, u8_t *src)
+static s32_t ICACHE_FLASH_ATTR esp_spiffs_write(u32_t addr, u32_t size, u8_t *src)
 {
     return esp_spiffs_readwrite(addr, size, src, 1);
 }
 
-static s32_t esp_spiffs_erase(u32_t addr, u32_t size)
+static s32_t ICACHE_FLASH_ATTR esp_spiffs_erase(u32_t addr, u32_t size)
 {
     /*
      * With proper configurarion spiffs always
@@ -82,12 +82,12 @@ static s32_t esp_spiffs_erase(u32_t addr, u32_t size)
     return spi_flash_erase_sector(addr / fs.cfg.phys_erase_block);
 }
 
-spiffs* esp_spiffs_get_fs()
+spiffs* ICACHE_FLASH_ATTR esp_spiffs_get_fs()
 {
     return &fs;
 }
 
-s32_t esp_spiffs_init(struct esp_spiffs_config *config)
+s32_t ICACHE_FLASH_ATTR esp_spiffs_init(struct esp_spiffs_config *config)
 {
     if (SPIFFS_mounted(&fs)) {
         return -1;
@@ -153,7 +153,7 @@ s32_t esp_spiffs_init(struct esp_spiffs_config *config)
     return ret;        
 }
 
-void esp_spiffs_deinit(u8_t format)
+void ICACHE_FLASH_ATTR esp_spiffs_deinit(u8_t format)
 {
     if (SPIFFS_mounted(&fs)) {
         SPIFFS_unmount(&fs);
@@ -167,7 +167,7 @@ void esp_spiffs_deinit(u8_t format)
     }
 }
 
-int _open_r(struct _reent *r, const char *filename, int flags, int mode)
+int ICACHE_FLASH_ATTR _open_r(struct _reent *r, const char *filename, int flags, int mode)
 {
     spiffs_mode sm = 0;
     int res;
@@ -206,7 +206,7 @@ int _open_r(struct _reent *r, const char *filename, int flags, int mode)
     return res;
 }
 
-_ssize_t _read_r(struct _reent *r, int fd, void *buf, size_t len)
+_ssize_t ICACHE_FLASH_ATTR _read_r(struct _reent *r, int fd, void *buf, size_t len)
 {
 
     ssize_t res;
@@ -220,7 +220,7 @@ _ssize_t _read_r(struct _reent *r, int fd, void *buf, size_t len)
     return res;
 }
 
-_ssize_t _write_r(struct _reent *r, int fd, void *buf, size_t len)
+_ssize_t ICACHE_FLASH_ATTR _write_r(struct _reent *r, int fd, void *buf, size_t len)
 {
 
     if (fd < NUM_SYS_FD) {
@@ -231,7 +231,7 @@ _ssize_t _write_r(struct _reent *r, int fd, void *buf, size_t len)
     return res;
 }
 
-_off_t _lseek_r(struct _reent *r, int fd, _off_t where, int whence)
+_off_t ICACHE_FLASH_ATTR _lseek_r(struct _reent *r, int fd, _off_t where, int whence)
 {
 
     ssize_t res;
@@ -245,7 +245,7 @@ _off_t _lseek_r(struct _reent *r, int fd, _off_t where, int whence)
     return res;
 }
 
-int _close_r(struct _reent *r, int fd)
+int ICACHE_FLASH_ATTR _close_r(struct _reent *r, int fd)
 {
 
     if (fd < NUM_SYS_FD) {
@@ -256,21 +256,21 @@ int _close_r(struct _reent *r, int fd)
     return 0;
 }
 
-int _rename_r(struct _reent *r, const char *from, const char *to)
+int ICACHE_FLASH_ATTR _rename_r(struct _reent *r, const char *from, const char *to)
 {
 
     int res = SPIFFS_rename(&fs, (char *) from, (char *) to);
     return res;
 }
 
-int _unlink_r(struct _reent *r, const char *filename)
+int ICACHE_FLASH_ATTR _unlink_r(struct _reent *r, const char *filename)
 {
 
     int res = SPIFFS_remove(&fs, (char *) filename);
     return res;
 }
 
-int _fstat_r(struct _reent *r, int fd, struct stat *s)
+int ICACHE_FLASH_ATTR _fstat_r(struct _reent *r, int fd, struct stat *s)
 {
 
     int res;

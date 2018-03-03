@@ -304,7 +304,7 @@ bool ICACHE_FLASH_ATTR wifi_ap_enabled(){
     return !!(wifi_get_opmode() & SOFTAP_MODE);
 }
 
-void wifi_get_ip_address(uint8 ip[4]){
+void ICACHE_FLASH_ATTR wifi_get_ip_address(uint8 ip[4]){
 	bool returnValue;
 	struct ip_info data;
 	returnValue = wifi_get_ip_info(0x00, &data); // 0x00 for STATION_IF, 0x01 for SOFTAP_IF.

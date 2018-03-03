@@ -26,7 +26,7 @@ uint8 remote_recBuffer[100];
 /******************************************************************************
 * Implementations
 \******************************************************************************/
-LOCAL void
+LOCAL void ICACHE_FLASH_ATTR
 Remote_Control_UART0_Handler(void *para)
 {
     uint8 received;
@@ -74,7 +74,7 @@ Remote_Control_UART0_Handler(void *para)
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
-void Remote_Control_Init(void) {
+void ICACHE_FLASH_ATTR Remote_Control_Init(void) {
 #if(REMOTE_CONTROL_ENABLE ==1)
 	//Init UART
 	//Setup interrupts
@@ -99,7 +99,7 @@ void Remote_Control_Init(void) {
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
-void Remote_Control_Main(void) {
+void ICACHE_FLASH_ATTR Remote_Control_Main(void) {
 #if(REMOTE_CONTROL_ENABLE ==1)
 	Cpi_Main();
 #endif

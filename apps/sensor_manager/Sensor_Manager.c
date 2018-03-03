@@ -92,7 +92,7 @@ void Sensor_Manager_PulseCounter3(void);
  * Functions
  **********************************************************************************/
 
-void Sensor_Manager_Init() {
+void ICACHE_FLASH_ATTR Sensor_Manager_Init() {
     uint8 i;
 
 	//Pulse counter input
@@ -130,12 +130,12 @@ void Sensor_Manager_Init() {
 
 }
 
-void Sensor_Manager_VeryFast() {
+void ICACHE_FLASH_ATTR Sensor_Manager_VeryFast() {
     //MHZ14 CO2 Sensor
     MHZ14_Feed(digitalRead(MHZ14_INPUT_PIN));
 }
 
-void Sensor_Manager_Fast() {
+void ICACHE_FLASH_ATTR Sensor_Manager_Fast() {
     //Local variables
     uint8 CS_i;
 
@@ -159,7 +159,7 @@ void Sensor_Manager_Fast() {
     }
 }
 
-void Sensor_Manager_Main() {
+void ICACHE_FLASH_ATTR Sensor_Manager_Main() {
 	uint8 i;
 
 	//Based on state do stuff
@@ -206,7 +206,7 @@ void Sensor_Manager_Main() {
 }
 
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 0)
-void Sensor_Manager_PulseCounter0(void)
+void ICACHE_FLASH_ATTR Sensor_Manager_PulseCounter0(void)
 {
 	prj_DisableInt();
 	Sensor_Manager_PulseCounters[0]++;
@@ -214,7 +214,7 @@ void Sensor_Manager_PulseCounter0(void)
 }
 #endif
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 1)
-void Sensor_Manager_PulseCounter1(void)
+void ICACHE_FLASH_ATTR Sensor_Manager_PulseCounter1(void)
 {
 	prj_DisableInt();
 	Sensor_Manager_PulseCounters[1]++;
@@ -222,7 +222,7 @@ void Sensor_Manager_PulseCounter1(void)
 }
 #endif
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 2)
-void Sensor_Manager_PulseCounter2(void)
+void ICACHE_FLASH_ATTR Sensor_Manager_PulseCounter2(void)
 {
 	prj_DisableInt();
 	Sensor_Manager_PulseCounters[2]++;
@@ -230,7 +230,7 @@ void Sensor_Manager_PulseCounter2(void)
 }
 #endif
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 3)
-void Sensor_Manager_PulseCounter3(void)
+void ICACHE_FLASH_ATTR Sensor_Manager_PulseCounter3(void)
 {
 	prj_DisableInt();
 	Sensor_Manager_PulseCounters[3]++;
@@ -238,7 +238,7 @@ void Sensor_Manager_PulseCounter3(void)
 }
 #endif
 
-uint32 Sensor_Manager_GetPulseCount(uint8 id)
+uint32 ICACHE_FLASH_ATTR Sensor_Manager_GetPulseCount(uint8 id)
 {
 	prj_ENTER_CRITICAL();
 	uint32 tempValue = Sensor_Manager_PulseCounters[id];
@@ -246,7 +246,7 @@ uint32 Sensor_Manager_GetPulseCount(uint8 id)
 	return tempValue;
 }
 
-uint32 Sensor_Manager_GetPulseLevel(uint8 id)
+uint32 ICACHE_FLASH_ATTR Sensor_Manager_GetPulseLevel(uint8 id)
 {
 	uint32_t tempValue = 0;
 	switch(id)
@@ -280,12 +280,12 @@ uint32 Sensor_Manager_GetPulseLevel(uint8 id)
 	return tempValue;
 }
 
-uint16 Sensor_Manager_GetAnalogValue(void)
+uint16 ICACHE_FLASH_ATTR Sensor_Manager_GetAnalogValue(void)
 {
 	return APP_PortMon_analogValues[0];
 }
 
-void Sensor_Manager_ResetPulseCounters(void)
+void ICACHE_FLASH_ATTR Sensor_Manager_ResetPulseCounters(void)
 {
 	uint8 i;
 	//Init pulse counters
@@ -295,7 +295,7 @@ void Sensor_Manager_ResetPulseCounters(void)
 	}
 }
 
-void Sensor_Manager_UpdateSensors(void) {
+void ICACHE_FLASH_ATTR Sensor_Manager_UpdateSensors(void) {
     uint16 i;
     /*Search for sensors*/
     uint8 Sensor_Manager_Count = SENSOR_MANAGER_DS18B20_Search();
@@ -339,7 +339,7 @@ void Sensor_Manager_UpdateSensors(void) {
     }
 }
 
-void SENSOR_MANAGER_DS18B20_StartMeasure(void)
+void ICACHE_FLASH_ATTR SENSOR_MANAGER_DS18B20_StartMeasure(void)
 {
 	uint8 i;
     for (i = 0; i < OWP_CHANNELS_COUNT; i++) {
@@ -350,7 +350,7 @@ void SENSOR_MANAGER_DS18B20_StartMeasure(void)
     }
 }
 
-uint8 SENSOR_MANAGER_DS18B20_Search(void) {
+uint8 ICACHE_FLASH_ATTR SENSOR_MANAGER_DS18B20_Search(void) {
     //Local variables
     uint8 i;
     uint8 j;
@@ -440,7 +440,7 @@ uint8 SENSOR_MANAGER_DS18B20_Search(void) {
     return CS_nSensors;
 }
 
-void SENSOR_MANAGER_DS18B20Measure() {
+void ICACHE_FLASH_ATTR SENSOR_MANAGER_DS18B20Measure() {
     //Local variables
     uint8 subzero, cel, cel_frac_bits, i;
 
@@ -462,7 +462,7 @@ void SENSOR_MANAGER_DS18B20Measure() {
     }
 }
 
-void Sensor_Manager_Get_TempSensorData(uint8* count, uint8** ids,sint16** temperatures )
+void ICACHE_FLASH_ATTR Sensor_Manager_Get_TempSensorData(uint8* count, uint8** ids,sint16** temperatures )
 {
 	(*count) = SENSOR_MANAGER_DS18B20Count;
 	(*ids) = (uint8*) &Sensor_Manager_sensorIDs;

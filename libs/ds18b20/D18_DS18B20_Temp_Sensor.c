@@ -25,7 +25,7 @@
    always returns  D18_DS18B20_OK
    TODO invalid-values detection (but should be covered by CRC)
  */
-uint8 D18_DS18B20_MeasuretoCel(uint8 fc, uint8 *sp,
+uint8 ICACHE_FLASH_ATTR D18_DS18B20_MeasuretoCel(uint8 fc, uint8 *sp,
         uint8* subzero, uint8* cel, uint8* cel_frac_bits) {
     uint16 meas;
     uint8 i;
@@ -87,7 +87,7 @@ uint8 D18_DS18B20_MeasuretoCel(uint8 fc, uint8 *sp,
 13	8125	125
 14	8750	750	14
 15	9375	375	*/
-sint16 D18_DS18B20_TemptoDecicel(uint8 subzero, uint8 cel, uint8 cel_frac_bits) {
+sint16 ICACHE_FLASH_ATTR D18_DS18B20_TemptoDecicel(uint8 subzero, uint8 cel, uint8 cel_frac_bits) {
     sint16 h;
     uint8 i;
     uint8 need_rounding[] = {1, 3, 4, 6, 9, 11, 12, 14};
@@ -114,7 +114,7 @@ sint16 D18_DS18B20_TemptoDecicel(uint8 subzero, uint8 cel, uint8 cel_frac_bits) 
    returns -1 if param-pair1 < param-pair2
             0 if ==
                         1 if >    */
-int8 D18_DS18B20_TempCmp(uint8 subzero1, uint16 cel1,
+int8 ICACHE_FLASH_ATTR D18_DS18B20_TempCmp(uint8 subzero1, uint16 cel1,
         uint8 subzero2, uint16 cel2) {
     sint16 t1 = (subzero1) ? (cel1 * (-1)) : (cel1);
     sint16 t2 = (subzero2) ? (cel2 * (-1)) : (cel2);
@@ -127,7 +127,7 @@ int8 D18_DS18B20_TempCmp(uint8 subzero1, uint16 cel1,
 /* find DS18X20 Sensors on 1-Wire-Bus
    input/ouput: diff is the result of the last rom-search
    output: id is the rom-code of the sensor found */
-void D18_DS18B20_FindSensor(uint8 *diff, uint8 id[]) {
+void ICACHE_FLASH_ATTR D18_DS18B20_FindSensor(uint8 *diff, uint8 id[]) {
     for (;;) {
         *diff = OWP_Rom_Search(*diff, &id[0]);
         if (*diff == OWP_CONST_PRESENCE_ERR || *diff == OWP_CONST_DATA_ERR ||
@@ -139,7 +139,7 @@ void D18_DS18B20_FindSensor(uint8 *diff, uint8 id[]) {
 /* get power status of DS18x20
    input  : id = rom_code
    returns: D18_DS18B20_POWER_EXTERN or D18_DS18B20_POWER_PARASITE */
-uint8 D18_DS18B20_GetPowerStatus(uint8 id[]) {
+uint8 ICACHE_FLASH_ATTR D18_DS18B20_GetPowerStatus(uint8 id[]) {
     uint8 pstat;
     OWP_Reset();
     OWP_Send_Command(D18_DS18B20_READ_POWER_SUPPLY, id);
@@ -150,7 +150,7 @@ uint8 D18_DS18B20_GetPowerStatus(uint8 id[]) {
 
 /* start measurement (CONVERT_T) for all sensors if input id==NULL
    or for single sensor. then id is the rom-code */
-uint8 D18_DS18B20_StartMeasure(uint8 with_power_extern, uint8 id[]) {
+uint8 ICACHE_FLASH_ATTR D18_DS18B20_StartMeasure(uint8 with_power_extern, uint8 id[]) {
     OWP_Reset(); //**
     if (OWP_Read_Bus()) { // only send if bus is "idle" = high
         OWP_Send_Command(D18_DS18B20_CONVERT_T, id);
@@ -166,7 +166,7 @@ uint8 D18_DS18B20_StartMeasure(uint8 with_power_extern, uint8 id[]) {
    output: subzero==1 if temp.<0, cel: full celsius, mcel: frac
    in millicelsius*0.1
    i.e.: subzero=1, cel=18, millicel=5000 = -18,5000�C */
-uint8 D18_DS18B20_ReadMeasure(uint8 id[], uint8 *subzero,
+uint8 ICACHE_FLASH_ATTR D18_DS18B20_ReadMeasure(uint8 id[], uint8 *subzero,
         uint8 *cel, uint8 *cel_frac_bits) {
     uint8 i;
     uint8 sp[D18_DS18B20_SP_SIZE];
@@ -190,7 +190,7 @@ uint8 D18_DS18B20_ReadMeasure(uint8 id[], uint8 *subzero,
    output: subzero==1 if temp.<0, cel: full celsius, mcel: frac
    in millicelsius*0.1
    i.e.: subzero=1, cel=18, millicel=5000 = -18,5000�C */
-uint8 D18_DS18B20_ReadMeasureSingle(uint8 familycode, uint8 *subzero,
+uint8 ICACHE_FLASH_ATTR D18_DS18B20_ReadMeasureSingle(uint8 familycode, uint8 *subzero,
         uint8 *cel, uint8 *cel_frac_bits) {
     uint8 i;
     uint8 sp[D18_DS18B20_SP_SIZE];
@@ -203,30 +203,7 @@ uint8 D18_DS18B20_ReadMeasureSingle(uint8 familycode, uint8 *subzero,
     return D18_DS18B20_OK;
 }
 
-void D18_DS18B20_ShowId(uint8 *id, uint8 n) {
-    size_t i;
-    for (i = 0; i < n; i++) {
-        if (i == 0) printf("FC:");
-        else if (i == n - 1) printf("CRC:");
-        if (i == 1) printf("SN: ");
-        printf("%0X", id[i]);
-        //lcd_putc(' ');
-        //if ( i == 0 )
-        //{
-        //	if ( id[0] == DS18S20_ID ) lcd_puts ("(18S)");
-        //	else if ( id[0] == DS18B20_ID ) lcd_puts("(18B)");
-        //	else lcd_puts("( ? )");
-        //}
-        printf("\r\n");
-    }
-    //if ( crc8( id, OW_ROMCODE_SIZE) )
-    //	lcd_puts( " CRC FAIL " );
-    //else
-    //	lcd_puts( " CRC O.K. " );
-}
-
-
-uint8 D18_DS18B20_WriteScratchpad(uint8 id[],
+uint8 ICACHE_FLASH_ATTR D18_DS18B20_WriteScratchpad(uint8 id[],
         uint8 th, uint8 tl, uint8 conf) {
     OWP_Reset(); //**
     if (OWP_Read_Bus()) { // only send if bus is "idle" = high
@@ -242,7 +219,7 @@ uint8 D18_DS18B20_WriteScratchpad(uint8 id[],
     }
 }
 
-uint8 D18_DS18B20_ReadScratchpad(uint8 id[], uint8 sp[]) {
+uint8 ICACHE_FLASH_ATTR D18_DS18B20_ReadScratchpad(uint8 id[], uint8 sp[]) {
     uint8 i;
 
     OWP_Reset(); //**
@@ -257,14 +234,13 @@ uint8 D18_DS18B20_ReadScratchpad(uint8 id[], uint8 sp[]) {
     }
 }
 
-uint8 D18_DS18B20_CopyScratchpad(uint8 with_power_extern,
+uint8 ICACHE_FLASH_ATTR D18_DS18B20_CopyScratchpad(uint8 with_power_extern,
         uint8 id[]) {
     OWP_Reset(); //**
     if (OWP_Read_Bus()) { // only send if bus is "idle" = high
         OWP_Send_Command(D18_DS18B20_COPY_SCRATCHPAD, id);
         if (with_power_extern != D18_DS18B20_POWER_EXTERN)
             OWP_Parasite_Enable();
-        DEL_Delay_ms(D18_DS18B20_COPYSP_DELAY); // wait for 10 ms
         if (with_power_extern != D18_DS18B20_POWER_EXTERN)
             OWP_Parasite_Disable();
         return D18_DS18B20_OK;
@@ -275,14 +251,13 @@ uint8 D18_DS18B20_CopyScratchpad(uint8 with_power_extern,
     }
 }
 
-uint8 D18_DS18B20_RecallE2(uint8 id[]) {
+uint8 ICACHE_FLASH_ATTR D18_DS18B20_RecallE2(uint8 id[]) {
     OWP_Reset(); //**
     if (OWP_Read_Bus()) { // only send if bus is "idle" = high
         OWP_Send_Command(D18_DS18B20_RECALL_E2, id);
         // TODO: wait until status is "1" (then eeprom values
         // have been copied). here simple delay to avoid timeout
         // handling
-        DEL_Delay_ms(D18_DS18B20_COPYSP_DELAY);
         return D18_DS18B20_OK;
     } else {
         return D18_DS18B20_ERROR;

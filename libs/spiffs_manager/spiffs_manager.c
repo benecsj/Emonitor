@@ -37,7 +37,7 @@ struct esp_spiffs_config config = {
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
-void spiffs_init(void) {
+void ICACHE_FLASH_ATTR spiffs_init(void) {
 	SPIFFSM_DBG("(SPIFFS) Initializing SPIFFS\n");
 
 	int32 result = 0;
@@ -51,7 +51,7 @@ void spiffs_init(void) {
 
 }
 
-void spiffs_test_write(void)
+void ICACHE_FLASH_ATTR spiffs_test_write(void)
 {
 	int32 result = 0;
 	uint8 buf[128];
@@ -97,20 +97,22 @@ void spiffs_test_write(void)
     }while (created == FALSE);
 }
 
-void spiffs_test_read(void)
+void ICACHE_FLASH_ATTR spiffs_test_read(void)
 {
 	char buf[128] = {0};
 	spiffs_stat status;
 	int32 result = SPIFFS_stat(fs, (char *)"/test"+0, &status);
+
 	SPIFFSM_DBG("(SPIFFS) %d %d  %s %d \n",result, status.obj_id, status.name, status.size);
 
 	spiffs_file fd = SPIFFS_open(fs, "/test", SPIFFS_RDWR, 0);
 	SPIFFS_read(fs, fd, (u8_t *)buf, 128);
 	SPIFFS_close(fs, fd);
-	printf("(SPIFFS) File: %s\n",buf);
+	prj_printf("(SPIFFS) File: %s\n",buf);
+
 }
 
-void spiffs_format(void)
+void ICACHE_FLASH_ATTR spiffs_format(void)
 {
 		SPIFFSM_DBG("(SPIFFS) Execute formating\n");
 		//Execute formating
@@ -119,7 +121,7 @@ void spiffs_format(void)
 		esp_spiffs_init(&config);
 }
 
-void spiffs_status(void)
+void ICACHE_FLASH_ATTR spiffs_status(void)
 {
 	uint8 result = 0;
 	uint32 total, used;
@@ -138,7 +140,7 @@ void spiffs_status(void)
 
 }
 
-spiffs* spiffs_get_fs(void)
+spiffs* ICACHE_FLASH_ATTR spiffs_get_fs(void)
 {
 	return fs;
 }

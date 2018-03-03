@@ -46,12 +46,12 @@ bool frc1_auto_load = false;
                         timer callback function,
 * Returns      : NONE
 *******************************************************************************/
-void hw_timer_set_func(void (* user_hw_timer_cb_set)(void))
+void ICACHE_FLASH_ATTR hw_timer_set_func(void (* user_hw_timer_cb_set)(void))
 {
     user_hw_timer_cb = user_hw_timer_cb_set;
 }
 
-static void hw_timer_isr_cb(void *arg)
+static void ICACHE_FLASH_ATTR hw_timer_isr_cb(void *arg)
 {
     if(frc1_auto_load == false ) {
         RTC_REG_WRITE(FRC1_CTRL_ADDRESS,
@@ -63,19 +63,19 @@ static void hw_timer_isr_cb(void *arg)
     }
 }
 
-static void hw_timer_nmi_cb(void)
+static void ICACHE_FLASH_ATTR hw_timer_nmi_cb(void)
 {
     if (user_hw_timer_cb != NULL) {
         (*(user_hw_timer_cb))();
     }
 }
 
-void hw_timer_disarm(void)
+void ICACHE_FLASH_ATTR hw_timer_disarm(void)
 {
     RTC_REG_WRITE(FRC1_CTRL_ADDRESS,0);
 }
 
-void hw_timer_arm(uint32 val ,bool req)
+void ICACHE_FLASH_ATTR hw_timer_arm(uint32 val ,bool req)
 {
     frc1_auto_load = req;
     if (frc1_auto_load == true) {

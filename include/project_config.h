@@ -80,16 +80,20 @@
 
 #if PRJ_ENV == OS
 #define prj_sprintf			sprintf
+#define prj_printf			printf
 #else
-#define prj_sprintf			os_printf
+#define prj_sprintf			os_sprintf
+#define prj_printf			os_printf
 #endif
 
 #if PRJ_ENV == OS
 #define prj_memcpy			memcpy
 #define prj_memset			memset
+#define prj_strncpy			strncpy
 #else
 #define prj_memcpy			os_memcpy
 #define prj_memset			os_memset
+#define prj_strncpy			os_strncpy
 #endif
 
 #if PRJ_ENV == OS

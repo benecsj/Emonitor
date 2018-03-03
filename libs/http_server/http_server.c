@@ -29,7 +29,7 @@ HttpdBuiltInUrl builtInUrls[]={
 	{NULL, NULL, NULL}
 };
 
-void Http_Server_Init(void)
+void ICACHE_FLASH_ATTR Http_Server_Init(void)
 {
 	DBG_HTTPS("(HS) Http_Server_Init START\n");
 	httpdInit(builtInUrls, 80);

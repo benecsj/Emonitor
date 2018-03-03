@@ -39,7 +39,7 @@ void NvM_RestoreVariables(void);
 //void NvM_Clear(void);
 
 /*Functions*/
-void NVM_Init(void)
+void ICACHE_FLASH_ATTR NVM_Init(void)
 {
 	//Init variables info
 	NvM_DataBlockCount = 0;
@@ -50,7 +50,7 @@ void NVM_Init(void)
 
 }
 
-void NvM_Restore(void)
+void ICACHE_FLASH_ATTR NvM_Restore(void)
 {
 	uint8 NVM_Crc;
 	uint16 NvM_Counter;
@@ -102,22 +102,22 @@ void NvM_Restore(void)
 
 }
 
-void NvM_RequestSave(void)
+void ICACHE_FLASH_ATTR NvM_RequestSave(void)
 {
 	NvM_Request = NVM_SAVE;
 }
 
-void NvM_RequestLoad(void)
+void ICACHE_FLASH_ATTR NvM_RequestLoad(void)
 {
 	NvM_Request = NVM_LOAD;
 }
 
-void NvM_RequestClear(void)
+void ICACHE_FLASH_ATTR NvM_RequestClear(void)
 {
     NvM_Request = NVM_CLEAR;
 }
 
-void NVM_Main(void)
+void ICACHE_FLASH_ATTR NVM_Main(void)
 {
 #if(NVM_CFG_CYCLIC_SAVE == 1)
 	//Increment save counter
@@ -162,7 +162,7 @@ void NVM_Main(void)
 	}
 }
 
-void NvM_Clear(void)
+void ICACHE_FLASH_ATTR NvM_Clear(void)
 {
 	NVM_DEBUG("(NVM)<<< Clear >>>\n");
 	//Clear buffer
@@ -172,7 +172,7 @@ void NvM_Clear(void)
 	system_param_save_with_protect(EMONITOR_PARAM_START_SEC, (void*)&NVM_FrameBuffer, sizeof(NVM_FrameBuffer));
 }
 
-void NvM_Store(void)
+void ICACHE_FLASH_ATTR NvM_Store(void)
 {
 	MD5_CTX mdContext;
 	uint8 NvM_Counter = 0;
@@ -191,7 +191,7 @@ void NvM_Store(void)
 }
 
 
-void NvM_RestoreVariables(void)
+void ICACHE_FLASH_ATTR NvM_RestoreVariables(void)
 {
 	uint16 NvM_Counter;
 	uint16 NvM_ReadPosition = NVM_DATA_POS_DATA_START;
@@ -208,7 +208,7 @@ void NvM_RestoreVariables(void)
 	NVM_DEBUG("(NVM) Restore done\n");
 }
 
-void NvM_StoreVariables(void)
+void ICACHE_FLASH_ATTR NvM_StoreVariables(void)
 {
 	uint16 NvM_Counter;
 	uint16 NvM_WritePosition = NVM_DATA_POS_DATA_START;
@@ -226,7 +226,7 @@ void NvM_StoreVariables(void)
 }
 
 
-void NvM_MemCopy(uint8* destination, uint8* source, uint16 length)
+void ICACHE_FLASH_ATTR NvM_MemCopy(uint8* destination, uint8* source, uint16 length)
 {
 	uint16 NvM_Counter;
 	//Copy all bytes
@@ -237,7 +237,7 @@ void NvM_MemCopy(uint8* destination, uint8* source, uint16 length)
 	}
 }
 
-void NvM_MemZero(uint8* destination, uint16 length)
+void ICACHE_FLASH_ATTR NvM_MemZero(uint8* destination, uint16 length)
 {
 	uint16 NvM_Counter;
 	//Clear all bytes

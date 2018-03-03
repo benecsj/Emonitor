@@ -42,7 +42,7 @@ uint32 MHZ14_Window[MHZ14_WINDOW_SIZE][2]={0};
 
 uint32 MHZ14_writeIndex = MHZ14_WINDOW_SIZE;
 
-void MHZ14_Init(void)
+void ICACHE_FLASH_ATTR MHZ14_Init(void)
 {
 	MHZ14_managedValue = MHZ14_INVALID_VALUE;
 	MHZ14_signalState = MHZ14_STATE_UNINITALIZED;
@@ -52,7 +52,7 @@ void MHZ14_Init(void)
 }
 
 
-void MHZ14_Main(void)
+void ICACHE_FLASH_ATTR MHZ14_Main(void)
 {
 	uint32 i;
 	uint32 low[2] ={5000,0};
@@ -130,7 +130,7 @@ void MHZ14_Main(void)
 }
 
 
-void MHZ14_Feed(uint8 level)
+void ICACHE_FLASH_ATTR MHZ14_Feed(uint8 level)
 {
 	//Detect rising edge event
 	if((MHZ14_signalState == MHZ14_STATE_LOW_SIG) && (level == 1))
@@ -166,7 +166,7 @@ void MHZ14_Feed(uint8 level)
 	MHZ14_signalState = level;
 }
 
-uint32 MHZ14_GetMeasurement(void)
+uint32 ICACHE_FLASH_ATTR MHZ14_GetMeasurement(void)
 {
 	uint32 value;
 	MHZ14_ENTER_CRITICAL();

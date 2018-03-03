@@ -51,27 +51,27 @@ static const uint32 g_pin_funcs[PINCOUNT] = {
 };
 
 
-uint32 digitalPinToPort(uint32 pin)
+uint32 ICACHE_FLASH_ATTR digitalPinToPort(uint32 pin)
 {
     return 0;
 }
 
-uint32 digitalPinToBitMask(uint32 pin)
+uint32 ICACHE_FLASH_ATTR digitalPinToBitMask(uint32 pin)
 {
     return 1 << pin;
 }
 
-volatile uint32* portOutputRegister(uint32 port)
+volatile uint32* ICACHE_FLASH_ATTR portOutputRegister(uint32 port)
 {
     return (volatile uint32*) (PERIPHS_GPIO_BASEADDR + GPIO_OUT_ADDRESS);
 }
 
-volatile uint32* portInputRegister(uint32 port)
+volatile uint32* ICACHE_FLASH_ATTR portInputRegister(uint32 port)
 {
     return (volatile uint32*) (PERIPHS_GPIO_BASEADDR + GPIO_IN_ADDRESS);
 }
 
-volatile uint32* portModeRegister(uint32 port)
+volatile uint32* ICACHE_FLASH_ATTR portModeRegister(uint32 port)
 {
     return (volatile uint32*) (PERIPHS_GPIO_BASEADDR + GPIO_ENABLE_ADDRESS);
 }
@@ -82,7 +82,7 @@ static uint32 g_gpio_function[PINCOUNT] = {
     GPIO
 };
 
-extern void pinMode(uint8 pin, uint8 mode)
+extern void ICACHE_FLASH_ATTR pinMode(uint8 pin, uint8 mode)
 {
     if (pin == 16)
     {
@@ -124,7 +124,7 @@ extern void pinMode(uint8 pin, uint8 mode)
     }
 }
 
-extern void digitalWrite(uint8 pin, uint8 val)
+extern void ICACHE_FLASH_ATTR digitalWrite(uint8 pin, uint8 val)
 {
     if (pin == 16) 
     {
@@ -139,7 +139,7 @@ extern void digitalWrite(uint8 pin, uint8 val)
       GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, mask);
 }
 
-extern int digitalRead(uint8 pin)
+extern int ICACHE_FLASH_ATTR digitalRead(uint8 pin)
 {
     if (pin == 16)
         return (READ_PERI_REG(RTC_GPIO_IN_DATA) & 1);
@@ -147,14 +147,14 @@ extern int digitalRead(uint8 pin)
         return ((gpio_input_get() >> pin) & 1);
 }
 
-extern void analogWrite(uint8 pin, int val)
+extern void ICACHE_FLASH_ATTR analogWrite(uint8 pin, int val)
 {
 }
 
 
 static voidFuncPtr g_handlers[PINCOUNT] = { 0 };
 
-void interrupt_handler(void *arg)
+void ICACHE_FLASH_ATTR interrupt_handler(void *arg)
 {
 	int pin;
     uint32 intr_mask = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
@@ -171,7 +171,7 @@ void interrupt_handler(void *arg)
     }
 }
 
-extern void attachInterrupt(uint8 pin, voidFuncPtr handler, int mode)
+extern void ICACHE_FLASH_ATTR attachInterrupt(uint8 pin, voidFuncPtr handler, int mode)
 {
     if (pin < 0 || pin > PINCOUNT)
         return;
@@ -196,13 +196,13 @@ extern void attachInterrupt(uint8 pin, voidFuncPtr handler, int mode)
     }
 }
 
-extern void detachInterrupt(uint8 pin)
+extern void ICACHE_FLASH_ATTR detachInterrupt(uint8 pin)
 {
     g_handlers[pin] = 0;
     pins_intr_state_set(pin, GPIO_PIN_INTR_DISABLE);
 }
 
-void Init_Pins(void)
+void ICACHE_FLASH_ATTR Init_Pins(void)
 {
 	pins_intr_handler_register(&interrupt_handler, NULL);
 #if PRJ_ENV == OS
@@ -212,7 +212,7 @@ void Init_Pins(void)
 #endif
 }
 
-void pins_pwm_init(uint32 pin_number,uint32 period, uint32 duty)
+void ICACHE_FLASH_ATTR pins_pwm_init(uint32 pin_number,uint32 period, uint32 duty)
 {
 	uint32 pwm_info[1][3] = {   {0,0,0}   };
 	u32 pwm_duty[1];
@@ -222,11 +222,11 @@ void pins_pwm_init(uint32 pin_number,uint32 period, uint32 duty)
 	pwm_info[0][1] = 3;
 	pwm_info[0][2] = pin_number;
 
-	pwm_init(period, pwm_duty, 1, pwm_info);
-	pwm_start();
+	//pwm_init(period, pwm_duty, 1, pwm_info);
+	//pwm_start();
 }
 
-void pins_intr_state_set(uint32 i, GPIO_INT_TYPE intr_state)
+void ICACHE_FLASH_ATTR pins_intr_state_set(uint32 i, GPIO_INT_TYPE intr_state)
 {
     uint32 pin_reg;
 
@@ -240,7 +240,7 @@ void pins_intr_state_set(uint32 i, GPIO_INT_TYPE intr_state)
     prj_EXIT_CRITICAL();
 }
 
-void pins_intr_handler_register(void *fn, void *arg)
+void ICACHE_FLASH_ATTR pins_intr_handler_register(void *fn, void *arg)
 {
 #if PRJ_ENV == OS
     _xt_isr_attach(ETS_GPIO_INUM, fn, arg);

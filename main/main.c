@@ -103,7 +103,7 @@ void task_1ms(void);
  * Parameters   : none
  * Returns      : rf cal sector
  *******************************************************************************/
-uint32 user_rf_cal_sector_set(void) {
+uint32 ICACHE_FLASH_ATTR user_rf_cal_sector_set(void) {
 	prj_flash_size_map size_map = system_get_flash_size_map();
 	uint32 rf_cal_sec = 0;
 
@@ -148,7 +148,7 @@ uint32 counter;
 /*
  * Init task
  */
-void task_InitA(void)
+void ICACHE_FLASH_ATTR task_InitA(void)
 {
 	//--------------------------------
 	//Init pins handler
@@ -171,7 +171,7 @@ void task_InitA(void)
 	httpclient_Init();
 	//--------------------------------
 }
-void task_InitB(void)
+void ICACHE_FLASH_ATTR task_InitB(void)
 {
 	prj_TaskHandle t;
 	//--------------------------------
@@ -204,7 +204,7 @@ TASK(task_Init){
 /*
  * Very fast task
  */
-void task_1ms(void){
+void ICACHE_FLASH_ATTR task_1ms(void){
 	//------------------
 	Emonitor_Main_1ms();
 	Sensor_Manager_VeryFast();
@@ -346,7 +346,7 @@ static void ICACHE_FLASH_ATTR task_timing(os_event_t *events) {
     system_os_post(0, 0, 0 );
 }
 
-void testCallback(void)
+void ICACHE_FLASH_ATTR testCallback(void)
 {
 	testCounter++;
 }
@@ -359,7 +359,7 @@ void testCallback(void)
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
-void user_init(void) {
+void ICACHE_FLASH_ATTR user_init(void) {
 	//Local variables
 	struct rst_info* resetInfo;
 	prj_TaskHandle t;
@@ -392,7 +392,6 @@ void user_init(void) {
     hw_timer_init(NMI_SOURCE,1);
     hw_timer_set_func(testCallback);
     hw_timer_arm(1000,1);
-
 #endif
 
 

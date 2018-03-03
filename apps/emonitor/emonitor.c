@@ -86,7 +86,7 @@ extern uint32 Emonitor_GetBackgroundRuntime(void);
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
-void Emonitor_Preinit(void) {
+void ICACHE_FLASH_ATTR Emonitor_Preinit(void) {
 
 	//Init UART
 	UART_SetBaudrate(UART0, BIT_RATE_115200);
@@ -96,12 +96,12 @@ void Emonitor_Preinit(void) {
     init_esp_wifi();
 }
 
-void Emonitor_EnableStatusLed(void) {
+void ICACHE_FLASH_ATTR Emonitor_EnableStatusLed(void) {
 	pinMode(LED_BUILTIN,OUTPUT);
 	digitalWrite(LED_BUILTIN,1);
 }
 
-void Emonitor_Init(void){
+void ICACHE_FLASH_ATTR Emonitor_Init(void){
 	PRINT_EMON("(EM) Emonitor_Init\n");
     //Check if has valid url and key
 	uint8 urlLength = strlen(Emonitor_url);
@@ -126,14 +126,14 @@ void Emonitor_Init(void){
 	Emonitor_sendTimer = Emonitor_RestoreTiming();
 }
 
-void Emonitor_StartTimer(void){
+void ICACHE_FLASH_ATTR Emonitor_StartTimer(void){
 	//Init timer for fast task
     hw_timer_init(FRC1_SOURCE,TRUE);
     hw_timer_set_func(task_1ms);
     hw_timer_arm(1000,1);
 }
 
-void Emonitor_StoreTiming(uint32_t timingValue){
+void ICACHE_FLASH_ATTR Emonitor_StoreTiming(uint32_t timingValue){
 	  uint8 buffer[4];
 	  buffer[0] = (timingValue>>24) & 0xF;
 	  buffer[1] = (timingValue>>16) & 0xF;
@@ -142,7 +142,7 @@ void Emonitor_StoreTiming(uint32_t timingValue){
 	  system_rtc_mem_write(64, buffer, 4);
 }
 
-uint32_t Emonitor_RestoreTiming(void){
+uint32_t ICACHE_FLASH_ATTR Emonitor_RestoreTiming(void){
 	  uint8 buffer[4];
 	  uint32_t timingValue = 0;
 	  system_rtc_mem_read(64, buffer, 4);
@@ -165,7 +165,7 @@ uint32_t Emonitor_RestoreTiming(void){
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
-void Emonitor_Main_1ms(void) {
+void ICACHE_FLASH_ATTR Emonitor_Main_1ms(void) {
 	uint8 ledValue;
 
 #if (EMONITOR_TIMING_TEST == 0)
@@ -229,7 +229,7 @@ void Emonitor_Main_1ms(void) {
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
-void Emonitor_Main_1000ms(void) {
+void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 	uint8 i;
 	uint16 length = 0;
 	char buffer[500];
@@ -425,14 +425,14 @@ void Emonitor_Main_1000ms(void) {
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
-void Emonitor_Main_Background(void) {
+void ICACHE_FLASH_ATTR Emonitor_Main_Background(void) {
 	//Just measure background runtime
 	prj_ENTER_CRITICAL();
 	Emonitor_backgroundCounter++;
 	prj_EXIT_CRITICAL();
 }
 
-uint32 Emonitor_GetBackgroundRuntime(void)
+uint32 ICACHE_FLASH_ATTR Emonitor_GetBackgroundRuntime(void)
 {
 	//Return value
 	uint32 returnValue;
@@ -445,7 +445,7 @@ uint32 Emonitor_GetBackgroundRuntime(void)
 	return returnValue;
 }
 
-uint32_t Emonitor_GetCpuUsage(void)
+uint32_t ICACHE_FLASH_ATTR Emonitor_GetCpuUsage(void)
 {
 	uint32_t countUsage = EMONITOR_EMPTYCOUNT - Emonitor_GetBackgroundCount();
 	countUsage = ((double)countUsage/(double)EMONITOR_EMPTYCOUNT)*100;
@@ -453,7 +453,7 @@ uint32_t Emonitor_GetCpuUsage(void)
 	return countUsage;
 }
 
-uint32_t Emonitor_GetRAMUsage(void)
+uint32_t ICACHE_FLASH_ATTR Emonitor_GetRAMUsage(void)
 {
 	uint32_t usedRAM = (EMONITOR_TOTALRAM -Emonitor_GetFreeRam())/1024;
 	uint32_t freeRAM = (Emonitor_GetFreeRam())/1024;
@@ -489,7 +489,7 @@ void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, 
 	Emonitor_responseTimer = 0;
 }
 
-uint32_t Emonitor_GetDefaultId(void)
+uint32_t ICACHE_FLASH_ATTR Emonitor_GetDefaultId(void)
 {
 	char buffer[64] = {0};
 	char *numStart;

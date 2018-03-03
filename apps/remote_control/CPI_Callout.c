@@ -21,12 +21,12 @@ Defines
 Global variables and functions
  ***********************************************************************************************************************/
 
-void Cpi_Reset(uint8* params,uint8 lenght, uint8* response) {
+void ICACHE_FLASH_ATTR Cpi_Reset(uint8* params,uint8 lenght, uint8* response) {
 	//Trigger reset
 	Emonitor_Request(EMONITOR_REQ_RESTART);
 }
 
-void Cpi_NvM(uint8* params, uint8 lenght, uint8* response) {
+void ICACHE_FLASH_ATTR Cpi_NvM(uint8* params, uint8 lenght, uint8* response) {
 	char* text = "/OK/"+0;
 	uint8 selection;
 
@@ -60,7 +60,7 @@ void Cpi_NvM(uint8* params, uint8 lenght, uint8* response) {
     Cpi_SendResponseFrame(lenght, response);
 }
 
-void Cpi_Wifi(uint8* params, uint8 lenght, uint8* response) {
+void ICACHE_FLASH_ATTR Cpi_Wifi(uint8* params, uint8 lenght, uint8* response) {
 	char* text = "/OK/"+0;
 	uint8 selection;
     uint8 temp[4];
@@ -96,7 +96,7 @@ void Cpi_Wifi(uint8* params, uint8 lenght, uint8* response) {
     Cpi_SendResponseFrame(lenght, response);
 }
 
-void Cpi_Spiffs(uint8* params, uint8 lenght, uint8* response) {
+void ICACHE_FLASH_ATTR Cpi_Spiffs(uint8* params, uint8 lenght, uint8* response) {
 	char* text = "/OK/"+0;
 	uint8 selection;
 
@@ -137,7 +137,7 @@ void Cpi_Spiffs(uint8* params, uint8 lenght, uint8* response) {
 }
 
 
-void Cpi_Sensor(uint8* params,uint8 lenght, uint8* response) {
+void ICACHE_FLASH_ATTR Cpi_Sensor(uint8* params,uint8 lenght, uint8* response) {
 	char* text = "/OK/"+0;
 	uint8 selection;
 

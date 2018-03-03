@@ -63,7 +63,7 @@ extern void Cpi_UnsupportedFunctionResponse(uint8* params,uint8 lenght, uint8* r
 @return        None.
 
 ****************************************************************************************************/
-void Cpi_Init(void)
+void ICACHE_FLASH_ATTR Cpi_Init(void)
 {
   uint8 Cpi_nCounterldu8;
   for (Cpi_nCounterldu8=0;Cpi_nCounterldu8<CPI_RX_MAX_FRAME_SIZE;Cpi_nCounterldu8++)
@@ -91,7 +91,7 @@ void Cpi_Init(void)
 
 ****************************************************************************************************/
  uint8 testval =3;
-void Cpi_Main(void)
+void ICACHE_FLASH_ATTR Cpi_Main(void)
 {
   //Only in processing state do the callout
   if(Cpi_Status == CPI_PROCESS)
@@ -268,7 +268,7 @@ void Cpi_Main(void)
 }
 
 
-void Cpi_RxHandler(void)
+void ICACHE_FLASH_ATTR Cpi_RxHandler(void)
 {
     uint8 Cpi_yCount_ldu8;
     uint8 Cpi_yReceiveSize = 0;
@@ -289,19 +289,19 @@ void Cpi_RxHandler(void)
     
 }
 
-void Cpi_ProcessParamArray(void)
+void ICACHE_FLASH_ATTR Cpi_ProcessParamArray(void)
 {
     Cpi_MemCopy(&Cpi_yRxParamBuffer_mau8[Cpi_yRxParamPos_mdu8],&Cpi_yRxBuffer_mau8[Cpi_yRxBufferReadPos_mdu8-Cpi_yExceptedByteArrayLenght+1],Cpi_yExceptedByteArrayLenght);
 	Cpi_yRxParamPos_mdu8 += Cpi_yExceptedByteArrayLenght;
 }
 
-void Cpi_ProcessString(void)
+void ICACHE_FLASH_ATTR Cpi_ProcessString(void)
 {
     Cpi_MemCopy(&Cpi_yRxParamBuffer_mau8[Cpi_yRxParamPos_mdu8],&Cpi_yRxBuffer_mau8[Cpi_yRxBufferReadPos_mdu8-Cpi_yRxParamRecRawSize_mdu8+1],Cpi_yRxParamRecRawSize_mdu8-1);
 	Cpi_yRxParamPos_mdu8 += (Cpi_yRxParamRecRawSize_mdu8-1);
 }
 
-void Cpi_ProcessDecimalValue(void)
+void ICACHE_FLASH_ATTR Cpi_ProcessDecimalValue(void)
 {
         uint8 Cpi_DataTemp1;
         uint16 Cpi_DataTemp2;
@@ -356,7 +356,7 @@ void Cpi_ProcessDecimalValue(void)
 
 }
 
-void Cpi_TxHandler(void)
+void ICACHE_FLASH_ATTR Cpi_TxHandler(void)
 {
 #if (CPI_OPERATION_MODE == CPI_MODE_INTERRUPT)
   if (    Cpi_Status == CPI_SENDRESPONE)
@@ -385,7 +385,7 @@ void Cpi_TxHandler(void)
 #endif
 }
 
-uint8 Cpi_SendRaw(uint8 length, uint8* buffer)
+uint8 ICACHE_FLASH_ATTR Cpi_SendRaw(uint8 length, uint8* buffer)
 {
         Cpi_Status = CPI_SENDRESPONE;
           
@@ -402,7 +402,7 @@ uint8 Cpi_SendRaw(uint8 length, uint8* buffer)
 	return 0;
 }
 
-uint8 Cpi_SendFrame(uint8 length, uint8* buffer)
+uint8 ICACHE_FLASH_ATTR Cpi_SendFrame(uint8 length, uint8* buffer)
 {
         Cpi_Status = CPI_SENDRESPONE;
   
@@ -427,7 +427,7 @@ uint8 Cpi_SendFrame(uint8 length, uint8* buffer)
 	return 0;
 }
 
-uint8 Cpi_SendResponseFrame(uint8 length,uint8* buffer)
+uint8 ICACHE_FLASH_ATTR Cpi_SendResponseFrame(uint8 length,uint8* buffer)
 {
   uint8 Cpi_temp;
         
@@ -459,7 +459,7 @@ uint8 Cpi_SendResponseFrame(uint8 length,uint8* buffer)
 	return 0;
 }
 
-uint8 Cpi_IsEqual( uint8 * data1, uint8 * data2, uint8 lenght )
+uint8 ICACHE_FLASH_ATTR Cpi_IsEqual( uint8 * data1, uint8 * data2, uint8 lenght )
 {
 while ( lenght -- )
 {
@@ -471,7 +471,7 @@ return FAIL;
 return OK;
 }
 
-void Cpi_MemCopy(void* dest, const void* src, uint8 count)
+void ICACHE_FLASH_ATTR Cpi_MemCopy(void* dest, const void* src, uint8 count)
 {
         char* dst8 = (char*)dest;
         char* src8 = (char*)src;
@@ -482,7 +482,7 @@ void Cpi_MemCopy(void* dest, const void* src, uint8 count)
 }
 
 
-uint8 Cpi_TransmitFrame(uint8* command,uint8 length,uint8* buffer)
+uint8 ICACHE_FLASH_ATTR Cpi_TransmitFrame(uint8* command,uint8 length,uint8* buffer)
 {
   uint8 Cpi_temp;
         
@@ -511,7 +511,7 @@ uint8 Cpi_TransmitFrame(uint8* command,uint8 length,uint8* buffer)
 	return 0;
 }
 
-void Cpi_UnsupportedFunctionResponse(uint8* params,uint8 lenght, uint8* response)
+void ICACHE_FLASH_ATTR Cpi_UnsupportedFunctionResponse(uint8* params,uint8 lenght, uint8* response)
 {
   //Send response
   uint8* Cpi_TextPointer = "/NOT SUPPORTED/";
