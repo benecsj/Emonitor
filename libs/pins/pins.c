@@ -203,7 +203,11 @@ extern void detachInterrupt(uint8 pin)
 void Init_Pins(void)
 {
 	pins_intr_handler_register(&interrupt_handler, NULL);
+#if PRJ_ENV == OS
 	_xt_isr_unmask(1<<ETS_GPIO_INUM);
+#else
+	 ETS_GPIO_INTR_ENABLE();
+#endif
 }
 
 void pins_pwm_init(uint32 pin_number,uint32 period, uint32 duty)
@@ -236,5 +240,9 @@ void pins_intr_state_set(uint32 i, GPIO_INT_TYPE intr_state)
 
 void pins_intr_handler_register(void *fn, void *arg)
 {
+#if PRJ_ENV == OS
     _xt_isr_attach(ETS_GPIO_INUM, fn, arg);
+#else
+    gpio_intr_handler_register(fn,arg);
+#endif
 }

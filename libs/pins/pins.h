@@ -1,6 +1,7 @@
 #ifndef PINS_H_
 #define PINS_H_
 
+#include "project_config.h"
 #include "c_types.h"
 #include "stdint.h"
 
@@ -33,7 +34,7 @@
 /******************************************************************************
 * Typedefs
 \******************************************************************************/
-
+#if PRJ_ENV == OS
 typedef enum {
     GPIO_PIN_INTR_DISABLE = 0,      /**< disable GPIO interrupt */
     GPIO_PIN_INTR_POSEDGE = 1,      /**< GPIO interrupt type : rising edge */
@@ -42,7 +43,7 @@ typedef enum {
     GPIO_PIN_INTR_LOLEVEL = 4,      /**< GPIO interrupt type : low level */
     GPIO_PIN_INTR_HILEVEL = 5       /**< GPIO interrupt type : high level */
 } GPIO_INT_TYPE;
-
+#endif
 typedef void (*voidFuncPtr)(void);
 
 /******************************************************************************

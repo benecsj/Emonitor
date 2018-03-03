@@ -16,18 +16,22 @@
 #include "user_interface.h"
 #endif
 
-#if PRJ_ENV == OS
 //Libs
+#include "pins.h"
+#include "uart.h"
+#if PRJ_ENV == OS
 #include "Wifi_Manager.h"
 #include "wifi_state_machine.h"
 #include "NVM_NonVolatileMemory.h"
 #include "spiffs_manager.h"
-#include "pins.h"
+
 #include "httpclient.h"
 #include "http_server.h"
 #include "esp_libc.h"
+#endif
 
 //Apps
+#if PRJ_ENV == OS
 #include "Emonitor.h"
 #include "remote_control.h"
 #include "Sensor_Manager.h"
@@ -50,7 +54,6 @@ void Emonitor_IncUptime(void){};
 bool Wifi_Manager_IsConnected(void){return 0;};
 void Emonitor_Preinit(void){};
 void Emonitor_SetResetReason(uint8 a){};
-void Init_Pins(void){};
 void Emonitor_StartTimer(void){};
 void NVM_Init(void){};
 void spiffs_init(void){};
@@ -64,6 +67,13 @@ void Emonitor_EnableStatusLed(void){};
 void Remote_Control_Main(void){};
 #endif
 
+/******************************************************************************
+* Declarations
+\******************************************************************************/
+void task_1000ms(void *pvParameters);
+void task_10ms(void *pvParameters);
+void task_background(void *pvParameters);
+void task_1ms(void);
 /******************************************************************************
  * FunctionName : user_rf_cal_sector_set
  * Description  : SDK just reversed 4 sectors, used for rf init data and paramters.
@@ -122,7 +132,7 @@ uint32 counter;
  * Init task
  */
 void task_Init(void *pvParameters) {
-	DELAY_MS(10);
+	prj_TaskHandle t;
 	//--------------------------------
 	//Init pins handler
 	Init_Pins();
@@ -143,7 +153,7 @@ void task_Init(void *pvParameters) {
 	//Http client init
 	httpclient_Init();
 	//--------------------------------
-	//Delay Http server init
+	//Delay init
 	DELAY_MS(5000);
 	//--------------------------------
 	//Http server init
@@ -152,6 +162,11 @@ void task_Init(void *pvParameters) {
 	Emonitor_EnableStatusLed();
 	//Finished
 	DBG("Init finished!!!\n-------------------------\n");
+	//--------------------------------
+	//Start cyclic tasks
+	prj_createTask(task_1000ms, "1000ms", 1024, NULL, 1, &t);
+	prj_createTask(task_10ms, "10ms", 512, NULL, (configMAX_PRIORITIES-2), &t);
+	prj_createTask(task_background, "bgnd", 512, NULL, 0, &t);
 	//Exit from the task
 	prj_TaskDelete( NULL );
 }
@@ -171,7 +186,6 @@ void task_1ms(void){
  */
 void task_10ms(void *pvParameters) {
 	uint32 sysTimeMS;
-	DELAY_MS(1000);
 	for (;;) {
 		//------------------
 		Sensor_Manager_Fast();
@@ -186,7 +200,6 @@ void task_10ms(void *pvParameters) {
  */
 void task_1000ms(void *pvParameters) {
 	uint32 sysTimeMS;
-	DELAY_MS(4000);
 	for (;;) {
 		//------------------
 		Emonitor_Main_1000ms();
@@ -211,7 +224,6 @@ void task_1000ms(void *pvParameters) {
  * Background task
  */
 void task_background(void *pvParameters) {
-	DELAY_MS(100);
 	for (;;) {
 		Emonitor_Main_Background();
 	}
@@ -228,6 +240,17 @@ void user_init(void) {
 	struct rst_info* resetInfo;
 	prj_TaskHandle t;
 
+#if PRJ_ENV == NOS
+	//Init UART
+	UART_SetBaudrate(UART0, BIT_RATE_115200);
+	//Init flash button
+	pinMode(FLASH_BUTTON,INPUT);
+
+	pinMode(LED_BUILTIN,OUTPUT);
+	digitalWrite(LED_BUILTIN,0);
+#endif
+
+
 	//Pre Init main application
 	Emonitor_Preinit();
 
@@ -243,11 +266,8 @@ void user_init(void) {
 	if(REASON_EXT_SYS_RST != resetInfo->reason)	{return;}
 
 	//Start freeRTOS tasks
-	DBG("About to create task\n");
+	DBG("About to create init task\n");
 	prj_createTask(task_Init, "init", 1024, NULL, (configMAX_PRIORITIES-1), &t);
-	prj_createTask(task_1000ms, "1000ms", 1024, NULL, 1, &t);
-	prj_createTask(task_10ms, "10ms", 512, NULL, (configMAX_PRIORITIES-2), &t);
-	prj_createTask(task_background, "bgnd", 512, NULL, 0, &t);
 }
 
 #if PRJ_ENV == NOS
