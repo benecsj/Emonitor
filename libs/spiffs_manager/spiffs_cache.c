@@ -298,7 +298,7 @@ void spiffs_cache_init(spiffs *fs) {
   }
 
   spiffs_cache cache;
-  memset(&cache, 0, sizeof(spiffs_cache));
+  prj_memset(&cache, 0, sizeof(spiffs_cache));
   cache.cpage_count = cache_entries;
   cache.cpages = (u8_t *)((u8_t *)fs->cache + sizeof(spiffs_cache));
 
@@ -308,7 +308,7 @@ void spiffs_cache_init(spiffs *fs) {
 
   spiffs_cache *c = spiffs_get_cache(fs);
 
-  memset(c->cpages, 0, c->cpage_count * SPIFFS_CACHE_PAGE_SIZE(fs));
+  prj_memset(c->cpages, 0, c->cpage_count * SPIFFS_CACHE_PAGE_SIZE(fs));
 
   c->cpage_use_map &= ~(c->cpage_use_mask);
   for (i = 0; i < cache.cpage_count; i++) {

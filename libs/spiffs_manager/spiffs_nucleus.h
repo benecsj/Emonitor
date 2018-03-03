@@ -835,7 +835,7 @@ s32_t spiffs_object_index_consistency_check(
 } while (0)
 #else
 #ifndef _SPIFFS_MEMCPY
-#define _SPIFFS_MEMCPY(__d, __s, __l) do{memcpy((__d),(__s),(__l));}while(0)
+#define _SPIFFS_MEMCPY(__d, __s, __l) do{prj_memcpy((__d),(__s),(__l));}while(0)
 #endif
 #endif //_SPIFFS_TEST
 

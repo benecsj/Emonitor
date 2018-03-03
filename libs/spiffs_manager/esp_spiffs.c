@@ -40,11 +40,11 @@ static s32_t esp_spiffs_readwrite(u32_t addr, u32_t size, u8_t *p, int write)
     }
 
     if (!write) {
-        memcpy(p, tmp_buf + (addr - aligned_addr), size);
+        prj_memcpy(p, tmp_buf + (addr - aligned_addr), size);
         return SPIFFS_OK;
     }
 
-    memcpy(tmp_buf + (addr - aligned_addr), p, size);
+    prj_memcpy(tmp_buf + (addr - aligned_addr), p, size);
 
     res = spi_flash_write(aligned_addr, (u32_t *) tmp_buf, aligned_size);
 
@@ -275,7 +275,7 @@ int _fstat_r(struct _reent *r, int fd, struct stat *s)
 
     int res;
     spiffs_stat ss;
-    memset(s, 0, sizeof(*s));
+    prj_memset(s, 0, sizeof(*s));
 
     if (fd < NUM_SYS_FD) {
         s->st_ino = fd;

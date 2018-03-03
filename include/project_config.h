@@ -35,14 +35,20 @@
 #include "esp_libc.h"
 
 //common
+#include <stddef.h>
 #include "esp_common.h"
 #include "esp_system.h"
 
 //pins
 #include "esp8266/ets_sys.h"
 
+//os
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
+//wifi
+#include "espressif/c_types.h"
+#include "espressif/esp_wifi.h"
 
 #else
 
@@ -70,6 +76,20 @@
 #else
 #define prj_malloc(a)		NULL_PTR
 #define prj_free(a)			NULL_PTR
+#endif
+
+#if PRJ_ENV == OS
+#define prj_sprintf			sprintf
+#else
+#define prj_sprintf			os_printf
+#endif
+
+#if PRJ_ENV == OS
+#define prj_memcpy			memcpy
+#define prj_memset			memset
+#else
+#define prj_memcpy			os_memcpy
+#define prj_memset			os_memset
 #endif
 
 #if PRJ_ENV == OS

@@ -48,7 +48,6 @@
 #if PRJ_ENV == NOS
 void Emonitor_Main_1000ms(void){};
 void Sensor_Manager_Main(void){};
-void Wifi_Manager_Main(void){};
 void Emonitor_IncUptime(void){};
 bool Wifi_Manager_IsConnected(void){return 0;};
 void Emonitor_Preinit(void){};
@@ -56,7 +55,6 @@ void Emonitor_SetResetReason(uint8 a){};
 void Emonitor_StartTimer(void){};
 void Emonitor_Init(void){};
 void Remote_Control_Init(void){};
-void Wifi_Manager_Init(void){};
 void Sensor_Manager_Init(void){};
 void httpclient_Init(void){};
 void Http_Server_Init(void){};
@@ -66,6 +64,12 @@ void Sensor_Manager_Fast(void){};
 void Emonitor_Main_Background(void){};
 void Emonitor_Main_1ms(void){};
 void Sensor_Manager_VeryFast(void){};
+
+//void Wifi_Manager_Init(void){};
+//void Wifi_Manager_Main(void){};
+//bool ICACHE_FLASH_ATTR start_wifi_ap(const char * ssid, const char * pass, uint8 hidden){return TRUE;}
+//bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){return TRUE;}
+//bool ICACHE_FLASH_ATTR wifi_station_connected(){return TRUE;}
 
 uint8 Emonitor_ledControl;
 uint8 WifiManager_enableHotspot;

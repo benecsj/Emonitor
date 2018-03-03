@@ -1,7 +1,11 @@
-#include "esp_common.h"
-#include "user_config.h"
+#include "project_config.h"
 #include "Wifi_Manager.h"
 #include "spiffs_manager.h"
+
+#if PRJ_ENV == OS
+#else
+#include "user_interface.h"
+#endif
 
 LOCAL void ICACHE_FLASH_ATTR on_wifi_connect(){
 	DBG_WM("Connected\n");
@@ -27,6 +31,7 @@ uint8 WifiManager_ScanTiming = 0;
 
 void Wifi_Manager_Init(void)
 {
+
 	//Verify Parameters
 	uint8 textLength = 0;
 	uint8 length;
@@ -114,14 +119,14 @@ void ICACHE_FLASH_ATTR Wifi_Manager_ScanDone(void *arg, STATUS status)
 
 	    while (bss_link != NULL)
 	    {
-	      memset(ssid, 0, 33);
+	      prj_memset(ssid, 0, 33);
 	      if (strlen(bss_link->ssid) <= 32)
 	      {
-	        memcpy(ssid, bss_link->ssid, strlen(bss_link->ssid));
+	        prj_memcpy(ssid, bss_link->ssid, strlen(bss_link->ssid));
 	      }
 	      else
 	      {
-	        memcpy(ssid, bss_link->ssid, 32);
+	        prj_memcpy(ssid, bss_link->ssid, 32);
 	      }
 	      WifiManager_SignalLevel = bss_link->rssi;
 

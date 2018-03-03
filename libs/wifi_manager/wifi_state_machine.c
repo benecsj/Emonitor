@@ -22,6 +22,8 @@
  *
  */
 
+#include "Wifi_Manager.h"
+#if PRJ_ENV == OS
 #include <stddef.h>
 #include "espressif/c_types.h"
 #include "lwipopts.h"
@@ -32,7 +34,14 @@
 #include "espressif/esp_wifi.h"
 #include "espressif/esp_sta.h"
 #include "espressif/esp_softap.h"
-#include "Wifi_Manager.h"
+#else
+//#include "ets_sys.h"
+//#include "os_type.h"
+//#include "osapi.h"
+#include "mem.h"
+#include "user_interface.h"
+//#include "espconn.h"
+#endif
 
 typedef void (* wifi_state_cb_t)();
 
@@ -53,9 +62,13 @@ void ICACHE_FLASH_ATTR wifi_event_handler_cb(System_Event_t *event)
         return;
     }
 
+#if PRJ_ENV == OS
     DBG_WM("[WiFi] event %u\n", event->event_id);
-
     switch (event->event_id) {
+#else
+    DBG_WM("[WiFi] event %u\n", event->event);
+    switch (event->event) {
+#endif
         case EVENT_STAMODE_DISCONNECTED:
             wifi_station_is_connected = false;
             Event_StaMode_Disconnected_t *ev = (Event_StaMode_Disconnected_t *)&event->event_info;
@@ -171,7 +184,7 @@ bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){
     DBG_WM("(WM) SSID: [%s][%d]\n",(char*)ssid,status);
 
     struct station_config config;
-    memset(&config, 0, sizeof(struct station_config));
+    prj_memset(&config, 0, sizeof(struct station_config));
     strcpy(config.ssid, ssid);
     if(pass){
         strcpy(config.password, pass);
@@ -224,11 +237,11 @@ bool ICACHE_FLASH_ATTR start_wifi_ap(const char * ssid, const char * pass, uint8
     struct softap_config config;
     bzero(&config, sizeof(struct softap_config));
     //Set SSID
-    sprintf(config.ssid, ssid);
+    prj_sprintf(config.ssid, ssid);
     //Set PASSWORD
     if((pass != NULL) && (strlen(pass)>0))
     {
-        sprintf(config.password, pass);
+        prj_sprintf(config.password, pass);
         config.authmode = AUTH_WPA_WPA2_PSK;
     }
     else
@@ -282,7 +295,7 @@ bool ICACHE_FLASH_ATTR wifi_station_connected(){
     if((mode & STATION_MODE) == 0){
         return false;
     }
-    STATION_STATUS wifistate = wifi_station_get_connect_status();
+    uint8 wifistate = wifi_station_get_connect_status();
     wifi_station_is_connected = (wifistate == STATION_GOT_IP || (wifi_station_static_ip && wifistate == STATION_CONNECTING));
     return wifi_station_is_connected;
 }

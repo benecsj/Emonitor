@@ -25,13 +25,20 @@
 #ifndef _WIFI_STATE_MACHINE_H_
 #define _WIFI_STATE_MACHINE_H_
 
-#include <stddef.h>
-#include "espressif/c_types.h"
-#include "espressif/esp_wifi.h"
-#include "user_config.h"
+#include "project_config.h"
 
 typedef void (* wifi_state_cb_t)();
 typedef void (* wifi_disco_cb_t)(uint8_t reason);
+
+#if PRJ_ENV == NOS
+typedef enum {
+    NULL_MODE = 0,      /**< null mode */
+    STATION_MODE,       /**< WiFi station mode */
+    SOFTAP_MODE,        /**< WiFi soft-AP mode */
+    STATIONAP_MODE,     /**< WiFi station + soft-AP mode */
+    MAX_MODE
+} WIFI_MODE;
+#endif
 
 void set_on_station_first_connect(wifi_state_cb_t cb);
 void set_on_station_connect(wifi_state_cb_t cb);
