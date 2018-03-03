@@ -50,6 +50,7 @@
 uint32 Emonitor_backgroundCounter = 0;
 uint32 Emonitor_LEDCounter = 0;
 uint32 Emonitor_sendTimer = 0;
+uint32 Emonitor_responseTimer = 0;
 uint32 Emonitor_buttonCounter = 0;
 
 //statuses
@@ -262,62 +263,76 @@ void Emonitor_Main_1000ms(void) {
 		//Check if got network connection
 		if(Wifi_Manager_IsConnected())
 		{
-			//Check if strings have a valid length
-			uint8 urlLength = strlen(Emonitor_url);
-			uint8 apiKeyLength = strlen(Emonitor_key);
-			//Check if url already has http:// text if not append it
-			if(strncmp(Emonitor_url,"http://",7) != 0)
+			//Increment response timer
+			Emonitor_responseTimer++;
+			//Check if not waiting for a repsonse
+			if(Emonitor_responseTimer == 1)
 			{
-				APPEND("http://");
-			}
-			//Check url and user key
-			if ((urlLength > URL_MIN_LENGTH) && (apiKeyLength == API_KEY_LENGTH))
-			{
-				DBG_EMON("----------------Emonitor Send Data-------------\n");
-				Sensor_Manager_Get_TempSensorData(&tempCount,&ids,&temperatures);
-				//Start of Emoncsm send Url
-				APPEND("%s/input/post.json?node=%d",Emonitor_url,Emonitor_nodeId);
-				//\\\\\\\\\\\\\\\\\\
-				//Start Json frame
-				APPEND(JSON_START);
-				//\\\\\\\\\\\\\\\\\\\\\\\\\\\
-				//Add ip (only single time per connection)
-				if (Emonitor_connectionStatus == EMONITOR_NOT_CONNECTED) {
-					APPEND("ip" 				JSON_DIV 	"%d" 		JSON_NEXT	,ip[3]);}
-				//Add freeram
-					APPEND("freeram" 			JSON_DIV 	"%d"		JSON_NEXT	,Emonitor_freeRam);
-				//Add pulse counters
-				for(i = 0 ; i < SENSOR_MANAGER_PULSE_COUNTERS ; i++ ){
-					APPEND("Pulse_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetPulseCount(i));}
-				//Add temperatures
-				for(i = 0 ; i < tempCount ; i++ ){
-					temperature = temperatures[i];
-					if(Sensor_Manager_IsTempValid(temperature)) {
-						sign = (temperature<0 ? '-':'+');
-						APPEND("Temp_" PRINT_TEMPID JSON_DIV 	PRINT_TEMP 	JSON_NEXT	,READ_ID, READ_TEMP);
-					}
+				//Check if strings have a valid length
+				uint8 urlLength = strlen(Emonitor_url);
+				uint8 apiKeyLength = strlen(Emonitor_key);
+				//Check if url already has http:// text if not append it
+				if(strncmp(Emonitor_url,"http://",7) != 0)
+				{
+					APPEND("http://");
 				}
-				//Add analog reads
-				for(i = 0 ; i < SENSOR_MANAGER_ANALOGCHANNELS_COUNT ; i++ ){
-					APPEND("Analog_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetAnalogValue());}
-				//MHZ14 CO2 Sensor
-				if(Sensor_Manager_HasCO2Sensor()){
-					APPEND("Meter_C02" 			JSON_DIV 	"%d" 		JSON_NEXT	,Sensor_Manager_GetCO2());}
-				//Add Uptime
-					APPEND("uptime" 			JSON_DIV 	"%d"		/*LAST*/	,Emonitor_uptime);
-				//\\\\\\\\\\\\\\\\\\\\\\\\\\\
-				//Finish Json frame
-				APPEND(JSON_END);
-				//\\\\\\\\\\\\\\\
-				//End request with apikey
-				APPEND("&apikey=%s",Emonitor_key);
+				//Check url and user key
+				if ((urlLength > URL_MIN_LENGTH) && (apiKeyLength == API_KEY_LENGTH))
+				{
+					DBG_EMON("----------------Emonitor Send Data-------------\n");
+					Sensor_Manager_Get_TempSensorData(&tempCount,&ids,&temperatures);
+					//Start of Emoncsm send Url
+					APPEND("%s/input/post.json?node=%d",Emonitor_url,Emonitor_nodeId);
+					//\\\\\\\\\\\\\\\\\\
+					//Start Json frame
+					APPEND(JSON_START);
+					//\\\\\\\\\\\\\\\\\\\\\\\\\\\
+					//Add ip (only single time per connection)
+					if (Emonitor_connectionStatus == EMONITOR_NOT_CONNECTED) {
+						APPEND("ip" 				JSON_DIV 	"%d" 		JSON_NEXT	,ip[3]);}
+					//Add freeram
+						APPEND("freeram" 			JSON_DIV 	"%d"		JSON_NEXT	,Emonitor_freeRam);
+					//Add pulse counters
+					for(i = 0 ; i < SENSOR_MANAGER_PULSE_COUNTERS ; i++ ){
+						APPEND("Pulse_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetPulseCount(i));}
+					//Add temperatures
+					for(i = 0 ; i < tempCount ; i++ ){
+						temperature = temperatures[i];
+						if(Sensor_Manager_IsTempValid(temperature)) {
+							sign = (temperature<0 ? '-':'+');
+							APPEND("Temp_" PRINT_TEMPID JSON_DIV 	PRINT_TEMP 	JSON_NEXT	,READ_ID, READ_TEMP);
+						}
+					}
+					//Add analog reads
+					for(i = 0 ; i < SENSOR_MANAGER_ANALOGCHANNELS_COUNT ; i++ ){
+						APPEND("Analog_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetAnalogValue());}
+					//MHZ14 CO2 Sensor
+					if(Sensor_Manager_HasCO2Sensor()){
+						APPEND("Meter_C02" 			JSON_DIV 	"%d" 		JSON_NEXT	,Sensor_Manager_GetCO2());}
+					//Add Uptime
+						APPEND("uptime" 			JSON_DIV 	"%d"		/*LAST*/	,Emonitor_uptime);
+					//\\\\\\\\\\\\\\\\\\\\\\\\\\\
+					//Finish Json frame
+					APPEND(JSON_END);
+					//\\\\\\\\\\\\\\\
+					//End request with apikey
+					APPEND("&apikey=%s",Emonitor_key);
 
-				//Send out Emoncsm Data
-				http_get(buffer, "", Emonitor_callback);
+					//Send out Emoncsm Data
+					http_get(buffer, "", Emonitor_callback);
+				}
+				else  //Invalid user parameters
+				{
+					DBG_EMON("(EM) Not valid userkey / server values found [%d][%d]\n",urlLength,apiKeyLength);
+				}
 			}
-			else  //Invalid user parameters
+			else // Waiting for http response
 			{
-				DBG_EMON("(EM) Not valid userkey / server values found [%d][%d]\n",urlLength,apiKeyLength);
+				//Check if not timed out
+				if(Emonitor_responseTimer> RESPONSE_TIME_OUT)
+				{
+					Emonitor_responseTimer = 0;
+				}
 			}
 		}
 		else	//No wifi connection therefore so no user connection possible
@@ -470,6 +485,8 @@ void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, 
 	{
 		Emonitor_connectionStatus = EMONITOR_NOT_CONNECTED;
 	}
+	//Clear response timer
+	Emonitor_responseTimer = 0;
 }
 
 uint32_t Emonitor_GetDefaultId(void)

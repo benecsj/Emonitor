@@ -79,6 +79,7 @@
 #define SHORT_PRESS_MIN			100
 #define LONG_PRESS_MIN			8000
 #define CPU_USAGE_AVERAGE		8
+#define RESPONSE_TIME_OUT		10
 
 //Sensor manager
 #define OWP_CHANNELS_COUNT 		2
@@ -98,7 +99,7 @@
 //Development flags
 #define EMONITOR_TIMING_TEST    (OFF)
 #define DEBUG_SENSOR_MANAGER 	(OFF)
-#define DEBUG_EMONITOR 			(OFF)
+#define DEBUG_EMONITOR 			(ON)
 #define DEBUG_HTTP_CLIENT 		(OFF)
 #define DEBUG_HTTP_SERVER 		(ON)
 #define DEBUG_WIFI_MANAGER		(OFF)
