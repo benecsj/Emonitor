@@ -34,8 +34,22 @@
 #include "c_types.h"
 #include "esp_libc.h"
 
+//common
+#include "esp_common.h"
+
+//pins
+#include "esp8266/ets_sys.h"
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
+#else
+
+//common
+#include "eagle_soc.h"
+
+//pins
+#include "ets_sys.h"
 
 #endif
 /******************************************************************************
