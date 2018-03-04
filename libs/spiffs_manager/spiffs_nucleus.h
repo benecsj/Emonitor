@@ -828,10 +828,10 @@ s32_t spiffs_object_index_consistency_check(
     intptr_t __b1 = (intptr_t)((u8_t*)(__d)); \
     intptr_t __b2 = (intptr_t)((u8_t*)(__d)+(__l)); \
     if (__a1 <= __b2 && __b1 <= __a2) { \
-      printf("FATAL OVERLAP: memcpy from %lx..%lx to %lx..%lx\n", __a1, __a2, __b1, __b2); \
+      printf("FATAL OVERLAP: prj_memcpy from %lx..%lx to %lx..%lx\n", __a1, __a2, __b1, __b2); \
       ERREXIT(); \
     } \
-    memcpy((__d),(__s),(__l)); \
+    prj_memcpy((__d),(__s),(__l)); \
 } while (0)
 #else
 #ifndef _SPIFFS_MEMCPY
