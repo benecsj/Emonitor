@@ -3,15 +3,14 @@ Includes
  ***********************************************************************************************************************/
 #include "CPI_Command_Processer.h"
 
-#include "esp_common.h"
-#include "user_config.h"
+#include "project_config.h"
 
 #include "NVM_NonVolatileMemory.h"
 #include "spiffs_manager.h"
 #include "Wifi_Manager.h"
 #include "Sensor_Manager.h"
 #include "Emonitor.h"
-
+#include "uart.h"
 /***********************************************************************************************************************
 Defines
  ***********************************************************************************************************************/
@@ -20,6 +19,35 @@ Defines
 /***********************************************************************************************************************
 Global variables and functions
  ***********************************************************************************************************************/
+
+void ICACHE_FLASH_ATTR Cpi_Uart(uint8* params,uint8 lenght, uint8* response) {
+	char* text = "/OK/"+0;
+	uint8 selection;
+
+    // Process parameters
+	selection = params[0];
+
+    //Do stuff
+	switch(selection)
+	{
+	case 'e':
+		UART_SetPrintPort(UART0);
+		text="/UART_Enabled/";
+		break;
+
+	case 'd':
+		UART_SetPrintPort(UART_OFF);
+		text="/UART_Disabled/";
+		break;
+
+	default:
+		text="/NOT_OK/"+0;
+	}
+
+    //Generate response
+    lenght = sprintf((char*) response, text);
+    Cpi_SendResponseFrame(lenght, response);
+}
 
 void ICACHE_FLASH_ATTR Cpi_Reset(uint8* params,uint8 lenght, uint8* response) {
 	//Trigger reset
@@ -122,11 +150,6 @@ void ICACHE_FLASH_ATTR Cpi_Spiffs(uint8* params, uint8 lenght, uint8* response) 
 		spiffs_test_read();
 		text="/spiffs_test_read/";
 		break;
-	case 'w':
-		spiffs_test_write();
-		text="/spiffs_test_write/";
-		break;
-
 	default:
 		text="/NOT_OK/"+0;
 	}

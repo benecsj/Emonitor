@@ -101,14 +101,13 @@ void ICACHE_FLASH_ATTR spiffs_test_read(void)
 {
 	char buf[128] = {0};
 	spiffs_stat status;
-	int32 result = SPIFFS_stat(fs, (char *)"/test"+0, &status);
-
+	int32 result = SPIFFS_stat(fs, (char *)"/id"+0, &status);
 	SPIFFSM_DBG("(SPIFFS) %d %d  %s %d \n",result, status.obj_id, status.name, status.size);
 
 	spiffs_file fd = SPIFFS_open(fs, "/test", SPIFFS_RDWR, 0);
 	SPIFFS_read(fs, fd, (u8_t *)buf, 128);
 	SPIFFS_close(fs, fd);
-	prj_printf("(SPIFFS) File: %s\n",buf);
+	prj_printf("(SPIFFS) File id : [%s]\n",buf);
 
 }
 

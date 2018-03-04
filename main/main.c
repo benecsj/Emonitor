@@ -41,6 +41,12 @@
 \******************************************************************************/
 #define DELAY_MS(a)  	prj_Delay(a);
 
+#if DEBUG_MAIN
+#define DBG_MAIN(...) prj_printf(__VA_ARGS__)
+#else
+#define DBG_MAIN(...)
+#endif
+
 /******************************************************************************
 * Implementations
 \******************************************************************************/
@@ -177,7 +183,7 @@ void ICACHE_FLASH_ATTR task_InitB(void)
 	//--------------------------------
 	Emonitor_EnableStatusLed();
 	//Finished
-	DBG("Init finished!!!\n-------------------------\n");
+	DBG_MAIN("Init finished!!!\n-------------------------\n");
 	//--------------------------------
 	//Start cyclic tasks
 	prj_createTask(task_1000ms, "1000ms", 1024, NULL, 1, &t);
@@ -323,7 +329,7 @@ static void ICACHE_FLASH_ATTR task_timing(os_event_t *events) {
 		if(taskTimingCounters[2] >= 1000){
 			taskTimingCounters[2] = 0;
 			task_1000ms();
-			os_printf("CALLBACK RECEIVED : %d \n" ,testCounter);
+			DBG("CALLBACK RECEIVED : %d \n" ,testCounter);
 			testCounter = 0;
 		}
 	    //call background task
@@ -363,7 +369,7 @@ void ICACHE_FLASH_ATTR user_init(void) {
 	UART_SetBaudrate(UART0, BIT_RATE_115200);
 	//Delay
 	os_delay_us(10000);
-	os_printf("\n----------------------------------------------\n");
+	DBG("\n----------------------------------------------\n");
 	//Init flash button
 	pinMode(FLASH_BUTTON,INPUT);
 
@@ -385,23 +391,24 @@ void ICACHE_FLASH_ATTR user_init(void) {
     hw_timer_arm(1000,1);
 #endif
 
-
 	//Pre Init main application
 	Emonitor_Preinit();
 
 	//Get general statuses
-	DBG("\nSDK version:%s\n", system_get_sdk_version());
+	DBG_MAIN("\nSDK version:%s\n", system_get_sdk_version());
+#if DEBUG_MAIN
 	system_print_meminfo();
+#endif
 	//Get reset cause
 	resetInfo = system_get_rst_info();
 	Emonitor_SetResetReason(resetInfo->reason);
-	DBG("Reset exccause:%d reason:%d\n",resetInfo->exccause,resetInfo->reason);
+	DBG_MAIN("Reset exccause:%d reason:%d\n",resetInfo->exccause,resetInfo->reason);
 
 	//Case on not external reset wait for reset
 	if(REASON_EXT_SYS_RST != resetInfo->reason)	{return;}
 
 	//Start freeRTOS tasks
-	DBG("About to create init task\n");
+	DBG_MAIN("About to create init task\n");
 	prj_createTask(task_Init, "init", 1024, NULL, (configMAX_PRIORITIES-1), &t);
 
 #if PRJ_ENV == NOS

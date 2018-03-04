@@ -37,6 +37,10 @@
 #define DEFAULT_API_KEY 		"97d3e42a841ea6c219582211313d5051"
 #define WIFI_SCAN_TIMING 		60
 
+//UART
+#define UART_CHANNEL			(UART0)   // UART0 | UART1 | UART_OFF
+#define UART_BAUDRATE			BIT_RATE_460800
+
 //NvM
 #define EMONITOR_PARAM_START_SEC		0x8D
 
@@ -97,7 +101,7 @@
 #define HTTPD_MAX_CONNECTIONS   			3
 
 //Development flags
-#define EMONITOR_TIMING_TEST    (ON)
+#define EMONITOR_TIMING_TEST    (OFF)
 #define DEBUG_SENSOR_MANAGER 	(OFF)
 #define DEBUG_EMONITOR 			(OFF)
 #define DEBUG_HTTP_CLIENT 		(OFF)
@@ -105,6 +109,8 @@
 #define DEBUG_WIFI_MANAGER		(OFF)
 #define DEBUG_MHZ14				(OFF)
 #define DEBUG_SPIFFS 			(OFF)
+#define DEBUG_NVM				(OFF)
+#define DEBUG_MAIN				(OFF)
 
 #endif
 

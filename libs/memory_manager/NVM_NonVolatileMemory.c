@@ -13,7 +13,12 @@
 /*Defines*/
 
 
-#define NVM_DEBUG os_printf
+// Debug output.
+#if DEBUG_NVM
+#define NVM_DEBUG(...) prj_printf(__VA_ARGS__)
+#else
+#define NVM_DEBUG(...)
+#endif
 
 #define NVM_DATA(a,b)	NvM_DataInfoList[NvM_DataBlockCount].VariablePointer=(uint8*)&a;NvM_DataInfoList[NvM_DataBlockCount].Size=b;NvM_DataBlockCount++;
 

@@ -50,6 +50,7 @@ typedef enum {
 typedef enum {
     UART0 = 0x0,
     UART1 = 0x1,
+    UART_OFF = 0x2
 } UART_Port;
 
 typedef enum {

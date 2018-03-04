@@ -96,7 +96,8 @@ extern uint32 Emonitor_GetBackgroundRuntime(void);
 void ICACHE_FLASH_ATTR Emonitor_Preinit(void) {
 
 	//Init UART
-	UART_SetBaudrate(UART0, BIT_RATE_115200);
+	UART_SetBaudrate(UART_CHANNEL,UART_BAUDRATE);
+	UART_SetPrintPort(UART_CHANNEL);
 	//Init flash button
 	pinMode(FLASH_BUTTON,INPUT);
     //Disable Wifi

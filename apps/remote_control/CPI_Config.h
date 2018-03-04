@@ -24,7 +24,7 @@ extern void Cpi_Wifi(uint8* params,uint8 lenght, uint8* response);
 extern void Cpi_Spiffs(uint8* params,uint8 lenght, uint8* response);
 extern void Cpi_Sensor(uint8* params,uint8 lenght, uint8* response);
 extern void Cpi_Reset(uint8* params,uint8 lenght, uint8* response);
-
+extern void ICACHE_FLASH_ATTR Cpi_Uart(uint8* params,uint8 lenght, uint8* response);
 /* Processing callout */
 
 
@@ -37,6 +37,7 @@ extern void Cpi_Reset(uint8* params,uint8 lenght, uint8* response);
         {"spifs"  ,CPI_VARIABLE_LENGHT  ,Cpi_Spiffs, NULL},\
         {"sense"  ,CPI_VARIABLE_LENGHT  ,Cpi_Sensor, NULL},\
         {"reset"  ,CPI_VARIABLE_LENGHT  ,Cpi_Reset, NULL},\
+        {"suart"  ,CPI_VARIABLE_LENGHT  ,Cpi_Uart, NULL},\
 
 /* Communication protocol setup*/
 /* Tokens: */

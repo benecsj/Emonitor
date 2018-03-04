@@ -235,7 +235,11 @@ UART_SetParity(UART_Port uart_no, UART_ParityMode Parity_mode)
 void
 UART_SetBaudrate(UART_Port uart_no, uint32 baud_rate)
 {
-    uart_div_modify(uart_no, UART_CLK_FREQ / baud_rate);
+	if(uart_no == UART_OFF)
+	{
+		uart_no = UART0;
+	}
+	uart_div_modify(uart_no, UART_CLK_FREQ / baud_rate);
 }
 
 //only when USART_HardwareFlowControl_RTS is set , will the rx_thresh value be set.
@@ -289,13 +293,20 @@ UART_intr_handler_register(void *fn, void *arg)
     _xt_isr_attach(ETS_UART_INUM, fn, arg);
 }
 
+LOCAL void
+UART_Sink(char c){};
+
 void
 UART_SetPrintPort(UART_Port uart_no)
 {
     if (uart_no == 1) {
         os_install_putc1(uart1_write_char);
-    } else {
+    } else if (uart_no == 0)  {
         os_install_putc1(uart0_write_char);
+    }
+    else
+    {
+    	os_install_putc1(UART_Sink);
     }
 }
 
