@@ -102,6 +102,7 @@
 
 //Development flags
 #define EMONITOR_TIMING_TEST    (OFF)
+#define DEBUG_LIBS				(ON)
 #define DEBUG_SENSOR_MANAGER 	(OFF)
 #define DEBUG_EMONITOR 			(OFF)
 #define DEBUG_HTTP_CLIENT 		(OFF)

@@ -67,16 +67,18 @@ LINKFLAGS_eagle.app.v6 = \
 	-lgcc					\
 	-lhal					\
 	-llwip	\
-	-lmain	\
-	-lnet80211	\
-	-lphy	\
-	-lpp	\
 	-lmbedtls               \
     -lopenssl               \
-	-lwpa	\
 	-lssl	\
+	-lphy	\
+	-lmain_loud	\
+	-lnet80211_loud	\
+	-lpp_loud	\
+	-lwpa_loud	\
 	$(DEP_LIBS_eagle.app.v6)					\
 	-Wl,--end-group
+
+
 
 DEPENDS_eagle.app.v6 = \
                 $(LD_FILE) \
