@@ -97,9 +97,9 @@
 #define HTTPD_MAX_CONNECTIONS   			3
 
 //Development flags
-#define EMONITOR_TIMING_TEST    (OFF)
+#define EMONITOR_TIMING_TEST    (ON)
 #define DEBUG_SENSOR_MANAGER 	(OFF)
-#define DEBUG_EMONITOR 			(ON)
+#define DEBUG_EMONITOR 			(OFF)
 #define DEBUG_HTTP_CLIENT 		(OFF)
 #define DEBUG_HTTP_SERVER 		(OFF)
 #define DEBUG_WIFI_MANAGER		(OFF)

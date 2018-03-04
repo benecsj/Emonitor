@@ -20,13 +20,20 @@
 /******************************************************************************
 * Defines
 \******************************************************************************/
-#if DEBUG_EMONITOR
+#if DEBUG_EMONITOR == 1
 #define DBG_EMON(...) printf(__VA_ARGS__)
+#define DBG2_EMON(...) printf(__VA_ARGS__)
 #else
 #define DBG_EMON(...)
 #endif
 
-#define PRINT_EMON(...) printf(__VA_ARGS__)
+#ifndef DBG2_EMON
+#if DEBUG_EMONITOR == 2
+#define DBG2_EMON(...) printf(__VA_ARGS__)
+#else
+#define DBG2_EMON(...)
+#endif
+#endif
 
 #define APPEND(...)				  length += sprintf(&buffer[length],__VA_ARGS__)
 
@@ -102,7 +109,7 @@ void ICACHE_FLASH_ATTR Emonitor_EnableStatusLed(void) {
 }
 
 void ICACHE_FLASH_ATTR Emonitor_Init(void){
-	PRINT_EMON("(EM) Emonitor_Init\n");
+	DBG2_EMON("(EM) Emonitor_Init\n");
     //Check if has valid url and key
 	uint8 urlLength = strlen(Emonitor_url);
 	uint8 apiKeyLength = strlen(Emonitor_key);
@@ -256,7 +263,7 @@ void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 	uint32 freeStack = uxTaskGetStackHighWaterMark(NULL);
 
 	//Print out status
-	PRINT_EMON("(EM) U(%d) T(%d) I(%d) C(%d) H(%d) S(%d) R(%d) S(%d) H(%d)\n", Emonitor_uptime,Emonitor_sendTimer,ip[3],Emonitor_connectionCounter,Emonitor_freeRam,freeStack,Emonitor_backgroundRuntime,Wifi_Manager_GetSignalLevel(),Sensor_Manager_GetTempHealth());
+	DBG2_EMON("(EM) U(%d) T(%d) I(%d) C(%d) H(%d) S(%d) R(%d) S(%d) H(%d)\n", Emonitor_uptime,Emonitor_sendTimer,ip[3],Emonitor_connectionCounter,Emonitor_freeRam,freeStack,Emonitor_backgroundRuntime,Wifi_Manager_GetSignalLevel(),Sensor_Manager_GetTempHealth());
 
 	//Send timing
 	if((Emonitor_sendTimer+1) >= Emonitor_SendPeroid){
@@ -287,11 +294,6 @@ void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 					//Start Json frame
 					APPEND(JSON_START);
 					//\\\\\\\\\\\\\\\\\\\\\\\\\\\
-					//Add ip (only single time per connection)
-					if (Emonitor_connectionStatus == EMONITOR_NOT_CONNECTED) {
-						APPEND("ip" 				JSON_DIV 	"%d" 		JSON_NEXT	,ip[3]);}
-					//Add freeram
-						APPEND("freeram" 			JSON_DIV 	"%d"		JSON_NEXT	,Emonitor_freeRam);
 					//Add pulse counters
 					for(i = 0 ; i < SENSOR_MANAGER_PULSE_COUNTERS ; i++ ){
 						APPEND("Pulse_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetPulseCount(i));}
@@ -309,8 +311,15 @@ void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 					//MHZ14 CO2 Sensor
 					if(Sensor_Manager_HasCO2Sensor()){
 						APPEND("Meter_C02" 			JSON_DIV 	"%d" 		JSON_NEXT	,Sensor_Manager_GetCO2());}
+					//Add ip (only single time per connection)
+					if (Emonitor_connectionStatus == EMONITOR_NOT_CONNECTED) {
+						APPEND("Sys_Ip" 			JSON_DIV 	"%d" 		JSON_NEXT	,ip[3]);}
+					//Add ram usage
+						APPEND("Sys_Ram" 			JSON_DIV 	"%d"		JSON_NEXT	,Emonitor_GetRAMUsage());
+					//Add cpu usage
+						APPEND("Sys_Cpu" 			JSON_DIV 	"%d"		JSON_NEXT	,Emonitor_GetCpuUsage());
 					//Add Uptime
-						APPEND("uptime" 			JSON_DIV 	"%d"		/*LAST*/	,Emonitor_uptime);
+						APPEND("Sys_Uptime" 		JSON_DIV 	"%d"		/*LAST*/	,Emonitor_GetUptime());
 					//\\\\\\\\\\\\\\\\\\\\\\\\\\\
 					//Finish Json frame
 					APPEND(JSON_END);
@@ -374,8 +383,8 @@ void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 		if(NvM_IsBusy() == FALSE)
 		{
 			DBG_EMON("(EM) RESTART REQUESTED\n");
-			PRINT_EMON("(EM) ###################################\n");
-			PRINT_EMON("(EM) ###################################\n");
+			DBG_EMON("(EM) ###################################\n");
+			DBG_EMON("(EM) ###################################\n");
 			//Disable status led, this will trigger EXT reset
 			pinMode(LED_BUILTIN,INPUT);
 			//Do nothing
