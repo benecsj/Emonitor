@@ -17,6 +17,18 @@
 #include <string.h>
 #include <stddef.h>
 
+
+#define SPIFFS_CFG_PHYS_SZ(ignore)        FS1_FLASH_SIZE
+
+#define SPIFFS_CFG_PHYS_ERASE_SZ(ignore)  SECTOR_SIZE
+
+#define SPIFFS_CFG_PHYS_ADDR(ignore)      FS1_FLASH_ADDR
+
+#define SPIFFS_CFG_LOG_PAGE_SZ(ignore)    LOG_PAGE
+
+#define SPIFFS_CFG_LOG_BLOCK_SZ(ignore)   LOG_BLOCK
+
+
 #if PRJ_ENV == NOS
 typedef unsigned   char    u8_t;
 typedef signed     char    s8_t;
@@ -87,19 +99,19 @@ typedef signed __PTRDIFF_TYPE__ intptr_t;
 #if SPIFFS_CACHE
 // Enables memory write caching for file descriptors in hydrogen
 #ifndef  SPIFFS_CACHE_WR
-#define SPIFFS_CACHE_WR                 1
+#define SPIFFS_CACHE_WR                 0
 #endif
 
 // Enable/disable statistics on caching. Debug/test purpose only.
 #ifndef  SPIFFS_CACHE_STATS
-#define SPIFFS_CACHE_STATS              1
+#define SPIFFS_CACHE_STATS              0
 #endif
 #endif
 
 // Always check header of each accessed page to ensure consistent state.
 // If enabled it will increase number of reads, will increase flash.
 #ifndef SPIFFS_PAGE_CHECK
-#define SPIFFS_PAGE_CHECK               1
+#define SPIFFS_PAGE_CHECK               0
 #endif
 
 // Define maximum number of gc runs to perform to reach desired free pages.
@@ -109,7 +121,7 @@ typedef signed __PTRDIFF_TYPE__ intptr_t;
 
 // Enable/disable statistics on gc. Debug/test purpose only.
 #ifndef SPIFFS_GC_STATS
-#define SPIFFS_GC_STATS                 1
+#define SPIFFS_GC_STATS                 0
 #endif
 
 // Garbage collecting examines all pages in a block which and sums up
@@ -194,7 +206,7 @@ typedef signed __PTRDIFF_TYPE__ intptr_t;
 // on the target. This will reduce calculations, flash and memory accesses.
 // Parts of configuration must be defined below instead of at time of mount.
 #ifndef SPIFFS_SINGLETON
-#define SPIFFS_SINGLETON 0
+#define SPIFFS_SINGLETON 1
 #endif
 
 #if SPIFFS_SINGLETON
@@ -248,7 +260,7 @@ typedef signed __PTRDIFF_TYPE__ intptr_t;
 // returned.
 // Might be useful for e.g. bootloaders and such.
 #ifndef SPIFFS_READ_ONLY
-#define SPIFFS_READ_ONLY                        0
+#define SPIFFS_READ_ONLY                        1
 #endif
 
 // Enable this to add a temporal file cache using the fd buffer.

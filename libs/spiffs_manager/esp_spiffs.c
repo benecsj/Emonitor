@@ -21,12 +21,12 @@ static s32_t ICACHE_FLASH_ATTR esp_spiffs_readwrite(u32_t addr, u32_t size, u8_t
      * LOG_PAGE_SIZE
      */
 
-    if (size > fs.cfg.log_page_size) {
+    if (size > LOG_PAGE) {
         SPIFFSM_DBG("Invalid size provided to read/write (%d)\n\r", (int) size);
         return SPIFFS_ERR_NOT_CONFIGURED;
     }
 
-    char tmp_buf[fs.cfg.log_page_size + FLASH_UNIT_SIZE * 2];
+    char tmp_buf[LOG_PAGE + FLASH_UNIT_SIZE * 2];
     u32_t aligned_addr = addr & (-FLASH_UNIT_SIZE);
     u32_t aligned_size =
         ((size + (FLASH_UNIT_SIZE - 1)) & -FLASH_UNIT_SIZE) + FLASH_UNIT_SIZE;
@@ -73,13 +73,13 @@ static s32_t ICACHE_FLASH_ATTR esp_spiffs_erase(u32_t addr, u32_t size)
      * With proper configurarion spiffs always
      * provides here sector address & sector size
      */
-    if (size != fs.cfg.phys_erase_block || addr % fs.cfg.phys_erase_block != 0) {
+    if (size != SECTOR_SIZE || addr % SECTOR_SIZE != 0) {
         SPIFFSM_DBG("Invalid size provided to esp_spiffs_erase (%d, %d)\n\r",
                (int) addr, (int) size);
         return SPIFFS_ERR_NOT_CONFIGURED;
     }
 
-    return spi_flash_erase_sector(addr / fs.cfg.phys_erase_block);
+    return spi_flash_erase_sector(addr / SECTOR_SIZE);
 }
 
 spiffs* ICACHE_FLASH_ATTR esp_spiffs_get_fs()
@@ -95,13 +95,13 @@ s32_t ICACHE_FLASH_ATTR esp_spiffs_init(struct esp_spiffs_config *config)
 
     spiffs_config cfg;
     s32_t ret;
-
+#if SPIFFS_SINGLETON == 0
     cfg.phys_size = config->phys_size;
     cfg.phys_addr = config->phys_addr;
     cfg.phys_erase_block = config->phys_erase_block;
     cfg.log_block_size = config->log_block_size;
     cfg.log_page_size = config->log_page_size;
-
+#endif
     cfg.hal_read_f = esp_spiffs_read;
     cfg.hal_write_f = esp_spiffs_write;
     cfg.hal_erase_f = esp_spiffs_erase;
