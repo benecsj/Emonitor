@@ -20,7 +20,7 @@
 \******************************************************************************/
 
 uint8 remote_recLength = 0;
-uint8 remote_recBuffer[100];
+uint8 remote_recBuffer[CPI_RX_MAX_FRAME_SIZE+1];
 
 
 /******************************************************************************
@@ -42,16 +42,23 @@ Remote_Control_UART0_Handler(void *para)
         //UART RX
         } else if ( (UART_RXFIFO_TOUT_INT_ST == (uart_intr_status & UART_RXFIFO_TOUT_INT_ST)) ||
         		    (UART_RXFIFO_FULL_INT_ST == (uart_intr_status & UART_RXFIFO_FULL_INT_ST)) )  {
+        	//Get number of received bytes
         	remote_recLength = (READ_PERI_REG(UART_STATUS(UART0)) >> UART_RXFIFO_CNT_S)&UART_RXFIFO_CNT;
-
-            for (buf_idx = 0 ; buf_idx < remote_recLength ; buf_idx++) {
-                received = (READ_PERI_REG(UART_FIFO(UART0)) & 0xFF);
-                remote_recBuffer[buf_idx]= received;
-                printf("%c",received);
-            }
-
-            Cpi_RxHandler();
-
+        	//Check if fits into rec buffer
+        	if(remote_recLength < CPI_RX_MAX_FRAME_SIZE)
+        	{
+        		//Read out all received bytes
+				for (buf_idx = 0 ; buf_idx < remote_recLength ; buf_idx++) {
+					//Get it from Uart FIFO
+					received = (READ_PERI_REG(UART_FIFO(UART0)) & 0xFF);
+					remote_recBuffer[buf_idx]= received;
+					//Echo back characters
+					prj_printf("%c",received);
+				}
+				//Process with CPI
+				Cpi_RxHandler();
+        	}
+        	//Clear all interrupta
             WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_TOUT_INT_CLR);
             WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR);
         //UART TX

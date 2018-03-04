@@ -4,3 +4,24 @@ https://www.penninkhof.com/2015/03/how-to-program-an-esp8266/
 
 
 
+
+
+Step 1:
+
+xtensa-lx106-elf-objcopy --redefine-sym printf=ets_printf libnet80211.a
+xtensa-lx106-elf-objcopy --redefine-sym printf=ets_printf libwpa.a
+xtensa-lx106-elf-objcopy --redefine-sym printf=ets_printf libpp.a
+
+Step 2:
+Edit esp-open-rtos/ld/program.ld and comment out "ets_printf = printf;"
+
+Step 3:
+
+Add dummy function:
+
+int ets_printf(const char *format, ...)
+{
+return 0;
+}
+
+Step 4: Comment out / remove printf statements from libmain source.

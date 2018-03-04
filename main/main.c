@@ -418,3 +418,5 @@ void ICACHE_FLASH_ATTR user_init(void) {
 #endif
 }
 
+//ESPRESSIF LIB printf dummy
+int ets_printf(const char *format, ...){return 0;}
