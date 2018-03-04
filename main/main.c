@@ -65,11 +65,8 @@ void Emonitor_Main_Background(void){};
 void Emonitor_Main_1ms(void){};
 void Sensor_Manager_VeryFast(void){};
 
-//void Wifi_Manager_Init(void){};
-//void Wifi_Manager_Main(void){};
-//bool ICACHE_FLASH_ATTR start_wifi_ap(const char * ssid, const char * pass, uint8 hidden){return TRUE;}
-//bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){return TRUE;}
-//bool ICACHE_FLASH_ATTR wifi_station_connected(){return TRUE;}
+void Wifi_Manager_Init(void){};
+void Wifi_Manager_Main(void){};
 
 uint8 Emonitor_ledControl;
 uint8 WifiManager_enableHotspot;
@@ -381,14 +378,14 @@ void ICACHE_FLASH_ATTR user_init(void) {
 
 	pinMode(PULSE_INPUT0,INPUT);
 	attachInterrupt(PULSE_INPUT0,testCallback,RISING);
-
+/*
 	MHZ14_Init();
 	MHZ14_Main();
 	MHZ14_Feed(0);
 	OWP_SelectChannel(0);
 	D18_DS18B20_FindSensor(&diff, &id[0]);
 	os_printf("ID: %02X%02X%02X%02X%02X%02X%02X%02X\n",id[0],id[1],id[2],id[3],id[4],id[5],id[6],id[7]);
-
+*/
     hw_timer_init(NMI_SOURCE,1);
     hw_timer_set_func(testCallback);
     hw_timer_arm(1000,1);
