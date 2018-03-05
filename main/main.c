@@ -183,7 +183,7 @@ void ICACHE_FLASH_ATTR task_InitB(void)
 	//--------------------------------
 	Emonitor_EnableStatusLed();
 	//Finished
-	DBG_MAIN("Init finished!!!\n-------------------------\n");
+	DBG_MAIN("(M) Init finished!!!\n-------------------------\n");
 	//--------------------------------
 	//Start cyclic tasks
 	prj_createTask(task_1000ms, "1000ms", 1024, NULL, 1, &t);
@@ -395,20 +395,20 @@ void ICACHE_FLASH_ATTR user_init(void) {
 	Emonitor_Preinit();
 
 	//Get general statuses
-	DBG_MAIN("\nSDK version:%s\n", system_get_sdk_version());
+	DBG_MAIN("(M) SDK version:%s\n", system_get_sdk_version());
 #if DEBUG_MAIN
 	system_print_meminfo();
 #endif
 	//Get reset cause
 	resetInfo = system_get_rst_info();
 	Emonitor_SetResetReason(resetInfo->reason);
-	DBG_MAIN("Reset exccause:%d reason:%d\n",resetInfo->exccause,resetInfo->reason);
+	DBG_MAIN("(M) Reset exccause:%d reason:%d\n",resetInfo->exccause,resetInfo->reason);
 
 	//Case on not external reset wait for reset
 	if(REASON_EXT_SYS_RST != resetInfo->reason)	{return;}
 
 	//Start freeRTOS tasks
-	DBG_MAIN("About to create init task\n");
+	DBG_MAIN("(M) About to create init task\n");
 	prj_createTask(task_Init, "init", 1024, NULL, (configMAX_PRIORITIES-1), &t);
 
 #if PRJ_ENV == NOS

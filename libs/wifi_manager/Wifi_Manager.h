@@ -8,11 +8,17 @@
 #define DBG_WM(...)
 #endif
 
+
+
+/******************************************************************************
+* Prototypes
+\******************************************************************************/
+
 extern void Wifi_Manager_Init(void);
 extern void Wifi_Manager_Main(void);
 extern void Wifi_Manager_CleanUp(void);
 
-extern void Wifi_Manager_GetIp(uint8 ip[4]);
+extern void Wifi_Manager_GetIp(uint8 ip[4],Wifi_Manager_Info_Type type);
 
 extern void Wifi_Manager_EnableHotspot(uint8 enable);
 extern void Wifi_Manager_UpdateLevel(void);

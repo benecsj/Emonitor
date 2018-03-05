@@ -98,6 +98,7 @@ void ICACHE_FLASH_ATTR Emonitor_Preinit(void) {
 	//Init UART
 	UART_SetBaudrate(UART_CHANNEL,UART_BAUDRATE);
 	UART_SetPrintPort(UART_CHANNEL);
+	prj_printf("\n");
 	//Init flash button
 	pinMode(FLASH_BUTTON,INPUT);
     //Disable Wifi
@@ -249,7 +250,7 @@ void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 	char sign;
 
 	//Get local ip address
-	Wifi_Manager_GetIp(ip);
+	Wifi_Manager_GetIp(ip,IP);
 	//Get background time
 	if(Emonitor_backgroundRuntime ==0)
 	{

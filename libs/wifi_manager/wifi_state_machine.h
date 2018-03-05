@@ -27,8 +27,19 @@
 
 #include "project_config.h"
 
+/******************************************************************************
+* Typedefs
+\******************************************************************************/
+
 typedef void (* wifi_state_cb_t)();
 typedef void (* wifi_disco_cb_t)(uint8_t reason);
+
+typedef enum
+{
+	IP,
+	NETMASK,
+	GATEWAY
+} Wifi_Manager_Info_Type;
 
 #if PRJ_ENV == NOS
 typedef enum {
@@ -39,6 +50,10 @@ typedef enum {
     MAX_MODE
 } WIFI_MODE;
 #endif
+
+/******************************************************************************
+* Prototypes
+\******************************************************************************/
 
 void set_on_station_first_connect(wifi_state_cb_t cb);
 void set_on_station_connect(wifi_state_cb_t cb);
@@ -56,6 +71,6 @@ bool wifi_station_connected();
 bool wifi_ap_enabled();
 
 
-void wifi_get_ip_address(uint8 ip[4]);
+void wifi_get_ip_address(uint8 ip[4],Wifi_Manager_Info_Type type);
 
 #endif /* _WIFI_STATE_MACHINE_H_ */

@@ -117,7 +117,7 @@ int ICACHE_FLASH_ATTR cgiEspJsonTemplate(HttpdConnData *connData) {
 			if(Wifi_Manager_IsConnected() == 1)
 			{
 				uint8 ip[4];
-				Wifi_Manager_GetIp(ip);
+				Wifi_Manager_GetIp(ip,IP);
 				length += sprintf(&buffer[length],"\"st_ip\":\"%d.%d.%d.%d\",",ip[0],ip[1],ip[2],ip[3]);
 			}
 			else

@@ -111,7 +111,7 @@ void ICACHE_FLASH_ATTR Cpi_Wifi(uint8* params, uint8 lenght, uint8* response) {
 		text="/start_wifi_station/";
 		break;
 	case 't':
-		Wifi_Manager_GetIp(temp);
+		Wifi_Manager_GetIp(temp,IP);
 		sprintf(text,"/IP:%d.%d.%d.%d/",temp[0],temp[1],temp[2],temp[3]);
 		break;
 

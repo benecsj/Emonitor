@@ -71,10 +71,10 @@ LINKFLAGS_eagle.app.v6 = \
     -lopenssl               \
 	-lssl	\
 	-lphy	\
-	-lmain_loud	\
-	-lnet80211_loud	\
-	-lpp_loud	\
-	-lwpa_loud	\
+	-lmain_silent	\
+	-lnet80211_silent	\
+	-lpp_silent	\
+	-lwpa_silent	\
 	$(DEP_LIBS_eagle.app.v6)					\
 	-Wl,--end-group
 

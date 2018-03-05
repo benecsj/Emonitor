@@ -390,7 +390,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 				if(Wifi_Manager_IsConnected() == 1)
 				{
 					uint8 ip[4];
-					Wifi_Manager_GetIp(ip);
+					Wifi_Manager_GetIp(ip,IP);
 					len = sprintf(buff, " %d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);
 				}
 				else

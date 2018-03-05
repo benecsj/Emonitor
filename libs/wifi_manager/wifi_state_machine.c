@@ -63,13 +63,12 @@ void ICACHE_FLASH_ATTR wifi_event_handler_cb(System_Event_t *event)
     }
 
 #if PRJ_ENV == OS
-    DBG_WM("[WiFi] event %u\n", event->event_id);
     switch (event->event_id) {
 #else
-    DBG_WM("[WiFi] event %u\n", event->event);
     switch (event->event) {
 #endif
         case EVENT_STAMODE_DISCONNECTED:
+            DBG_WM("(WM) Event STA DIS\n");
             wifi_station_is_connected = false;
             Event_StaMode_Disconnected_t *ev = (Event_StaMode_Disconnected_t *)&event->event_info;
             if(on_station_disconnect){
@@ -77,6 +76,7 @@ void ICACHE_FLASH_ATTR wifi_event_handler_cb(System_Event_t *event)
             }
             break;
         case EVENT_STAMODE_CONNECTED:
+            DBG_WM("(WM) Event STA CON\n");
             if(wifi_station_static_ip){
                 wifi_station_is_connected = true;
                 if(!station_was_connected){
@@ -91,6 +91,7 @@ void ICACHE_FLASH_ATTR wifi_event_handler_cb(System_Event_t *event)
             }
             break;
         case EVENT_STAMODE_DHCP_TIMEOUT:
+            DBG_WM("(WM) Event DHCP TIMEOUT\n");
             if(wifi_station_is_connected){
                 wifi_station_is_connected = false;
                 if(on_station_disconnect){
@@ -99,6 +100,7 @@ void ICACHE_FLASH_ATTR wifi_event_handler_cb(System_Event_t *event)
             }
             break;
         case EVENT_STAMODE_GOT_IP:
+            DBG_WM("(WM) Event GOT IP\n");
             wifi_station_is_connected = true;
             if(!station_was_connected){
                 station_was_connected = true;
@@ -112,15 +114,29 @@ void ICACHE_FLASH_ATTR wifi_event_handler_cb(System_Event_t *event)
             break;
 
         case EVENT_SOFTAPMODE_STACONNECTED:
+            DBG_WM("(WM) Event STA CON\n");
             if(on_client_connect){
                 on_client_connect();
             }
             break;
         case EVENT_SOFTAPMODE_STADISCONNECTED:
+            DBG_WM("(WM) Event STA DIS\n");
             if(on_client_disconnect){
                 on_client_disconnect();
             }
             break;
+        case EVENT_STAMODE_SCAN_DONE:
+            DBG_WM("(WM) Event SCAN DONE\n");
+        	break;
+
+        case EVENT_STAMODE_AUTHMODE_CHANGE:
+            DBG_WM("(WM) Event AUTH CHG\n");
+        	break;
+
+        case EVENT_SOFTAPMODE_PROBEREQRECVED:
+            DBG_WM("(WM) Event PROBE REC\n");
+        	break;
+
         default:
             break;
     }
@@ -171,17 +187,16 @@ bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){
     if((mode & STATION_MODE) == 0){
         mode |= STATION_MODE;
         if(!wifi_set_mode(mode)){
-        	DBG_WM("Failed to enable Station mode!\n");
+        	DBG_WM("(WM) Failed to enable Station mode!\n");
             return false;
         }
     }
     if(!ssid){
-    	DBG_WM("No SSID Given. Will connect to the station saved in flash\n");
+    	DBG_WM("(WM) No SSID Given. Will connect to the station saved in flash\n");
         return true;
     }
 
     bool status = wifi_station_set_hostname((char*)ssid);
-    DBG_WM("(WM) SSID: [%s][%d]\n",(char*)ssid,status);
 
     struct station_config config;
     prj_memset(&config, 0, sizeof(struct station_config));
@@ -190,14 +205,14 @@ bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){
         strcpy(config.password, pass);
     }
     if(!wifi_station_set_config_current(&config)){
-    	DBG_WM("Failed to set Station config!\n");
+    	DBG_WM("(WM) Failed to set Station config!\n");
         return false;
     }
 
     if(!wifi_station_dhcpc_status()){
-    	DBG_WM("DHCP is not started. Starting it...\n");
+    	DBG_WM("(WM) DHCP is not started. Starting it...\n");
         if(!wifi_station_dhcpc_start()){
-        	DBG_WM("DHCP start failed!\n");
+        	DBG_WM("(WM) DHCP start failed!\n");
             return false;
         }
     }
@@ -211,7 +226,7 @@ bool ICACHE_FLASH_ATTR stop_wifi_station(){
     WIFI_MODE mode = wifi_get_opmode();
     mode &= ~STATION_MODE;
     if(!wifi_set_mode(mode)){
-    	DBG_WM("Failed to disable Station mode!\n");
+    	DBG_WM("(WM) Failed to disable Station mode!\n");
         return false;
     }
     return true;
@@ -222,14 +237,14 @@ bool ICACHE_FLASH_ATTR start_wifi_ap(const char * ssid, const char * pass, uint8
     if((mode & SOFTAP_MODE) == 0){
         mode |= SOFTAP_MODE;
         if(!wifi_set_mode(mode)){
-        	DBG_WM("Failed to enable AP mode!\n");
+        	DBG_WM("(WM) Failed to enable AP mode!\n");
             return false;
         }
     }
     //Check ssid parameter
     if((ssid == NULL) || (strlen(ssid)==0) )
     {
-    	DBG_WM("No SSID Given. Will start the AP saved in flash\n");
+    	DBG_WM("(WM) No SSID Given. Will start the AP saved in flash\n");
         return true;
     }
 
@@ -281,7 +296,7 @@ bool ICACHE_FLASH_ATTR stop_wifi_ap(){
     WIFI_MODE mode = wifi_get_opmode();
     mode &= ~SOFTAP_MODE;
     if(!wifi_set_mode(mode)){
-    	DBG_WM("Failed to disable AP mode!\n");
+    	DBG_WM("(WM) Failed to disable AP mode!\n");
         return false;
     }
     return true;
@@ -304,17 +319,34 @@ bool ICACHE_FLASH_ATTR wifi_ap_enabled(){
     return !!(wifi_get_opmode() & SOFTAP_MODE);
 }
 
-void ICACHE_FLASH_ATTR wifi_get_ip_address(uint8 ip[4]){
+void ICACHE_FLASH_ATTR wifi_get_ip_address(uint8 ip[4],Wifi_Manager_Info_Type type){
 	bool returnValue;
 	struct ip_info data;
 	returnValue = wifi_get_ip_info(0x00, &data); // 0x00 for STATION_IF, 0x01 for SOFTAP_IF.
 	//If succesfully get ip then extract it
 	if(returnValue)
 	{
-		ip[0] = (data.ip.addr) & 0xFF;
-		ip[1] = (data.ip.addr>>8) & 0xFF;;
-		ip[2] = (data.ip.addr>>16) & 0xFF;;
-		ip[3] = (data.ip.addr>>24) & 0xFF;;
+		switch(type)
+		{
+		case IP:
+			ip[0] = (data.ip.addr) & 0xFF;
+			ip[1] = (data.ip.addr>>8) & 0xFF;;
+			ip[2] = (data.ip.addr>>16) & 0xFF;;
+			ip[3] = (data.ip.addr>>24) & 0xFF;;
+			break;
+		case NETMASK:
+			ip[0] = (data.netmask.addr) & 0xFF;
+			ip[1] = (data.netmask.addr>>8) & 0xFF;;
+			ip[2] = (data.netmask.addr>>16) & 0xFF;;
+			ip[3] = (data.netmask.addr>>24) & 0xFF;;
+			break;
+		case GATEWAY:
+			ip[0] = (data.gw.addr) & 0xFF;
+			ip[1] = (data.gw.addr>>8) & 0xFF;;
+			ip[2] = (data.gw.addr>>16) & 0xFF;;
+			ip[3] = (data.gw.addr>>24) & 0xFF;;
+			break;
+		}
 	}
 	else
 	{
@@ -324,4 +356,5 @@ void ICACHE_FLASH_ATTR wifi_get_ip_address(uint8 ip[4]){
 		ip[3] = 0;
 	}
 }
+
 

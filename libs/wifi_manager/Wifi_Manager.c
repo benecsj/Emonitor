@@ -7,14 +7,25 @@
 #include "user_interface.h"
 #endif
 
+#define GETARRAY(a)		a[0],a[1],a[2],a[3]
+
 LOCAL void ICACHE_FLASH_ATTR on_wifi_connect(){
-	DBG_WM("Connected\n");
+	DBG_WM("(WM) Connected\n");
+#if DEBUG_WIFI_MANAGER
+	uint8 addr[4];
+	uint8 netmask[4];
+	uint8 gateway[4];
+	Wifi_Manager_GetIp(addr,IP);
+	Wifi_Manager_GetIp(netmask,NETMASK);
+	Wifi_Manager_GetIp(gateway,GATEWAY);
+	DBG_WM("(WM) ip:%d.%d.%d.%d  netmask:%d.%d.%d.%d  gateway:%d.%d.%d.%d\n",GETARRAY(addr),GETARRAY(netmask),GETARRAY(gateway));
+#endif
     //Trigger level measurement
 	Wifi_Manager_UpdateLevel();
 }
 
 LOCAL void ICACHE_FLASH_ATTR on_wifi_disconnect(uint8 reason){
-	DBG_WM("Disconnect %d\n", reason);
+	DBG_WM("(WM) Disconnect %d\n", reason);
 }
 
 //Configured parameters
@@ -31,7 +42,7 @@ uint8 WifiManager_ScanTiming = 0;
 
 void ICACHE_FLASH_ATTR Wifi_Manager_Init(void)
 {
-
+	DBG_WM("(WM) Init\n",WifiManager_STA_SSID);
 	//Verify Parameters
 	uint8 textLength = 0;
 	uint8 length;
@@ -63,11 +74,11 @@ void ICACHE_FLASH_ATTR Wifi_Manager_Init(void)
 		WifiManager_enableHotspot = 1;
 	}
 
-	DBG_WM("(WF) STA SSID: [%s]\n",WifiManager_STA_SSID);
-	DBG_WM("(WF) STA PASS: [%s]\n",WifiManager_STA_PASSWORD);
-	DBG_WM("(WF) AP  SSID: [%s]\n",WifiManager_AP_SSID);
-	DBG_WM("(WF) AP  PASS: [%s]\n",WifiManager_AP_PASSWORD);
-	DBG_WM("(WF) AP  %s\n",((WifiManager_enableHotspot ==1) ? "ENABLED" : "DISABLED"));
+	DBG_WM("(WM) STA SSID: [%s]\n",WifiManager_STA_SSID);
+	DBG_WM("(WM) STA PASS: [%s]\n",WifiManager_STA_PASSWORD);
+	DBG_WM("(WM) AP  SSID: [%s]\n",WifiManager_AP_SSID);
+	DBG_WM("(WM) AP  PASS: [%s]\n",WifiManager_AP_PASSWORD);
+	DBG_WM("(WM) AP  %s\n",((WifiManager_enableHotspot ==1) ? "ENABLED" : "DISABLED"));
 
 	//Clear default configs from Wifi if present
 	if(wifi_get_opmode() != 0x0)
@@ -112,7 +123,6 @@ void ICACHE_FLASH_ATTR ICACHE_FLASH_ATTR Wifi_Manager_ScanDone(void *arg, STATUS
 {
 	  uint8 ssid[33];
 	  char temp[128];
-
 	  if (status == OK)
 	  {
 	    struct bss_info *bss_link = (struct bss_info *)arg;
@@ -130,7 +140,7 @@ void ICACHE_FLASH_ATTR ICACHE_FLASH_ATTR Wifi_Manager_ScanDone(void *arg, STATUS
 	      }
 	      WifiManager_SignalLevel = bss_link->rssi;
 
-	      DBG_WM("(%d,\"%s\",%d,\""MACSTR"\",%d)\r\n",
+	      DBG_WM("(WM) auth:%d ssid:\"%s\" rssi:%ddBm MAC:\""MACSTR"\" ch:%d\n",
 	                 bss_link->authmode, ssid, bss_link->rssi,
 	                 MAC2STR(bss_link->bssid),bss_link->channel);
 	      bss_link = bss_link->next.stqe_next;
@@ -139,7 +149,7 @@ void ICACHE_FLASH_ATTR ICACHE_FLASH_ATTR Wifi_Manager_ScanDone(void *arg, STATUS
 	  else
 	  {
 		  WifiManager_SignalLevel = 0;
-		  DBG_WM("scan fail !!!\r\n");
+		  DBG_WM("(WM) scan fail !!!\n");
 	  }
 	  WifiManager_ScanRunning = OFF;
 }
@@ -163,9 +173,9 @@ void ICACHE_FLASH_ATTR Wifi_Manager_CleanUp(void)
 }
 
 
-void ICACHE_FLASH_ATTR Wifi_Manager_GetIp(uint8 ip[4])
+void ICACHE_FLASH_ATTR Wifi_Manager_GetIp(uint8 ip[4],Wifi_Manager_Info_Type type)
 {
-	wifi_get_ip_address(ip);
+	wifi_get_ip_address(ip,type);
 }
 
 void ICACHE_FLASH_ATTR Wifi_Manager_EnableHotspot(uint8 enable)
