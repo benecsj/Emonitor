@@ -39,7 +39,7 @@ s32_t STUB_SPIFFS_read(spiffs *fs, spiffs_file fh, void *buf, s32_t len)
 //path in the filesystem and if it exists, passes the file through. This simulates what a normal
 //webserver would do with static files.
 int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
-	DBG_HTTPS("(HS) cgiEspFsHook START\n");
+	DBG_HTTPS("(HS) cgiEspFsHook\n");
 	spiffs* fs = spiffs_get_fs();
 	int len;
 	char buff[1025];
@@ -81,7 +81,6 @@ int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 		else
 		{
 			len = SPIFFS_read(fs, connData->file, (u8_t *)buff, HTTPD_MAX_FILE_READ_BLOCK);
-			DBG_HTTPS("(HS) SPIFFS_read  [%d]\n",len);
 			if (len>0)
 			{
 				httpdSend(connData, buff, len);
@@ -96,8 +95,6 @@ int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 			}
 		}
 	}
-
-	DBG_HTTPS("(HS) cgiEspFsHook END\n");
 	return returnValue;
 }
 
@@ -116,7 +113,7 @@ typedef void (* TplCallback)(HttpdConnData *connData, char *token, void **arg);
 static TplData tplData[HTTPD_MAX_CONNECTIONS];
 
 int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
-	DBG_HTTPS("(HS) cgiEspFsTemplate START\n");
+	DBG_HTTPS("(HS) cgiEspFsTemplate\n");
 	TplData *tpd=connData->cgiData;
 	spiffs* fs = spiffs_get_fs();
 	int len;
@@ -163,7 +160,6 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 		if(returnValue == HTTPD_CGI_DONE)
 		{
 			len = SPIFFS_read(fs, tpd->file, (u8_t *)buff, HTTPD_MAX_FILE_READ_BLOCK-500);
-			DBG_HTTPS("(HS) SPIFFS_read  [%d]\n",len);
 			if (len>0) {
 				sp=0;
 				e=buff;
@@ -213,7 +209,6 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 			}
 		}
 	}
-	DBG_HTTPS("(HS) cgiEspFsTemplate END\n");
 	return returnValue;
 }
 

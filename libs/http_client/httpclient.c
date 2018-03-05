@@ -47,7 +47,7 @@ static char * ICACHE_FLASH_ATTR esp_strdup(const char * str)
 	}
 	char * new_str = (char *)prj_malloc(strlen(str) + 1); // 1 for null character
 	if (new_str == NULL) {
-		PRINTF("esp_strdup: malloc error");
+		PRINTF("(HC) malloc error");
 		return NULL;
 	}
 	strcpy(new_str, str);
@@ -178,7 +178,7 @@ static int ICACHE_FLASH_ATTR chunked_decode(char * chunked, int size)
 	{
 		//[chunk-size]
 		i = esp_strtol(src, (char **) NULL, 16);
-		PRINTF("Chunk Size:%d\r\n", i);
+		PRINTF("(HC) Chunk Size:%d\r\n", i);
 		if (i <= 0) 
 			break;
 		//[chunk-size-end-ptr]
@@ -210,14 +210,14 @@ static void ICACHE_FLASH_ATTR receive_callback(void * arg, char * buf, unsigned 
 	const int new_size = req->buffer_size + len;
 	char * new_buffer;
 	if (new_size > BUFFER_SIZE_MAX || NULL == (new_buffer = (char *)prj_malloc(new_size))) {
-		PRINTF("HTTP Response too long (%d)\n", new_size);
+		PRINTF("(HC) HTTP Response too long (%d)\n", new_size);
 		req->buffer[0] = '\0'; // Discard the buffer to avoid using an incomplete response.
 		espconn_disconnect(conn);
 		return; // The disconnect callback will be called.
 	}
 	else
 	{
-		PRINTF("HTTP Response received (%d)\n", new_size);
+		PRINTF("(HC) HTTP Response received (%d)\n", new_size);
 	}
 	memcpy(new_buffer, req->buffer, req->buffer_size);
 	memcpy(new_buffer + req->buffer_size - 1 /*overwrite the null character*/, buf, len); // Append new data.
@@ -234,11 +234,11 @@ static void ICACHE_FLASH_ATTR sent_callback(void * arg)
 	request_args * req = (request_args *)conn->reserve;
 
 	if (req->post_data == NULL) {
-		PRINTF("HTTP All sent\n");
+		PRINTF("(HC) HTTP All sent\n");
 	}
 	else {
 		// The headers were sent, now send the contents.
-		PRINTF("HTTP Sending request body\n");
+		PRINTF("(HC) HTTP Sending request body\n");
 		espconn_send(conn, (uint8 *)req->post_data, strlen(req->post_data));
 		prj_free(req->post_data);
 		req->post_data = NULL;
@@ -247,7 +247,7 @@ static void ICACHE_FLASH_ATTR sent_callback(void * arg)
 
 static void ICACHE_FLASH_ATTR connect_callback(void * arg)
 {
-	PRINTF("TCP Connected\n");
+	PRINTF("(HC) TCP Connected\n");
 	struct espconn * conn = (struct espconn *)arg;
 	request_args * req = (request_args *)conn->reserve;
 
@@ -277,12 +277,12 @@ static void ICACHE_FLASH_ATTR connect_callback(void * arg)
 	espconn_send(conn, (uint8 *)buf, len);
 	prj_free(req->headers);
 	req->headers = NULL;
-	PRINTF("HTTP Sending request header\n");
+	PRINTF("(HC) HTTP Sending request header\n");
 }
 
 static void ICACHE_FLASH_ATTR disconnect_callback(void * arg)
 {
-	PRINTF("TCP Disconnected\n");
+	PRINTF("(HC) TCP Disconnected\n");
 	struct espconn *conn = (struct espconn *)arg;
 
 	if(conn == NULL) {
@@ -295,7 +295,7 @@ static void ICACHE_FLASH_ATTR disconnect_callback(void * arg)
 		int body_size = 0;
 		char * body = "";
 		if (req->buffer == NULL) {
-			PRINTF("Buffer shouldn't be NULL\n");
+			PRINTF("(HC) Buffer shouldn't be NULL\n");
 		}
 		else if (req->buffer[0] != '\0') {
 			// FIXME: make sure this is not a partial response, using the Content-Length header.
@@ -304,7 +304,7 @@ static void ICACHE_FLASH_ATTR disconnect_callback(void * arg)
 			const char * version11 = "HTTP/1.1 ";
 			if (strncmp(req->buffer, version10, strlen(version10)) != 0
 			 && strncmp(req->buffer, version11, strlen(version11)) != 0) {
-				PRINTF("Invalid version in %s\n", req->buffer);
+				PRINTF("(HC) Invalid version in %s\n", req->buffer);
 			}
 			else {
 				http_status = atoi(req->buffer + strlen(version10));
@@ -341,7 +341,7 @@ static void ICACHE_FLASH_ATTR disconnect_callback(void * arg)
 
 static void ICACHE_FLASH_ATTR error_callback(void *arg, sint8 errType)
 {
-	PRINTF("TCP Disconnected with error\n");
+	PRINTF("(HC) TCP Disconnected with error\n");
 	disconnect_callback(arg);
 }
 
@@ -350,7 +350,7 @@ static void ICACHE_FLASH_ATTR dns_callback(const char * hostname, ip_addr_t * ad
 	request_args * req = (request_args *)arg;
 	sint8 result;
 	if (addr == NULL) {
-		PRINTF("DNS failed for %s\n", hostname);
+		PRINTF("(HC) DNS failed for %s\n", hostname);
 		if (req->user_callback != NULL) {
 			req->user_callback("", -1, "", 0);
 		}
@@ -362,7 +362,7 @@ static void ICACHE_FLASH_ATTR dns_callback(const char * hostname, ip_addr_t * ad
 		prj_free(req);
 	}
 	else {
-		PRINTF("DNS found %s " IPSTR "\n", hostname, IP2STR(addr));
+		PRINTF("(HC) DNS found %s " IPSTR "\n", hostname, IP2STR(addr));
 		struct espconn * conn = (struct espconn *)prj_malloc(sizeof(struct espconn));
 		conn->type = ESPCONN_TCP;
 		conn->state = ESPCONN_NONE;
@@ -377,7 +377,7 @@ static void ICACHE_FLASH_ATTR dns_callback(const char * hostname, ip_addr_t * ad
 		espconn_regist_disconcb(conn, disconnect_callback);
 		espconn_regist_reconcb(conn, error_callback);
 		result = espconn_connect(conn);
-		PRINTF("TCP Connect Request (%d)\n",result);
+		PRINTF("(HC) TCP Connect Request (%d)\n",result);
 		if(result != 0)
 		{
 			espconn_delete(conn);
@@ -397,7 +397,7 @@ static void ICACHE_FLASH_ATTR dns_callback(const char * hostname, ip_addr_t * ad
 
 void ICACHE_FLASH_ATTR http_raw_request(const char * hostname, int port, const char * path, const char * post_data, const char * headers, http_callback user_callback)
 {
-	PRINTF("DNS request\n");
+	PRINTF("(HC) DNS request\n");
 
 	request_args * req = (request_args *)prj_malloc(sizeof(request_args));
 	req->hostname = esp_strdup(hostname);
@@ -415,7 +415,7 @@ void ICACHE_FLASH_ATTR http_raw_request(const char * hostname, int port, const c
 										hostname, &addr, dns_callback);
 
 	if (error == ESPCONN_INPROGRESS) {
-		PRINTF("DNS pending\n");
+		PRINTF("(HC) DNS pending\n");
 	}
 	else if (error == ESPCONN_OK) {
 		// Already in the local names table (or hostname was an IP address), execute the callback ourselves.
@@ -423,10 +423,10 @@ void ICACHE_FLASH_ATTR http_raw_request(const char * hostname, int port, const c
 	}
 	else {
 		if (error == ESPCONN_ARG) {
-			PRINTF("DNS arg error %s\n", hostname);
+			PRINTF("(HC) DNS arg error %s\n", hostname);
 		}
 		else {
-			PRINTF("DNS error code %d\n", error);
+			PRINTF("(HC) DNS error code %d\n", error);
 		}
 		dns_callback(hostname, NULL, req); // Handle all DNS errors the same way.
 	}
@@ -472,7 +472,7 @@ void ICACHE_FLASH_ATTR http_post(const char * url, const char * post_data, const
 	else {
 		port = atoi(colon + 1);
 		if (port == 0) {
-			PRINTF("IP Port error %s\n", url);
+			PRINTF("(HC) IP Port error %s\n", url);
 			return;
 		}
 
@@ -484,9 +484,9 @@ void ICACHE_FLASH_ATTR http_post(const char * url, const char * post_data, const
 		path = "/";
 	}
 
-	PRINTF("IP hostname=%s\n", hostname);
-	PRINTF("IP port=%d\n", port);
-	PRINTF("HTTP path=%s\n", path);
+	PRINTF("(HC) IP hostname=%s\n", hostname);
+	PRINTF("(HC) IP port=%d\n", port);
+	PRINTF("(HC) HTTP path=%s\n", path);
 	http_raw_request(hostname, port, path, post_data, headers, user_callback);
 }
 

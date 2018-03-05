@@ -103,7 +103,7 @@ static HttpdConnData ICACHE_FLASH_ATTR *httpdFindConnData(ConnTypePtr conn, char
 	//Check if connection was found
 	if(returnValue == NULL)
 	{
-		DBG_HTTPS("*** Unknown connection %d.%d.%d.%d:%d\n", remIp[0]&0xff, remIp[1]&0xff, remIp[2]&0xff, remIp[3]&0xff, remPort);
+		DBG_HTTPS("(HS) Unknown connection %d.%d.%d.%d:%d\n", remIp[0]&0xff, remIp[1]&0xff, remIp[2]&0xff, remIp[3]&0xff, remPort);
 		httpdPlatDisconnect(conn);
 	}
 
@@ -112,7 +112,6 @@ static HttpdConnData ICACHE_FLASH_ATTR *httpdFindConnData(ConnTypePtr conn, char
 
 //Retires a connection for re-use
 static void ICACHE_FLASH_ATTR httpdRetireConn(HttpdConnData *conn) {
-	DBG_HTTPS("(HS) httpdRetireConn START\n");
 	int i;
 
 	//Release all sendBacklog buffers
@@ -130,8 +129,6 @@ static void ICACHE_FLASH_ATTR httpdRetireConn(HttpdConnData *conn) {
 	for (i=0; i<HTTPD_MAX_CONNECTIONS; i++) {
 		if (connData[i]==conn) connData[i]=NULL;
 	}
-
-	DBG_HTTPS("(HS) httpdRetireConn END\n");
 }
 
 //Stupid li'l helper function that returns the value of a hex char.
@@ -178,7 +175,6 @@ int ICACHE_FLASH_ATTR httpdUrlDecode(char *val, int valLen, char *ret, int retLe
 //function returns the length of the result, or -1 if the value wasn't found. The 
 //returned string will be urldecoded already.
 int ICACHE_FLASH_ATTR httpdFindArg(char *line, char *arg, char *buff, int buffLen) {
-	DBG_HTTPS("(HS) httpdFindArg START\n");
 	char *p, *e;
 	if (line==NULL) return -1;
 	p=line;
@@ -192,14 +188,14 @@ int ICACHE_FLASH_ATTR httpdFindArg(char *line, char *arg, char *buff, int buffLe
 		p=(char*)strstr(p, "&");
 		if (p!=NULL) p+=1;
 	}
-	DBG_HTTPS("Finding %s in %s: Not found :/\n", arg, line);
+	DBG_HTTPS("(HS) Finding %s in %s: Not found :/\n", arg, line);
 	return -1; //not found
 }
 
 //Get the value of a certain header in the HTTP client head
 //Returns true when found, false when not found.
 int ICACHE_FLASH_ATTR httpdGetHeader(HttpdConnData *conn, char *header, char *ret, int retLen) {
-	DBG_HTTPS("(HS) httpdGetHeader START\n");
+	DBG_HTTPS("(HS) httpdGetHeader\n");
 	char *p=conn->priv->head;
 	p=p+strlen(p)+1; //skip GET/POST part
 	p=p+strlen(p)+1; //skip HTTP part
@@ -241,7 +237,7 @@ void ICACHE_FLASH_ATTR httdSetTransferMode(HttpdConnData *conn, int mode) {
 
 //Start the response headers.
 void ICACHE_FLASH_ATTR httpdStartResponse(HttpdConnData *conn, int code) {
-	DBG_HTTPS("(HS) httpdStartResponse START\n");
+	DBG_HTTPS("(HS) httpdStartResponse\n");
 	uint32_t buff[(1024/4)+1];
 	int l;
 	const char *connStr="Connection: close\r\n";
@@ -254,56 +250,50 @@ void ICACHE_FLASH_ATTR httpdStartResponse(HttpdConnData *conn, int code) {
 			connStr);
 
 	httpdSend(conn, (char*)buff, l);
-	DBG_HTTPS("(HS) httpdStartResponse END\n");
 }
 
 //Send a http header.
 void ICACHE_FLASH_ATTR httpdHeader(HttpdConnData *conn, const char *field, const char *val) {
-	DBG_HTTPS("(HS) httpdHeader START\n");
+	DBG_HTTPS("(HS) httpdHeader\n");
 	httpdSend(conn, field, -1);
 	httpdSend(conn, ": ", -1);
 	httpdSend(conn, val, -1);
 	httpdSend(conn, "\r\n", -1);
-	DBG_HTTPS("(HS) httpdHeader END\n");
 }
 
 //Finish the headers.
 void ICACHE_FLASH_ATTR httpdEndHeaders(HttpdConnData *conn) {
-	DBG_HTTPS("(HS) httpdEndHeaders START\n");
+	DBG_HTTPS("(HS) httpdEndHeaders\n");
 	httpdSend(conn, "\r\n", -1);
 	conn->priv->flags|=HFL_SENDINGBODY;
-	DBG_HTTPS("(HS) httpdEndHeaders END\n");
 }
 
 //Redirect to the given URL.
 void ICACHE_FLASH_ATTR httpdRedirect(HttpdConnData *conn, char *newUrl) {
-	DBG_HTTPS("(HS) httpdRedirect START\n");
+	DBG_HTTPS("(HS) httpdRedirect\n");
 	httpdStartResponse(conn, 302);
 	httpdHeader(conn, "Location", newUrl);
 	httpdEndHeaders(conn);
 	httpdSend(conn, "Moved to ", -1);
 	httpdSend(conn, newUrl, -1);
-	DBG_HTTPS("(HS) httpdRedirect END\n");
 }
 
 //Use this as a cgi function to redirect one url to another.
 int ICACHE_FLASH_ATTR cgiRedirect(HttpdConnData *connData) {
-	DBG_HTTPS("(HS) cgiRedirect START\n");
+	DBG_HTTPS("(HS) cgiRedirect\n");
 	if (connData->conn!=NULL) {
 		httpdRedirect(connData, (char*)connData->cgiArg);
 	}
-	DBG_HTTPS("(HS) cgiRedirect END\n");
 	return HTTPD_CGI_DONE;
 }
 
 //Used to spit out a 404 error
 static int ICACHE_FLASH_ATTR cgiNotFound(HttpdConnData *connData) {
-	DBG_HTTPS("(HS) cgiNotFound START\n");
+	DBG_HTTPS("(HS) cgiNotFound\n");
 	if (connData->conn==NULL) return HTTPD_CGI_DONE;
 	httpdStartResponse(connData, 404);
 	httpdEndHeaders(connData);
 	httpdSend(connData, "404 File not found.", -1);
-	DBG_HTTPS("(HS) cgiNotFound END\n");
 	return HTTPD_CGI_DONE;
 }
 
@@ -313,7 +303,6 @@ static int ICACHE_FLASH_ATTR cgiNotFound(HttpdConnData *connData) {
 //this will also redirect connections when the ESP is in STA mode, potentially to a hostname that is not
 //in the 'official' DNS and so will fail.
 int ICACHE_FLASH_ATTR cgiRedirectToHostname(HttpdConnData *connData) {
-	DBG_HTTPS("(HS) cgiRedirectToHostname START\n");
 	static const char hostFmt[]="http://%s/";
 	char *buff;
 	int isIP=0;
@@ -323,7 +312,6 @@ int ICACHE_FLASH_ATTR cgiRedirectToHostname(HttpdConnData *connData) {
 		return HTTPD_CGI_DONE;
 	}
 	if (connData->hostName==NULL) {
-		DBG_HTTPS("(HS) Huh? No hostname.\n");
 		return HTTPD_CGI_NOTFOUND;
 	}
 
@@ -365,7 +353,7 @@ int ICACHE_FLASH_ATTR cgiRedirectApClientToHostname(HttpdConnData *connData) {
 //the data is seen as a C-string.
 //Returns 1 for success, 0 for out-of-memory.
 int ICACHE_FLASH_ATTR httpdSend(HttpdConnData *conn, const char *data, int len) {
-	DBG_HTTPS("(HS) httpdSend [%d] START\n",len);
+	DBG_HTTPS("(HS) httpdSend [%d]\n",len);
 	int returnValue = 0;
 	if (conn->conn==NULL) return 0;
 	if (len<0) len=strlen(data);
@@ -381,8 +369,6 @@ int ICACHE_FLASH_ATTR httpdSend(HttpdConnData *conn, const char *data, int len) 
 	if (conn->priv->sendBuffLen+len>HTTPD_MAX_SENDBUFF_LEN) return 0;
 	memcpy(conn->priv->sendBuff+conn->priv->sendBuffLen, data, len);
 	conn->priv->sendBuffLen+=len;
-
-	DBG_HTTPS("(HS) httpdSend END\n");
 	return 1;
 }
 
@@ -396,7 +382,7 @@ static char ICACHE_FLASH_ATTR httpdHexNibble(int val) {
 //are doing! Also, if you do set conn->cgi to NULL to indicate the connection is closed, do it BEFORE
 //calling this.
 void ICACHE_FLASH_ATTR httpdFlushSendBuffer(HttpdConnData *conn) {
-	DBG_HTTPS("(HS) httpdFlushSendBuffer START\n");
+	DBG_HTTPS("(HS) httpdFlushSendBuffer\n");
 	int r, len;
 
 	if (conn->conn!=NULL)
@@ -450,12 +436,10 @@ void ICACHE_FLASH_ATTR httpdFlushSendBuffer(HttpdConnData *conn) {
 			conn->priv->sendBuffLen=0;
 		}
 	}
-
-	DBG_HTTPS("(HS) httpdFlushSendBuffer FINISH\n");
 }
 
 void ICACHE_FLASH_ATTR httpdCgiIsDone(HttpdConnData *conn) {
-	DBG_HTTPS("(HS) httpdCgiIsDone START\n");
+	DBG_HTTPS("(HS) httpdCgiIsDone\n");
 	conn->cgi=NULL; //no need to call this anymore
 	if (conn->priv->flags&HFL_CHUNKED) {
 		DBG_HTTPS("(HS) Pool slot %d is done. Cleaning up for next req\n", conn->slot);
@@ -473,13 +457,12 @@ void ICACHE_FLASH_ATTR httpdCgiIsDone(HttpdConnData *conn) {
 		//Cannot re-use this connection. Mark to get it killed after all data is sent.
 		conn->priv->flags|=HFL_DISCONAFTERSENT;
 	}
-	DBG_HTTPS("(HS) httpdCgiIsDone FINISH\n");
 }
 
 //Callback called when the data on a socket has been successfully
 //sent.
 void ICACHE_FLASH_ATTR httpdSentCb(ConnTypePtr rconn, char *remIp, int remPort) {
-	DBG_HTTPS("(HS) httpdSentCb START\n");
+	DBG_HTTPS("(HS) httpdSentCb\n");
 	HttpdConnData *conn=httpdFindConnData(rconn, remIp, remPort);
 	httpdContinue(conn);
 }
@@ -487,7 +470,7 @@ void ICACHE_FLASH_ATTR httpdSentCb(ConnTypePtr rconn, char *remIp, int remPort) 
 //Can be called after a CGI function has returned HTTPD_CGI_MORE to
 //resume handling an open connection asynchronously
 void ICACHE_FLASH_ATTR httpdContinue(HttpdConnData * conn) {
-	DBG_HTTPS("(HS) httpdContinue START\n");
+	DBG_HTTPS("(HS) httpdContinue\n");
 	httpdPlatLock();
 	int r;
 
@@ -529,7 +512,6 @@ void ICACHE_FLASH_ATTR httpdContinue(HttpdConnData * conn) {
 	}
 
 	httpdPlatUnlock();
-	DBG_HTTPS("(HS) httpdContinue END\n");
 }
 
 //This is called when the headers have been received and the connection is ready to send
@@ -537,7 +519,7 @@ void ICACHE_FLASH_ATTR httpdContinue(HttpdConnData * conn) {
 //We need to find the CGI function to call, call it, and dependent on what it returns either
 //find the next cgi function, wait till the cgi data is sent or close up the connection.
 static void ICACHE_FLASH_ATTR httpdProcessRequest(HttpdConnData *conn) {
-	DBG_HTTPS("(HS) httpdProcessRequest START\n");
+	DBG_HTTPS("(HS) httpdProcessRequest\n");
 	int r;
 	int i=0;
 	if (conn->url==NULL) {
@@ -593,7 +575,6 @@ static void ICACHE_FLASH_ATTR httpdProcessRequest(HttpdConnData *conn) {
 			i++; //look at next url the next iteration of the loop.
 		}
 	}
-	DBG_HTTPS("(HS) httpdProcessRequest END\n");
 }
 
 //Parse a line of header data and modify the connection data accordingly.
@@ -680,7 +661,7 @@ static void ICACHE_FLASH_ATTR httpdParseHeader(char *h, HttpdConnData *conn) {
 //ToDo: Also make httpdRecvCb/httpdContinue use these?
 //ToDo: Fail if aligned_prj_malloc fails?
 void ICACHE_FLASH_ATTR httpdConnSendStart(HttpdConnData *conn) {
-	DBG_HTTPS("(HS) httpdConnSendStart START\n");
+	DBG_HTTPS("(HS) httpdConnSendStart\n");
 	httpdPlatLock();
 
 	conn->priv->sendBuffLen=0;
@@ -688,7 +669,7 @@ void ICACHE_FLASH_ATTR httpdConnSendStart(HttpdConnData *conn) {
 
 //Finish the live-ness of a connection. Always call this after httpdConnStart
 void ICACHE_FLASH_ATTR httpdConnSendFinish(HttpdConnData *conn) {
-	DBG_HTTPS("(HS) httpdConnSendFinish START\n");
+	DBG_HTTPS("(HS) httpdConnSendFinish\n");
 	if (conn->conn) httpdFlushSendBuffer(conn);
 	//aligned_prj_free(conn->priv->sendBuff);
 	httpdPlatUnlock();
@@ -696,7 +677,7 @@ void ICACHE_FLASH_ATTR httpdConnSendFinish(HttpdConnData *conn) {
 
 //Callback called when there's data available on a socket.
 void ICACHE_FLASH_ATTR httpdRecvCb(ConnTypePtr rconn, char *remIp, int remPort, char *data, unsigned short len) {
-	DBG_HTTPS("(HS) httpdRecvCb START\n");
+	DBG_HTTPS("(HS) httpdRecvCb\n");
 	int x, r;
 	char *p, *e;
 	httpdPlatLock();
@@ -785,7 +766,6 @@ void ICACHE_FLASH_ATTR httpdRecvCb(ConnTypePtr rconn, char *remIp, int remPort, 
 	}
 	if (conn->conn) httpdFlushSendBuffer(conn);
 	httpdPlatUnlock();
-	DBG_HTTPS("(HS) httpdRecvCb END\n");
 }
 
 //The platform layer should ALWAYS call this function, regardless if the connection is closed by the server

@@ -107,11 +107,11 @@
 #define DEBUG_EMONITOR 			(OFF)
 #define DEBUG_HTTP_CLIENT 		(OFF)
 #define DEBUG_HTTP_SERVER 		(OFF)
-#define DEBUG_WIFI_MANAGER		(ON)
+#define DEBUG_WIFI_MANAGER		(OFF)
 #define DEBUG_MHZ14				(OFF)
 #define DEBUG_SPIFFS 			(OFF)
 #define DEBUG_NVM				(OFF)
-#define DEBUG_MAIN				(ON)
+#define DEBUG_MAIN				(OFF)
 
 #endif
 

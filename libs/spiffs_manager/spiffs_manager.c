@@ -130,7 +130,7 @@ void ICACHE_FLASH_ATTR spiffs_status(void)
 	SPIFFS_opendir(fs, "/", &spiffsDir);
 	struct spiffs_dirent spiffsDirEnt;
 	while(SPIFFS_readdir(&spiffsDir, &spiffsDirEnt) != 0) {
-		SPIFFSM_DBG("%s : %d \n", spiffsDirEnt.name, spiffsDirEnt.size);
+		SPIFFSM_DBG("(SPIFFS) %s : %d \n", spiffsDirEnt.name, spiffsDirEnt.size);
 	}
 	SPIFFS_closedir(&spiffsDir);
 

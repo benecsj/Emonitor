@@ -134,7 +134,7 @@ void ICACHE_FLASH_ATTR wifi_event_handler_cb(System_Event_t *event)
         	break;
 
         case EVENT_SOFTAPMODE_PROBEREQRECVED:
-            DBG_WM("(WM) Event PROBE REC\n");
+            //DBG_WM("(WM) Event PROBE REC\n");
         	break;
 
         default:

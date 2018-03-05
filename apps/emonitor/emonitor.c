@@ -288,7 +288,7 @@ void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 				//Check url and user key
 				if ((urlLength > URL_MIN_LENGTH) && (apiKeyLength == API_KEY_LENGTH))
 				{
-					DBG_EMON("----------------Emonitor Send Data-------------\n");
+					DBG_EMON("(EM) Report Data\n");
 					Sensor_Manager_Get_TempSensorData(&tempCount,&ids,&temperatures);
 					//Start of Emoncsm send Url
 					APPEND("%s/input/post.json?node=%d",Emonitor_url,Emonitor_nodeId);
@@ -474,12 +474,9 @@ uint32_t ICACHE_FLASH_ATTR Emonitor_GetRAMUsage(void)
 
 void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, char * response_headers, int body_size)
 {
-	DBG_EMON("HTTP status=%d\n", http_status);
+	DBG_EMON("(EM) Send status=%d\n", http_status);
 	//Check for generic HTTP error
 	if (http_status != HTTP_STATUS_GENERIC_ERROR) {
-		DBG_EMON("HTTP headers (%d)\n", strlen(response_headers));
-		DBG_EMON("HTTP body (%d)\n", body_size);
-		DBG_EMON("HTTP body=\"%s\"\n", response_body); // FIXME: this does not handle binary data.
 		//Check if HTTP OK received
 		if(http_status == 200)
 		{
