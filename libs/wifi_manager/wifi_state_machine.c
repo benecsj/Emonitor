@@ -191,8 +191,8 @@ bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){
             return false;
         }
     }
-    if(!ssid){
-    	DBG_WM("(WM) No SSID Given. Will connect to the station saved in flash\n");
+    if(!ssid[0] != 0){
+    	DBG_WM("(WM) No SSID Given\n");
         return true;
     }
 

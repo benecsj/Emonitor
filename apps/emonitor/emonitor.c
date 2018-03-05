@@ -384,14 +384,17 @@ void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 		//Wait until NvM is done
 		if(NvM_IsBusy() == FALSE)
 		{
-			DBG_EMON("(EM) RESTART REQUESTED\n");
-			DBG_EMON("(EM) ###################################\n");
-			DBG_EMON("(EM) ###################################\n");
-			//Disable status led, this will trigger EXT reset
-			pinMode(LED_BUILTIN,INPUT);
-			//Do nothing
-			while(1){}
+			Emonitor_Request(EMONITOR_REQ_RESTART_DELAY);
 		}
+		break;
+	case EMONITOR_REQ_RESTART_DELAY:
+		DBG_EMON("(EM) RESTART REQUESTED\n");
+		DBG_EMON("(EM) ###################################\n");
+		DBG_EMON("(EM) ###################################\n");
+		//Disable status led, this will trigger EXT reset
+		pinMode(LED_BUILTIN,INPUT);
+		//Do nothing
+		while(1){}
 		break;
 	}
 

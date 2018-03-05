@@ -1,6 +1,7 @@
 #include "project_config.h"
 #include "Wifi_Manager.h"
 #include "spiffs_manager.h"
+#include "Emonitor.h"
 
 #if PRJ_ENV == OS
 #else
@@ -8,6 +9,11 @@
 #endif
 
 #define GETARRAY(a)		a[0],a[1],a[2],a[3]
+
+uint32 Wifi_Manager_disconnectCount = 0;
+uint32 Wifi_Manager_disconnectLastCount = 0;
+Wifi_Manager_State Wifi_Manager_status;
+uint32 Wifi_Manager_errorCounter = 0;
 
 LOCAL void ICACHE_FLASH_ATTR on_wifi_connect(){
 	DBG_WM("(WM) Connected\n");
@@ -20,12 +26,18 @@ LOCAL void ICACHE_FLASH_ATTR on_wifi_connect(){
 	Wifi_Manager_GetIp(gateway,GATEWAY);
 	DBG_WM("(WM) ip:%d.%d.%d.%d  netmask:%d.%d.%d.%d  gateway:%d.%d.%d.%d\n",GETARRAY(addr),GETARRAY(netmask),GETARRAY(gateway));
 #endif
+	//Set internal status
+	Wifi_Manager_status = WIFI_CONNECTED;
     //Trigger level measurement
 	Wifi_Manager_UpdateLevel();
 }
 
 LOCAL void ICACHE_FLASH_ATTR on_wifi_disconnect(uint8 reason){
 	DBG_WM("(WM) Disconnect %d\n", reason);
+	//Count disconnects for monitoring
+	Wifi_Manager_disconnectCount++;
+	//Set internal status
+	Wifi_Manager_status = WIFI_DISCONNECTED;
 }
 
 //Configured parameters
@@ -43,6 +55,8 @@ uint8 WifiManager_ScanTiming = 0;
 void ICACHE_FLASH_ATTR Wifi_Manager_Init(void)
 {
 	DBG_WM("(WM) Init\n",WifiManager_STA_SSID);
+	//Set internal status
+	Wifi_Manager_status = WIFI_INIT;
 	//Verify Parameters
 	uint8 textLength = 0;
 	uint8 length;
@@ -87,27 +101,60 @@ void ICACHE_FLASH_ATTR Wifi_Manager_Init(void)
 	}
 
 	//Register eventhandlers
-
     set_on_station_connect(on_wifi_connect);
     set_on_station_disconnect(on_wifi_disconnect);
 
     //Init Wifi
-    //init_esp_wifi();
    	start_wifi_ap(WifiManager_AP_SSID, WifiManager_AP_PASSWORD,(WifiManager_enableHotspot==0));
    	start_wifi_station(WifiManager_STA_SSID, WifiManager_STA_PASSWORD);
 
+   	//Check if special state has to be entered
+   	if(WifiManager_STA_SSID[0] == 0)
+   	{
+   		Wifi_Manager_status = WIFI_STA_NOT_CONFIGURED;
+   	}
+
     ////stop_wifi_station();
     ////stop_wifi_ap();
-
-
-
 }
 
 void ICACHE_FLASH_ATTR Wifi_Manager_Main(void)
 {
-	//Only scan if connected
-	if(Wifi_Manager_IsConnected())
+	//Based on wifi state do stuff
+	switch(Wifi_Manager_status)
 	{
+	case WIFI_STA_NOT_CONFIGURED:
+		//Do nothing
+		break;
+	case WIFI_INIT:
+	case WIFI_DISCONNECTED:
+		//Check if trying to connect
+		if(Wifi_Manager_disconnectLastCount != Wifi_Manager_disconnectCount)
+		{
+			//Clear error count
+			Wifi_Manager_errorCounter=0;
+
+		}
+		else
+		{
+			//Check if connecting timeouted
+			Wifi_Manager_errorCounter++;
+			if(Wifi_Manager_errorCounter == 10)
+			{
+				//Try to Reactivate reconnect
+				wifi_station_set_reconnect_policy(TRUE);
+			}
+			if(Wifi_Manager_errorCounter>20)
+			{
+				//Request reset
+				Emonitor_Request(EMONITOR_REQ_RESTART);
+			}
+		}
+		//Store last count
+		Wifi_Manager_disconnectLastCount = Wifi_Manager_disconnectCount;
+		break;
+
+	case WIFI_CONNECTED:
 		//Scan timing
 		WifiManager_ScanTiming++;
 		if(WifiManager_ScanTiming == WIFI_SCAN_TIMING)
@@ -116,6 +163,14 @@ void ICACHE_FLASH_ATTR Wifi_Manager_Main(void)
 			//Trigger scan
 			Wifi_Manager_UpdateLevel();
 		}
+
+		//Monitor if still connected
+		if(Wifi_Manager_IsConnected() == false)
+		{
+			//Set internal status
+			Wifi_Manager_status = WIFI_DISCONNECTED;
+		}
+		break;
 	}
 }
 
