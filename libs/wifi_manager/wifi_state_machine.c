@@ -35,12 +35,8 @@
 #include "espressif/esp_sta.h"
 #include "espressif/esp_softap.h"
 #else
-//#include "ets_sys.h"
-//#include "os_type.h"
-//#include "osapi.h"
 #include "mem.h"
 #include "user_interface.h"
-//#include "espconn.h"
 #endif
 
 typedef void (* wifi_state_cb_t)();
