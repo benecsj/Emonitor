@@ -60,10 +60,10 @@
 
 //Pins
 #define LED_BUILTIN		D0
-#define ONEWIRE_BUS_0	D1     //D1
-#define ONEWIRE_BUS_1	D2     //D2
-#define PULSE_INPUT0    D7     //D7
-#define PULSE_INPUT1    D6     //D6
+#define ONEWIRE_BUS_0	D1
+#define ONEWIRE_BUS_1	D2
+#define PULSE_INPUT0    D7
+#define PULSE_INPUT1    D6
 #define PULSE_INPUT2    D5
 #define PULSE_INPUT3    D4
 #define FLASH_BUTTON    D3
