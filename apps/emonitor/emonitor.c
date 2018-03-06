@@ -131,8 +131,8 @@ void ICACHE_FLASH_ATTR Emonitor_Init(void){
 	{
 		Emonitor_SendPeroid = DEFAULT_SEND_TIMING;
 	}
-	//Restore timing
-	Emonitor_sendTimer = Emonitor_RestoreTiming();
+	//Start with a send to update connection status right away
+	Emonitor_sendTimer = Emonitor_SendPeroid;
 }
 
 void ICACHE_FLASH_ATTR Emonitor_StartTimer(void){
@@ -140,32 +140,6 @@ void ICACHE_FLASH_ATTR Emonitor_StartTimer(void){
     hw_timer_init(FRC1_SOURCE,TRUE);
     hw_timer_set_func(task_1ms);
     hw_timer_arm(1000,1);
-}
-
-void ICACHE_FLASH_ATTR Emonitor_StoreTiming(uint32_t timingValue){
-	  uint8 buffer[4];
-	  buffer[0] = (timingValue>>24) & 0xF;
-	  buffer[1] = (timingValue>>16) & 0xF;
-	  buffer[2] = (timingValue>>8) & 0xF;
-	  buffer[3] = (timingValue) & 0xF;
-	  system_rtc_mem_write(64, buffer, 4);
-}
-
-uint32_t ICACHE_FLASH_ATTR Emonitor_RestoreTiming(void){
-	  uint8 buffer[4];
-	  uint32_t timingValue = 0;
-	  system_rtc_mem_read(64, buffer, 4);
-	  timingValue |=  (((uint32_t) buffer[0])<<24);
-	  timingValue |=  (((uint32_t) buffer[1])<<16);
-	  timingValue |=  (((uint32_t) buffer[2])<<8);
-	  timingValue |=  (((uint32_t) buffer[3]));
-	  //plausibity check
-	  if(timingValue > Emonitor_SendPeroid*2)
-	  {
-		  timingValue = Emonitor_SendPeroid/2;
-	  }
-
-	  return timingValue;
 }
 
 /******************************************************************************
@@ -355,8 +329,6 @@ void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 	{
 		//Emonitor send timing
 		Emonitor_sendTimer++;
-		//Store timing value
-		Emonitor_StoreTiming(Emonitor_sendTimer);
 	}
 
 	//Process requests

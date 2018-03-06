@@ -31,7 +31,7 @@
 #define PRJ_ENV		OS
 
 //WIFI
-#define DEFAULT_STA_SSID 		""
+#define DEFAULT_STA_SSID 		"BOCI"
 #define DEFAULT_STA_PASSWORD 	"fucking6"
 #define DEFAULT_SERVER_ADDRESS 	"http://v9.emonitor.hu"
 #define DEFAULT_API_KEY 		"97d3e42a841ea6c219582211313d5051"

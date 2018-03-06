@@ -1,19 +1,14 @@
 <html>
-
 <head>
-
 <title>Emonitor_%emon_id%</title>
-  
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="viewport" content="width=device-width, user-scalable=no" />
 <meta name="description" content="Emonitor">
 <meta name="author" content="Emonitor">
 <meta name="theme-color" content="#000000" />
-
 <meta charset="UTF-8" />
 <link rel="stylesheet" type="text/css" href="style.css">
 </head> 
@@ -39,7 +34,7 @@ window.location.reload();}else{pageloaded();}
 </script>
 <body id="body" onLoad="loadCheck();">
   <div id="page">
-  
+
     <ul>
       <li><a href="/index.html">Home</a></li>
       <li class="dropdown">
@@ -49,14 +44,14 @@ window.location.reload();}else{pageloaded();}
         </div>
       </li>
     </ul>
-  
+
     <div class="box">
       <h1><span>E</span>monitor_%emon_id%</h1>
       <h3>Home Energy Monitoring</h3>
     </div>
-<!--############-->
+
     <div id="left-hand-container" data-bind="visible: initialised()" style="display: none">
-     <!--//////////////////////////////////////////////////////////////////////////////////-->
+
       <div id="one">
         <h2>1. Device</h2>
         <div class="itembody-wrapper">
@@ -67,8 +62,8 @@ window.location.reload();}else{pageloaded();}
           <b class="fixwidth">CPU:</b> <t data-bind="text: status.st_bck()||'%st_bck%'">%st_bck%</t>%%<br>
           <b class="fixwidth">Reset:</b> <t data-bind="text: status.st_rst()||'%st_rst%'">%st_rst%</t></p>
         </div>
-      </div> 
-     <!--//////////////////////////////////////////////////////////////////////////////////-->
+      </div>
+
       <div id="two">
         <h2>2. WiFi Network</h2>
         <div class="itembody-wrapper">
@@ -91,7 +86,7 @@ window.location.reload();}else{pageloaded();}
           </div>
         </div>
       </div>       
-     <!--//////////////////////////////////////////////////////////////////////////////////-->
+
       <div id="three">
         <h2>3. Pulse counters</h2>
         <div class="itembody-wrapper">
@@ -111,11 +106,11 @@ window.location.reload();}else{pageloaded();}
           </table><br>
         </div>
       </div>
-      
+
     </div>
- <!--############-->
+
    <div id="right-hand-container" data-bind="visible: initialised()" style="display: none">
-     <!--//////////////////////////////////////////////////////////////////////////////////-->
+
       <div id="four">
         <h2>4. Temp sensors</h2>
         <div class="itembody-wrapper">
@@ -148,7 +143,6 @@ window.location.reload();}else{pageloaded();}
         </div>
    </div>
 
-     <!--//////////////////////////////////////////////////////////////////////////////////-->
       <div id="five">
         <h2>5. Extra sensors</h2>
         <div class="itembody-wrapper">

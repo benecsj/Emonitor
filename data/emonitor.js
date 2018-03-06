@@ -1,11 +1,5 @@
-var reference = window.location.href ;
-var hostName = reference.substr(0,reference.lastIndexOf("/"));
-
-function scaleString(string, scale, precision) {
-  var tmpval = parseInt(string) / scale;
-  return tmpval.toFixed(precision);
-}
-
+var ref = window.location.href ;
+var host = ref.substr(0,ref.lastIndexOf("/"));
 function BaseViewModel(defaults, remoteUrl, mappings) {
   if(mappings === undefined){mappings = {};}
   var self = this;
@@ -13,7 +7,6 @@ function BaseViewModel(defaults, remoteUrl, mappings) {
   ko.mapping.fromJS(defaults, mappings, self);
   self.fetching = ko.observable(false);
 }
-
 BaseViewModel.prototype.update = function (after) {
   if(after === undefined){after = function () { };}
   var self = this;
@@ -25,57 +18,28 @@ BaseViewModel.prototype.update = function (after) {
     after();
   });
 };
-
-//---------------------------------------------------------------------------
 function StatusViewModel() {
   var self = this;
-
   BaseViewModel.call(self, {
-"st_uptime": null,
-"st_timing": null,
-"st_conn": null,
-"st_heap": null,
-"st_bck": null,
-"st_rst": null,
+"st_uptime": null,"st_timing": null,"st_conn": null,"st_heap": null,"st_bck": null,"st_rst": null,
 "meter_co2": null,
-"pc_01": "0|0",
-"pc_02": "0|0",
-"pc_03": "0|0",
-"pc_04": "0|0",
-"pc_05": "0|0",
-"temp_health": null,
-"temp_count": 0,
-"ds18_01": "          | . ",
-"ds18_02": "          | . ",
-"ds18_03": "          | . ",
-"ds18_04": "          | . ",
-"ds18_05": "          | . ",
-"ds18_06": "          | . ",
-"ds18_07": "          | . ",
-"ds18_08": "          | . ",
-"ds18_09": "          | . ",
-"ds18_10": "          | . ",
-"ds18_11": "          | . ",
-"ds18_12": "          | . ",
-"ds18_13": "          | . ",
-"ds18_14": "          | . ",
-"ds18_15": "          | . ",
-"ds18_16": "          | . ",
-"st_wifi": null,
-"st_signal": null,
-"st_ip" : null
-  }, hostName + '/status.json');
+"pc_01": "0|0","pc_02": "0|0","pc_03": "0|0","pc_04": "0|0","pc_05": "0|0",
+"temp_health": null,"temp_count": 0,
+"ds18_01": "|.","ds18_02": "|.","ds18_03": "|.","ds18_04": "|.","ds18_05": "|.","ds18_06": "|.","ds18_07": "|.","ds18_08": "|.",
+"ds18_09": "|.","ds18_10": "|.","ds18_11": "|.","ds18_12": "|.","ds18_13": "|.","ds18_14": "|.","ds18_15": "|.","ds18_16": "|.",
+"st_wifi": null,"st_signal": null,"st_ip" : null
+  }, host + '/status.json');
 
     this.getCounter = ko.observable(0);
     this.getCounter.count = function (value) {
         return ko.computed({
             read: function () {
               switch(value) {
-                  case 1:temp = self.pc_01();break;
-                  case 2:temp = self.pc_02();break;
-                  case 3:temp = self.pc_03();break;
-                  case 4:temp = self.pc_04();break;
-                  case 5:temp = self.pc_05();break;
+case 1:temp = self.pc_01();break;
+case 2:temp = self.pc_02();break;
+case 3:temp = self.pc_03();break;
+case 4:temp = self.pc_04();break;
+case 5:temp = self.pc_05();break;
               }return temp.substr(0,temp.lastIndexOf("|"));}
         }, this);
     }.bind(this.getCounter);
@@ -83,11 +47,11 @@ function StatusViewModel() {
         return ko.computed({
             read: function () {
               switch(value) {
-                  case 1:temp = self.pc_01();break;
-                  case 2:temp = self.pc_02();break;
-                  case 3:temp = self.pc_03();break;
-                  case 4:temp = self.pc_04();break;
-                  case 5:temp = self.pc_05();break;
+case 1:temp = self.pc_01();break;
+case 2:temp = self.pc_02();break;
+case 3:temp = self.pc_03();break;
+case 4:temp = self.pc_04();break;
+case 5:temp = self.pc_05();break;
               }return temp.substr(temp.lastIndexOf("|")+1,10);}
         }, this);
     }.bind(this.getCounter);
@@ -149,7 +113,6 @@ case 16:temp = self.ds18_16();break;
   ko.pureComputed(function() {
     return self.pc_01().substr(0,self.pc_01().lastIndexOf("|"));
   }, self);
-
   // Some devired values
   self.getPulseLevel = ko.pureComputed(function() {
     return self.pc_01().substr(self.pc_01().lastIndexOf("|")+1,10);
@@ -157,11 +120,7 @@ case 16:temp = self.ds18_16();break;
 
   self.hasMeterCO2 = ko.pureComputed(function() {
     if((self.meter_co2() != null) && (self.meter_co2() != 10000)) {
-    return true;
-    }
-    return false;   
-  }, self);
-
+    return true;}return false;}, self);
 }
 StatusViewModel.prototype = Object.create(BaseViewModel.prototype);
 StatusViewModel.prototype.constructor = StatusViewModel;
@@ -173,10 +132,10 @@ function EmonitorViewModel() {
   var self = this;
   self.initialised = ko.observable(false);
   self.updating = ko.observable(false);
-  self.statusEnabled = reference.includes("status.html");
-  self.clockEnabled = reference.includes("clock.html");
-  self.indexEnabled = reference.endsWith("index.html");
-  self.waitEnabled = reference.includes("wait.html");
+  self.statusEnabled = ref.includes("status.html");
+  self.clockEnabled = ref.includes("clock.html");
+  self.indexEnabled = ref.endsWith("index.html");
+  self.waitEnabled = ref.includes("wait.html");
   var updateTimer = null;
   var updateTime = 1 * 1000;
   var pendingRequest = false;
@@ -184,27 +143,23 @@ function EmonitorViewModel() {
   var cycleCount = 0;
   self.status = new StatusViewModel();
 
-  // Initialise the app
-  self.start = function () {
-    delay = 1;
+  self.start = function () {delay = 1;
     if(self.statusEnabled){delay = 1;updateTime = 300;}
     if(self.clockEnabled){delay = 1;updateTime = 10000;}
     if(self.waitEnabled){delay = 10000;}
-    updateTimer = setTimeout(self.update, delay);
-  };
+    updateTimer = setTimeout(self.update, delay);};
 
-  // Get the updated state
   self.update = function (){
     if (self.updating()) {return;}
     self.updating(true);
     if (null !== updateTimer){
         clearTimeout(updateTimer);
         updateTimer = null;}
-    //Status page
+
     if(self.statusEnabled){
         if(pendingRequest == false){
             pendingRequest = true;
-            self.status.update(function () { 
+            self.status.update(function () {
                 pendingRequest = false;
                 pendingTimeOut = 0;})
         }else{
@@ -212,12 +167,12 @@ function EmonitorViewModel() {
             if(pendingTimeOut>30){pendingRequest=false;}
         }
     }
-    //Wait page
+
     if(self.waitEnabled){
         self.status.update(function () {
             window.location.replace("index.html");})
     }
-    //Clock page
+
     if(self.clockEnabled){
         self.status.update(function () {
             clockReceived();})
@@ -226,12 +181,8 @@ function EmonitorViewModel() {
     console.log("Cycle:"+cycleCount);cycleCount++;
     updateTimer = setTimeout(self.update, updateTime);
     self.updating(false);
-    self.initialised(true);    
+    self.initialised(true);
   };
 }
 
-function pageloaded(){
-  var emonitor = new EmonitorViewModel();
-  ko.applyBindings(emonitor);
-  emonitor.start();
-}
+function pageloaded(){var emonitor = new EmonitorViewModel();ko.applyBindings(emonitor);emonitor.start();}
