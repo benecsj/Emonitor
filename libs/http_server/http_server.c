@@ -50,7 +50,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 	if (token==NULL)
 	{
 		//Page finished... last callback
-		DBG_HTTPS("(HS) Page finished.. Process ARGS \n");
+		//DBG_HTTPS("(HS) Page finished.. Process ARGS \n");
 
 		// WAIT PAGE
 		if(strcmp(connData->url,"/wait.html")==0)
@@ -58,7 +58,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 			//Check if args received on wait page
 			if(connData->getArgs != NULL)
 			{
-				DBG_HTTPS("(HS) %s \n",connData->getArgs);
+				//DBG_HTTPS("(HS) %s \n",connData->getArgs);
 
 				//Process all tokens
 				tokenizer = 0;
@@ -120,7 +120,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 					{
 						tokenizer = 0;
 						//Process tokens
-						DBG_HTTPS("(HS) [%s][%s] \n",name,buff);
+						//DBG_HTTPS("(HS) [%s][%s] \n",name,buff);
 
 
 						//STA SSID
@@ -459,7 +459,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 		}
 		//Send out processed token
 		buff[len] = 0;
-		DBG_HTTPS("(HS) Fetch token [%s][%s]\n",token,buff);
+		//DBG_HTTPS("(HS) Fetch token [%s][%s]\n",token,buff);
 		httpdSend(connData, buff, -1);
 	}
 

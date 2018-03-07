@@ -39,7 +39,7 @@ s32_t STUB_SPIFFS_read(spiffs *fs, spiffs_file fh, void *buf, s32_t len)
 //path in the filesystem and if it exists, passes the file through. This simulates what a normal
 //webserver would do with static files.
 int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
-	DBG_HTTPS("(HS) cgiEspFsHook\n");
+	//DBG_HTTPS("(HS) cgiEspFsHook\n");
 	spiffs* fs = spiffs_get_fs();
 	int len;
 	char buff[1025];
@@ -58,12 +58,12 @@ int ICACHE_FLASH_ATTR cgiEspFsHook(HttpdConnData *connData) {
 				//Open a different file than provided in http request.
 				//Common usage: {"/", cgiEspFsHook, "/index.html"} will show content of index.html without actual redirect to that file if host root was requested
 				connData->file = SPIFFS_open(fs, (char*)connData->cgiArg, SPIFFS_RDONLY, 0);
-				DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->cgiArg);
+				//DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->cgiArg);
 
 			} else {
 				//Open the file so we can read it.
 				connData->file = SPIFFS_open(fs, (char*)connData->url, SPIFFS_RDONLY, 0);
-				DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->url);
+				//DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",connData->file,(char*)connData->url);
 			}
 
 			if (connData->file < 0) {
@@ -113,7 +113,7 @@ typedef void (* TplCallback)(HttpdConnData *connData, char *token, void **arg);
 static TplData tplData[HTTPD_MAX_CONNECTIONS];
 
 int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
-	DBG_HTTPS("(HS) cgiEspFsTemplate\n");
+	//DBG_HTTPS("(HS) cgiEspFsTemplate\n");
 	TplData *tpd=connData->cgiData;
 	spiffs* fs = spiffs_get_fs();
 	int len;
@@ -140,7 +140,7 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 			else
 			{
 				tpd->file = SPIFFS_open(fs, (char*)connData->url, SPIFFS_RDONLY, 0);
-				DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",tpd->file,(char*)connData->url);
+				//DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",tpd->file,(char*)connData->url);
 				tpd->tplArg=NULL;
 				tpd->tokenPos=-1;
 				if (tpd->file < 0) {
@@ -204,7 +204,7 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 				tpd->file = -1;
 			} else {
 				//Ok, till next time.
-				DBG_HTTPS("(HS) HTTPD_CGI_MORE\n");
+				//DBG_HTTPS("(HS) HTTPD_CGI_MORE\n");
 				returnValue = HTTPD_CGI_MORE;
 			}
 		}

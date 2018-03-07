@@ -16,15 +16,6 @@ extern spiffs* esp_spiffs_get_fs();
 \******************************************************************************/
 
 spiffs* fs = NULL;
-struct esp_spiffs_config config = {
-		FS1_FLASH_SIZE,
-		FS1_FLASH_ADDR,
-		SECTOR_SIZE,
-		LOG_BLOCK,
-		LOG_PAGE,
-		FD_BUF_SIZE * 2,
-		CACHE_BUF_SIZE
-};
 
 /******************************************************************************
 * Implementations
@@ -43,7 +34,7 @@ void ICACHE_FLASH_ATTR spiffs_init(void) {
 	int32 result = 0;
 
 	//Init spiffs file system
-    result = esp_spiffs_init(&config);
+    result = esp_spiffs_init();
     //Get File System
     fs = esp_spiffs_get_fs();
 
@@ -117,7 +108,7 @@ void ICACHE_FLASH_ATTR spiffs_format(void)
 		//Execute formating
 		esp_spiffs_deinit(TRUE);
 		//Re init Filesystem
-		esp_spiffs_init(&config);
+		esp_spiffs_init();
 }
 
 void ICACHE_FLASH_ATTR spiffs_status(void)

@@ -31,28 +31,6 @@
 extern "C" {
 #endif
 
-/** \defgroup Spiffs_APIs Spiffs APIs
-  * @brief Spiffs APIs
-  *
-  * More details about spiffs on https://github.com/pellepl/spiffs
-  *
-  */
-
-/** @addtogroup Spiffs_APIs
-  * @{
-  */
-
-struct esp_spiffs_config {
-    uint32 phys_size;        /**< physical size of the SPI Flash */
-    uint32 phys_addr;        /**< physical offset in spi flash used for spiffs, must be on block boundary */
-    uint32 phys_erase_block; /**< physical size when erasing a block */
-
-    uint32 log_block_size;   /**< logical size of a block, must be on physical block size boundary and must never be less than a physical block */
-    uint32 log_page_size;    /**< logical size of a page, at least log_block_size/8  */
-
-    uint32 fd_buf_size;      /**< file descriptor memory area size */
-    uint32 cache_buf_size;   /**< cache buffer size */
-};
 
 /**
   * @brief  Initialize spiffs
@@ -62,7 +40,7 @@ struct esp_spiffs_config {
   * @return 0         : succeed
   * @return otherwise : fail
   */
-s32_t esp_spiffs_init(struct esp_spiffs_config *config);
+s32_t esp_spiffs_init(void);
 
 /**
   * @brief  Deinitialize spiffs

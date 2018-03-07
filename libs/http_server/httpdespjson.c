@@ -20,7 +20,7 @@ Connector to let httpd use the espfs filesystem to serve the files in it.
 #include "esp_system.h"
 
 int ICACHE_FLASH_ATTR cgiEspJsonTemplate(HttpdConnData *connData) {
-	DBG_HTTPS("(HS) cgiEspJsonTemplate\n");
+	//DBG_HTTPS("(HS) cgiEspJsonTemplate\n");
 	int length =0;
 	char buffer[1025];
 	int returnValue = HTTPD_CGI_DONE;

@@ -347,6 +347,8 @@ void ICACHE_FLASH_ATTR SENSOR_MANAGER_DS18B20_StartMeasure(void)
         OWP_SelectChannel(i);
         //Broadcast convert message to all temp sensors
         D18_DS18B20_StartMeasure(D18_DS18B20_POWER_EXTERN, 0);
+        //Minor delay for TASK YIELD
+        DELAY_MS(1);
     }
 }
 
@@ -435,6 +437,8 @@ uint8 ICACHE_FLASH_ATTR SENSOR_MANAGER_DS18B20_Search(void) {
                 break;
             }
         }
+        //Minor delay for TASK YIELD
+        DELAY_MS(1);
     }
     //Return found sensors count
     return CS_nSensors;

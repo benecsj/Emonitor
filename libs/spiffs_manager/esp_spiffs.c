@@ -12,6 +12,10 @@ static u8_t *spiffs_work_buf;
 static u8_t *spiffs_fd_buf;
 static u8_t *spiffs_cache_buf;
 
+static u8_t spiffs_work_buffer[LOG_PAGE*2];
+static u8_t spiffs_fd_buffer[FD_BUF_SIZE * 2];
+static u8_t spiffs_cache_buffer[CACHE_BUF_SIZE];
+
 #define FLASH_UNIT_SIZE 4
 
 static s32_t ICACHE_FLASH_ATTR esp_spiffs_readwrite(u32_t addr, u32_t size, u8_t *p, int write)
@@ -87,80 +91,32 @@ spiffs* ICACHE_FLASH_ATTR esp_spiffs_get_fs()
     return &fs;
 }
 
-s32_t ICACHE_FLASH_ATTR esp_spiffs_init(struct esp_spiffs_config *config)
+s32_t ICACHE_FLASH_ATTR esp_spiffs_init(void)
 {
-    if (SPIFFS_mounted(&fs)) {
-        return -1;
-    }
-
     spiffs_config cfg;
-    s32_t ret;
-#if SPIFFS_SINGLETON == 0
-    cfg.phys_size = config->phys_size;
-    cfg.phys_addr = config->phys_addr;
-    cfg.phys_erase_block = config->phys_erase_block;
-    cfg.log_block_size = config->log_block_size;
-    cfg.log_page_size = config->log_page_size;
-#endif
-    cfg.hal_read_f = esp_spiffs_read;
-    cfg.hal_write_f = esp_spiffs_write;
-    cfg.hal_erase_f = esp_spiffs_erase;
-
-    if (spiffs_work_buf != NULL) {
-        os_free(spiffs_work_buf);
-        spiffs_work_buf = NULL;
+    s32_t ret = -1;
+	//Only mount if not yet mounted
+    if (SPIFFS_mounted(&fs) == FALSE) {
+    	//Load hal functions
+        cfg.hal_read_f = esp_spiffs_read;
+        cfg.hal_write_f = esp_spiffs_write;
+        cfg.hal_erase_f = esp_spiffs_erase;
+        //Mount filesystem
+        ret =  SPIFFS_mount(&fs, &cfg, (u8_t*)&spiffs_work_buffer,
+        					(u8_t*)&spiffs_fd_buffer, sizeof(spiffs_fd_buffer),
+        					(u8_t*)&spiffs_cache_buffer, sizeof(spiffs_cache_buffer),
+                            0);
     }
-    spiffs_work_buf = os_malloc(config->log_page_size * 2);
-
-    if (spiffs_work_buf == NULL) {
-        return -1;
-    }
-
-    if (spiffs_fd_buf != NULL) {
-    	os_free(spiffs_fd_buf);
-        spiffs_fd_buf = NULL;
-    }
-    spiffs_fd_buf = os_malloc(config->fd_buf_size);
-
-    if (spiffs_fd_buf == NULL) {
-    	os_free(spiffs_work_buf);
-        return -1;
-    }
-
-    if (spiffs_cache_buf != NULL) {
-    	os_free(spiffs_cache_buf);
-        spiffs_cache_buf = NULL;
-    }
-    spiffs_cache_buf = os_malloc(config->cache_buf_size);
-
-    if (spiffs_cache_buf == NULL) {
-    	os_free(spiffs_work_buf);
-    	os_free(spiffs_fd_buf);
-        return -1;
-    }
-
-    ret =  SPIFFS_mount(&fs, &cfg, spiffs_work_buf,
-                        spiffs_fd_buf, config->fd_buf_size,
-                        spiffs_cache_buf, config->cache_buf_size,
-                        0);
-
-    if (ret == -1) {
-    	os_free(spiffs_work_buf);
-    	os_free(spiffs_fd_buf);
-    	os_free(spiffs_cache_buf);
-    }
-
+    //Return mount status
     return ret;        
 }
 
 void ICACHE_FLASH_ATTR esp_spiffs_deinit(u8_t format)
 {
+	//Check if its mounted
     if (SPIFFS_mounted(&fs)) {
         SPIFFS_unmount(&fs);
-        os_free(spiffs_work_buf);
-        os_free(spiffs_fd_buf);
-        os_free(spiffs_cache_buf);
-
+        //Check if formating requested
         if (format) {
             SPIFFS_format(&fs);
         }

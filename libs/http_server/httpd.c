@@ -195,7 +195,7 @@ int ICACHE_FLASH_ATTR httpdFindArg(char *line, char *arg, char *buff, int buffLe
 //Get the value of a certain header in the HTTP client head
 //Returns true when found, false when not found.
 int ICACHE_FLASH_ATTR httpdGetHeader(HttpdConnData *conn, char *header, char *ret, int retLen) {
-	DBG_HTTPS("(HS) httpdGetHeader\n");
+	//DBG_HTTPS("(HS) httpdGetHeader\n");
 	char *p=conn->priv->head;
 	p=p+strlen(p)+1; //skip GET/POST part
 	p=p+strlen(p)+1; //skip HTTP part
@@ -237,7 +237,7 @@ void ICACHE_FLASH_ATTR httdSetTransferMode(HttpdConnData *conn, int mode) {
 
 //Start the response headers.
 void ICACHE_FLASH_ATTR httpdStartResponse(HttpdConnData *conn, int code) {
-	DBG_HTTPS("(HS) httpdStartResponse\n");
+	//DBG_HTTPS("(HS) httpdStartResponse\n");
 	uint32_t buff[(1024/4)+1];
 	int l;
 	const char *connStr="Connection: close\r\n";
@@ -254,7 +254,7 @@ void ICACHE_FLASH_ATTR httpdStartResponse(HttpdConnData *conn, int code) {
 
 //Send a http header.
 void ICACHE_FLASH_ATTR httpdHeader(HttpdConnData *conn, const char *field, const char *val) {
-	DBG_HTTPS("(HS) httpdHeader\n");
+	//DBG_HTTPS("(HS) httpdHeader\n");
 	httpdSend(conn, field, -1);
 	httpdSend(conn, ": ", -1);
 	httpdSend(conn, val, -1);
@@ -263,7 +263,7 @@ void ICACHE_FLASH_ATTR httpdHeader(HttpdConnData *conn, const char *field, const
 
 //Finish the headers.
 void ICACHE_FLASH_ATTR httpdEndHeaders(HttpdConnData *conn) {
-	DBG_HTTPS("(HS) httpdEndHeaders\n");
+	//DBG_HTTPS("(HS) httpdEndHeaders\n");
 	httpdSend(conn, "\r\n", -1);
 	conn->priv->flags|=HFL_SENDINGBODY;
 }
@@ -353,7 +353,7 @@ int ICACHE_FLASH_ATTR cgiRedirectApClientToHostname(HttpdConnData *connData) {
 //the data is seen as a C-string.
 //Returns 1 for success, 0 for out-of-memory.
 int ICACHE_FLASH_ATTR httpdSend(HttpdConnData *conn, const char *data, int len) {
-	DBG_HTTPS("(HS) httpdSend [%d]\n",len);
+	//DBG_HTTPS("(HS) httpdSend [%d]\n",len);
 	int returnValue = 0;
 	if (conn->conn==NULL) return 0;
 	if (len<0) len=strlen(data);
@@ -382,7 +382,7 @@ static char ICACHE_FLASH_ATTR httpdHexNibble(int val) {
 //are doing! Also, if you do set conn->cgi to NULL to indicate the connection is closed, do it BEFORE
 //calling this.
 void ICACHE_FLASH_ATTR httpdFlushSendBuffer(HttpdConnData *conn) {
-	DBG_HTTPS("(HS) httpdFlushSendBuffer\n");
+	//DBG_HTTPS("(HS) httpdFlushSendBuffer\n");
 	int r, len;
 
 	if (conn->conn!=NULL)
@@ -439,7 +439,7 @@ void ICACHE_FLASH_ATTR httpdFlushSendBuffer(HttpdConnData *conn) {
 }
 
 void ICACHE_FLASH_ATTR httpdCgiIsDone(HttpdConnData *conn) {
-	DBG_HTTPS("(HS) httpdCgiIsDone\n");
+	//DBG_HTTPS("(HS) httpdCgiIsDone\n");
 	conn->cgi=NULL; //no need to call this anymore
 	if (conn->priv->flags&HFL_CHUNKED) {
 		DBG_HTTPS("(HS) Pool slot %d is done. Cleaning up for next req\n", conn->slot);
@@ -462,7 +462,7 @@ void ICACHE_FLASH_ATTR httpdCgiIsDone(HttpdConnData *conn) {
 //Callback called when the data on a socket has been successfully
 //sent.
 void ICACHE_FLASH_ATTR httpdSentCb(ConnTypePtr rconn, char *remIp, int remPort) {
-	DBG_HTTPS("(HS) httpdSentCb\n");
+	//DBG_HTTPS("(HS) httpdSentCb\n");
 	HttpdConnData *conn=httpdFindConnData(rconn, remIp, remPort);
 	httpdContinue(conn);
 }
@@ -470,7 +470,7 @@ void ICACHE_FLASH_ATTR httpdSentCb(ConnTypePtr rconn, char *remIp, int remPort) 
 //Can be called after a CGI function has returned HTTPD_CGI_MORE to
 //resume handling an open connection asynchronously
 void ICACHE_FLASH_ATTR httpdContinue(HttpdConnData * conn) {
-	DBG_HTTPS("(HS) httpdContinue\n");
+	//DBG_HTTPS("(HS) httpdContinue\n");
 	httpdPlatLock();
 	int r;
 
@@ -519,7 +519,7 @@ void ICACHE_FLASH_ATTR httpdContinue(HttpdConnData * conn) {
 //We need to find the CGI function to call, call it, and dependent on what it returns either
 //find the next cgi function, wait till the cgi data is sent or close up the connection.
 static void ICACHE_FLASH_ATTR httpdProcessRequest(HttpdConnData *conn) {
-	DBG_HTTPS("(HS) httpdProcessRequest\n");
+	//DBG_HTTPS("(HS) httpdProcessRequest\n");
 	int r;
 	int i=0;
 	if (conn->url==NULL) {
@@ -537,7 +537,7 @@ static void ICACHE_FLASH_ATTR httpdProcessRequest(HttpdConnData *conn) {
 			if (builtInUrls[i].url[strlen(builtInUrls[i].url)-1]=='*' &&
 					strncmp(builtInUrls[i].url, conn->url, strlen(builtInUrls[i].url)-1)==0) match=1;
 			if (match) {
-				DBG_HTTPS("(HS) Is url index %d\n", i);
+				//DBG_HTTPS("(HS) Is url index %d\n", i);
 				conn->cgiData=NULL;
 				conn->file = -1;
 				conn->cgi=builtInUrls[i].cgiCb;
@@ -618,7 +618,7 @@ static void ICACHE_FLASH_ATTR httpdParseHeader(char *h, HttpdConnData *conn) {
 		if (conn->getArgs!=0) {
 			*conn->getArgs=0;
 			conn->getArgs++;
-			DBG_HTTPS("(HS) GET args = %s\n", conn->getArgs);
+			//DBG_HTTPS("(HS) GET args = %s\n", conn->getArgs);
 		} else {
 			conn->getArgs=NULL;
 		}
@@ -661,7 +661,7 @@ static void ICACHE_FLASH_ATTR httpdParseHeader(char *h, HttpdConnData *conn) {
 //ToDo: Also make httpdRecvCb/httpdContinue use these?
 //ToDo: Fail if aligned_prj_malloc fails?
 void ICACHE_FLASH_ATTR httpdConnSendStart(HttpdConnData *conn) {
-	DBG_HTTPS("(HS) httpdConnSendStart\n");
+	//DBG_HTTPS("(HS) httpdConnSendStart\n");
 	httpdPlatLock();
 
 	conn->priv->sendBuffLen=0;
@@ -669,7 +669,7 @@ void ICACHE_FLASH_ATTR httpdConnSendStart(HttpdConnData *conn) {
 
 //Finish the live-ness of a connection. Always call this after httpdConnStart
 void ICACHE_FLASH_ATTR httpdConnSendFinish(HttpdConnData *conn) {
-	DBG_HTTPS("(HS) httpdConnSendFinish\n");
+	//DBG_HTTPS("(HS) httpdConnSendFinish\n");
 	if (conn->conn) httpdFlushSendBuffer(conn);
 	//aligned_prj_free(conn->priv->sendBuff);
 	httpdPlatUnlock();
@@ -677,7 +677,7 @@ void ICACHE_FLASH_ATTR httpdConnSendFinish(HttpdConnData *conn) {
 
 //Callback called when there's data available on a socket.
 void ICACHE_FLASH_ATTR httpdRecvCb(ConnTypePtr rconn, char *remIp, int remPort, char *data, unsigned short len) {
-	DBG_HTTPS("(HS) httpdRecvCb\n");
+	//DBG_HTTPS("(HS) httpdRecvCb\n");
 	int x, r;
 	char *p, *e;
 	httpdPlatLock();

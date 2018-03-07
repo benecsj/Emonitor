@@ -70,6 +70,8 @@
 #define NULL_PTR	NULL
 #define DBG os_printf
 
+#define DELAY_MS(a)  	prj_Delay(a);
+
 #if PRJ_ENV == OS
 #define prj_malloc(a)		os_malloc(a)
 #define prj_free(a)			os_free(a)
