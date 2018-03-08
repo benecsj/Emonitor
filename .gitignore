@@ -3,3 +3,5 @@
 
 *.a
 .output
+
+data/version
