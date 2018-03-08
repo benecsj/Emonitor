@@ -130,7 +130,7 @@ void ICACHE_FLASH_ATTR Sensor_Manager_Init() {
 
 }
 
-void ICACHE_FLASH_ATTR Sensor_Manager_VeryFast() {
+void IRAM0 Sensor_Manager_VeryFast() {
     //MHZ14 CO2 Sensor
     MHZ14_Feed(digitalRead(MHZ14_INPUT_PIN));
 }

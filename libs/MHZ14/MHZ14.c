@@ -130,7 +130,7 @@ void ICACHE_FLASH_ATTR MHZ14_Main(void)
 }
 
 
-void ICACHE_FLASH_ATTR MHZ14_Feed(uint8 level)
+void IRAM0 MHZ14_Feed(uint8 level)
 {
 	//Detect rising edge event
 	if((MHZ14_signalState == MHZ14_STATE_LOW_SIG) && (level == 1))

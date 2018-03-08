@@ -148,7 +148,7 @@ void ICACHE_FLASH_ATTR Emonitor_StartTimer(void){
  * Parameters   : none
  * Returns      : none
  *******************************************************************************/
-void ICACHE_FLASH_ATTR Emonitor_Main_1ms(void) {
+void IRAM0 Emonitor_Main_1ms(void) {
 	uint8 ledValue;
 
 #if (EMONITOR_TIMING_TEST == 0)

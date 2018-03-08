@@ -206,7 +206,7 @@ TASK(task_Init){
 /*
  * Very fast task
  */
-void ICACHE_FLASH_ATTR task_1ms(void){
+void IRAM0 task_1ms(void){
 	//------------------
 	Emonitor_Main_1ms();
 	Sensor_Manager_VeryFast();

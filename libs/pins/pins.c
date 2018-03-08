@@ -124,7 +124,7 @@ extern void ICACHE_FLASH_ATTR pinMode(uint8 pin, uint8 mode)
     }
 }
 
-extern void ICACHE_FLASH_ATTR digitalWrite(uint8 pin, uint8 val)
+extern void IRAM0 digitalWrite(uint8 pin, uint8 val)
 {
     if (pin == 16) 
     {
@@ -139,7 +139,7 @@ extern void ICACHE_FLASH_ATTR digitalWrite(uint8 pin, uint8 val)
       GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, mask);
 }
 
-extern int ICACHE_FLASH_ATTR digitalRead(uint8 pin)
+extern int IRAM0 digitalRead(uint8 pin)
 {
     if (pin == 16)
         return (READ_PERI_REG(RTC_GPIO_IN_DATA) & 1);
