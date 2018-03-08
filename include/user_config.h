@@ -83,7 +83,7 @@
 #define SHORT_PRESS_MIN			100
 #define LONG_PRESS_MIN			8000
 #define CPU_USAGE_AVERAGE		8
-#define RESPONSE_TIME_OUT		10
+#define RESPONSE_TIME_OUT		20
 
 //Sensor manager
 #define OWP_CHANNELS_COUNT 		2

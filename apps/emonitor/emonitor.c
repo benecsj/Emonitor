@@ -317,6 +317,8 @@ void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 				if(Emonitor_responseTimer> RESPONSE_TIME_OUT)
 				{
 					Emonitor_responseTimer = 0;
+					//Clear last http request
+					httpclient_Cleanup();
 				}
 			}
 		}

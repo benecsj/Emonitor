@@ -40,6 +40,11 @@ typedef struct {
 	http_callback user_callback;
 } request_args;
 
+//Single client single connection
+struct espconn client_connection;
+esp_tcp client_tcp;
+request_args client_request;
+
 static char * ICACHE_FLASH_ATTR esp_strdup(const char * str)
 {
 	//New string pointer
@@ -277,12 +282,13 @@ static void ICACHE_FLASH_ATTR disconnect_callback(void * arg)
 {
 	HC_DEBUG("(HC) TCP Disconnected\n");
 	struct espconn *conn = (struct espconn *)arg;
+	request_args * req;
 
 	//Check connection parameter
 	if(conn != NULL) {
 		//Check if connection got user data
 		if(conn->reserve != NULL) {
-			request_args * req = (request_args *)conn->reserve;
+			req = (request_args *)conn->reserve;
 			int http_status = -1;
 			int body_size = 0;
 			char * body = "";
@@ -323,16 +329,11 @@ static void ICACHE_FLASH_ATTR disconnect_callback(void * arg)
 			prj_free(req->buffer);
 			prj_free(req->hostname);
 			prj_free(req->path);
-			prj_free(req);
+			//Set user callback back to NULL
+			req->user_callback = NULL;
 		}
 		//Connection clean up
 		espconn_delete(conn);
-		//Free tcp buffer if present
-		if(conn->proto.tcp != NULL) {
-			prj_free(conn->proto.tcp);
-		}
-		//Free up connection
-		prj_free(conn);
 	}
 }
 
@@ -345,41 +346,26 @@ static void ICACHE_FLASH_ATTR error_callback(void *arg, sint8 errType)
 static void ICACHE_FLASH_ATTR dns_callback(const char * hostname, ip_addr_t * addr, void * arg)
 {
 	request_args * req = (request_args *)arg;
-	sint8 result;
+	sint8 result = -1;
 
 	//Check input parameter
 	if (addr == NULL) { // DNS Not found
 		HC_DEBUG("(HC) DNS failed for %s\n", hostname);
-		//Call user callback if registered
-		if (req->user_callback != NULL) {
-			req->user_callback("", -1, "", 0);
-		}
-		//Free allocated ram
-		prj_free(req->buffer);
-		prj_free(req->post_data);
-		prj_free(req->headers);
-		prj_free(req->path);
-		prj_free(req->hostname);
-		prj_free(req);
 	}
-	else { // DNS found
+	else
+	{ // DNS found
 		HC_DEBUG("(HC) DNS found %s " IPSTR "\n", hostname, IP2STR(addr));
 		//Prepare esp connection
 		//Malloc connection struct
-		struct espconn * conn = (struct espconn *)prj_malloc(sizeof(struct espconn));
+		struct espconn * conn = (struct espconn *)&client_connection;
 		//Setup connection parameters
 		conn->type = ESPCONN_TCP;
 		conn->state = ESPCONN_NONE;
-		conn->proto.tcp = (esp_tcp *)prj_malloc(sizeof(esp_tcp));
 		conn->proto.tcp->local_port = espconn_port();
 		conn->proto.tcp->remote_port = req->port;
 		conn->reserve = req;
 		//Set remote ip
 		memcpy(conn->proto.tcp->remote_ip, addr, 4);
-		//Set callbacks
-		espconn_regist_connectcb(conn, connect_callback);
-		espconn_regist_disconcb(conn, disconnect_callback);
-		espconn_regist_reconcb(conn, error_callback);
 		//Register connection
 		result = espconn_connect(conn);
 		HC_DEBUG("(HC) TCP Connect Request (%d)\n",result);
@@ -388,26 +374,30 @@ static void ICACHE_FLASH_ATTR dns_callback(const char * hostname, ip_addr_t * ad
 		{
 			//Connection setup failed do clean up
 			espconn_delete(conn);
-			//Free tcp buffer if present
-			if(conn->proto.tcp != NULL) {
-				prj_free(conn->proto.tcp);
-			}
-			//Free allocated ram
-			prj_free(conn);
-			prj_free(req->buffer);
-			prj_free(req->post_data);
-			prj_free(req->headers);
-			prj_free(req->path);
-			prj_free(req->hostname);
-			prj_free(req);
 		}
+	}
+	//Check if got valid connection
+	if(result != 0)
+	{
+		//Free allocated ram
+		prj_free(req->buffer);
+		prj_free(req->post_data);
+		prj_free(req->headers);
+		prj_free(req->path);
+		prj_free(req->hostname);
+		//Call user callback if registered
+		if (req->user_callback != NULL) {
+			req->user_callback("", -1, "", 0);
+		}
+		//Set user callback back to NULL
+		req->user_callback = NULL;
 	}
 }
 
 void ICACHE_FLASH_ATTR http_raw_request(const char * hostname, int port, const char * path, const char * post_data, const char * headers, http_callback user_callback)
 {
 	HC_DEBUG("(HC) DNS request\n");
-	request_args * req = (request_args *)prj_malloc(sizeof(request_args));
+	request_args * req = (request_args *)&client_request;
 	ip_addr_t addr;
 	err_t error;
 
@@ -464,68 +454,100 @@ void ICACHE_FLASH_ATTR http_post(const char * url, const char * post_data, const
 	char * path;
 	char * colon;
 
-	//Check url
-	is_http  = strncmp(url, "http://",  strlen("http://"))  == 0;
-	//Check if http request
-	if (is_http)
+	//Only accept new request if http request is not pending
+	if(client_request.user_callback == NULL)
 	{
-		// Get rid of the protocol.
-		url += strlen("http://");
-		//Get path
-		path = (char *)strchr(url, '/');
-		if (path == NULL) {
-			path = (char *)strchr(url, '\0'); // Pointer to end of string.
-		}
-		//Get port integer position
-		colon = (char *)strchr(url, ':');
-		if (colon > path) {
-			colon = NULL; // Limit the search to characters before the path.
-		}
-		//Check if port is defined
-		if (colon == NULL) { // The port is not present.
-			memcpy(hostname, url, path - url);
-			hostname[path - url] = '\0';
-		}
-		else //Port is present
+		//Check url
+		is_http  = strncmp(url, "http://",  strlen("http://"))  == 0;
+		//Check if http request
+		if (is_http)
 		{
-			//Get port value
-			port = atoi(colon + 1);
-			//Check if its a valid port
-			if (port == 0)
-			{
-				HC_DEBUG("(HC) IP Port error %s\n", url);
+			// Get rid of the protocol.
+			url += strlen("http://");
+			//Get path
+			path = (char *)strchr(url, '/');
+			if (path == NULL) {
+				path = (char *)strchr(url, '\0'); // Pointer to end of string.
 			}
-			else
-			{
-				memcpy(hostname, url, colon - url);
-				hostname[colon - url] = '\0';
+			//Get port integer position
+			colon = (char *)strchr(url, ':');
+			if (colon > path) {
+				colon = NULL; // Limit the search to characters before the path.
 			}
-		}
-		//Check path
-		if (path[0] == '\0') {
-			// Empty path is not allowed.
-			path = "/";
-		}
-		HC_DEBUG("(HC) IP hostname=%s\n", hostname);
-		HC_DEBUG("(HC) IP port=%d\n", port);
-		HC_DEBUG("(HC) HTTP path=%s\n", path);
-		//Send http request
-		http_raw_request(hostname, port, path, post_data, headers, user_callback);
+			//Check if port is defined
+			if (colon == NULL) { // The port is not present.
+				memcpy(hostname, url, path - url);
+				hostname[path - url] = '\0';
+			}
+			else //Port is present
+			{
+				//Get port value
+				port = atoi(colon + 1);
+				//Check if its a valid port
+				if (port == 0)
+				{
+					HC_DEBUG("(HC) IP Port error %s\n", url);
+				}
+				else
+				{
+					memcpy(hostname, url, colon - url);
+					hostname[colon - url] = '\0';
+				}
+			}
+			//Check path
+			if (path[0] == '\0') {
+				// Empty path is not allowed.
+				path = "/";
+			}
+			HC_DEBUG("(HC) IP hostname=%s\n", hostname);
+			HC_DEBUG("(HC) IP port=%d\n", port);
+			HC_DEBUG("(HC) HTTP path=%s\n", path);
+			//Send http request
+			http_raw_request(hostname, port, path, post_data, headers, user_callback);
 
+		}
+		else // Not http request
+		{
+			HC_DEBUG("(HC) URL is not HTTP or HTTPS %s\n", url);
+		}
 	}
-	else // Not http request
+	else
 	{
-		HC_DEBUG("URL is not HTTP or HTTPS %s\n", url);
+		HC_DEBUG("(HC) Http client is BUSY\n");
 	}
 }
 
 void ICACHE_FLASH_ATTR http_get(const char * url, const char * headers, http_callback user_callback)
 {
+	//Call without post data
 	http_post(url, NULL, headers, user_callback);
 }
 
 void ICACHE_FLASH_ATTR httpclient_Init(void)
 {
+	//Call espconn stack init
 	espconn_init();
+
+	//Setup tcp struct
+	client_connection.proto.tcp = (esp_tcp *)&client_tcp;
+
+	//Set callbacks
+	espconn_regist_connectcb(&client_connection, connect_callback);
+	espconn_regist_disconcb(&client_connection, disconnect_callback);
+	espconn_regist_reconcb(&client_connection, error_callback);
+
+	//Callback used for status handling
+	client_request.user_callback = NULL;
 }
 
+void ICACHE_FLASH_ATTR httpclient_Cleanup(void)
+{
+	//Connection setup failed do clean up
+	espconn_delete(&client_connection);
+	//Call user callback if registered
+	if (client_request.user_callback != NULL) {
+		client_request.user_callback("", -1, "", 0);
+	}
+	//Callback used for status handling
+	client_request.user_callback = NULL;
+}

@@ -51,4 +51,6 @@ void ICACHE_FLASH_ATTR http_callback_example(char * response_body, int http_stat
 
 void ICACHE_FLASH_ATTR httpclient_Init(void);
 
+void ICACHE_FLASH_ATTR httpclient_Cleanup(void);
+
 #endif
