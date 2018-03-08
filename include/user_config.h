@@ -93,6 +93,7 @@
 
 //Remote control
 #define REMOTE_PRINT_PROMPT		(OFF)
+#define REMOTE_LOGIN_NEEDED		(OFF)
 #define REMOTE_MAX_COMMANDS		10
 #define REMOTE_MAX_INPUT		70
 #define REMOTE_MAX_COMMAND_ARGS 4

@@ -129,6 +129,7 @@ void shell_print_commands()
 
 	for (i = 0; i < CONFIG_SHELL_MAX_COMMANDS; i++) {
 		if (list[i].shell_program != 0 || list[i].shell_command_string != 0) {
+			shell_print("  ");
 			shell_println(list[i].shell_command_string);
 		}
 	}

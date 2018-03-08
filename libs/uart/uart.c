@@ -43,6 +43,8 @@ typedef struct _os_event_ {
 xTaskHandle xUartTaskHandle;
 xQueueHandle xQueueUart;
 
+uint8 uart_print_port = UART0;
+
 LOCAL STATUS
 uart_tx_one_char(uint8 uart, uint8 TxChar)
 {
@@ -61,26 +63,35 @@ uart_tx_one_char(uint8 uart, uint8 TxChar)
 LOCAL void
 uart1_write_char(char c)
 {
-    if (c == '\n') {
-        uart_tx_one_char(UART1, '\r');
-        uart_tx_one_char(UART1, '\n');
-    } else if (c == '\r') {
-    } else {
-        uart_tx_one_char(UART1, c);
-    }
+	//only print here if this port is selected
+	if(uart_print_port == UART1)
+	{
+		if (c == '\n') {
+			uart_tx_one_char(UART1, '\r');
+			uart_tx_one_char(UART1, '\n');
+		} else if (c == '\r') {
+		} else {
+			uart_tx_one_char(UART1, c);
+		}
+	}
 }
 
 void
 uart0_write_char(char c)
 {
-    if (c == '\n') {
-        uart_tx_one_char(UART0, '\r');
-        uart_tx_one_char(UART0, '\n');
-    } else if (c == '\r') {
-    } else {
-        uart_tx_one_char(UART0, c);
-    }
+	//only print here if this port is selected
+	if(uart_print_port == UART0)
+	{
+		if (c == '\n') {
+			uart_tx_one_char(UART0, '\r');
+			uart_tx_one_char(UART0, '\n');
+		} else if (c == '\r') {
+		} else {
+			uart_tx_one_char(UART0, c);
+		}
+	}
 }
+
 /*
 LOCAL void
 uart_rx_intr_handler_ssc(void *arg)
@@ -235,6 +246,7 @@ UART_SetPrintPort(UART_Port uart_no)
     {
     	os_install_putc1(UART_Sink);
     }
+    uart_print_port = uart_no;
 }
 
 void
