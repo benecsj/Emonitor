@@ -112,7 +112,7 @@
 #define DEBUG_LIBS				(OFF)
 #define DEBUG_SENSOR_MANAGER 	(OFF)
 #define DEBUG_EMONITOR 			(OFF)
-#define DEBUG_HTTP_CLIENT 		(ON)
+#define DEBUG_HTTP_CLIENT 		(OFF)
 #define DEBUG_HTTP_SERVER 		(OFF)
 #define DEBUG_WIFI_MANAGER		(OFF)
 #define DEBUG_MHZ14				(OFF)

@@ -544,7 +544,7 @@ void ICACHE_FLASH_ATTR httpclient_Init(void)
 	espconn_regist_disconcb(&client_connection, disconnect_callback);
 	espconn_regist_reconcb(&client_connection, error_callback);
 
-	//Request buffers
+	//Client buffers
 	client_request.buffer = (char *)&client_buffer;
 	client_request.post_data = (char *)&client_post_data;
 	client_request.hostname = (char *)&client_host_name;
