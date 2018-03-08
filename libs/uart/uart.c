@@ -81,13 +81,10 @@ uart0_write_char(char c)
         uart_tx_one_char(UART0, c);
     }
 }
-
+/*
 LOCAL void
 uart_rx_intr_handler_ssc(void *arg)
 {
-    /* uart0 and uart1 intr combine togther, when interrupt occur, see reg 0x3ff20020, bit2, bit0 represents
-      * uart1 and uart0 respectively
-      */
     os_event_t e;
     portBASE_TYPE xHigherPriorityTaskWoken;
 
@@ -109,46 +106,6 @@ uart_rx_intr_handler_ssc(void *arg)
     portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
-#if 0
-LOCAL void
-uart_config(uint8 uart_no, UartDevice *uart)
-{
-    if (uart_no == UART1) {
-        PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_U1TXD_BK);
-    } else {
-        /* rcv_buff size if 0x100 */
-        _xt_isr_attach(ETS_UART_INUM, uart_rx_intr_handler_ssc, NULL);
-        PIN_PULLUP_DIS(PERIPHS_IO_MUX_U0TXD_U);
-        PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_U0TXD);
-    }
-
-    uart_div_modify(uart_no, UART_CLK_FREQ / (uart->baut_rate));
-
-    WRITE_PERI_REG(UART_CONF0(uart_no), uart->exist_parity
-                   | uart->parity
-                   | (uart->stop_bits << UART_STOP_BIT_NUM_S)
-                   | (uart->data_bits << UART_BIT_NUM_S));
-
-    //clear rx and tx fifo,not ready
-    SET_PERI_REG_MASK(UART_CONF0(uart_no), UART_RXFIFO_RST | UART_TXFIFO_RST);
-    CLEAR_PERI_REG_MASK(UART_CONF0(uart_no), UART_RXFIFO_RST | UART_TXFIFO_RST);
-
-    if (uart_no == UART0) {
-        //set rx fifo trigger
-        WRITE_PERI_REG(UART_CONF1(uart_no),
-                       ((0x01 & UART_RXFIFO_FULL_THRHD) << UART_RXFIFO_FULL_THRHD_S));
-    } else {
-        WRITE_PERI_REG(UART_CONF1(uart_no),
-                       ((0x01 & UART_RXFIFO_FULL_THRHD) << UART_RXFIFO_FULL_THRHD_S));
-    }
-
-    //clear all interrupt
-    WRITE_PERI_REG(UART_INT_CLR(uart_no), 0xffff);
-    //enable rx_interrupt
-    SET_PERI_REG_MASK(UART_INT_ENA(uart_no), UART_RXFIFO_FULL_INT_ENA);
-}
-#endif
-
 LOCAL void
 uart_task(void *pvParameters)
 {
@@ -169,37 +126,7 @@ uart_task(void *pvParameters)
 
     vTaskDelete(NULL);
 }
-
-#if 0
-void
-uart_init(void)
-{
-    while (READ_PERI_REG(UART_STATUS(0)) & (UART_TXFIFO_CNT << UART_TXFIFO_CNT_S));
-
-    while (READ_PERI_REG(UART_STATUS(1)) & (UART_TXFIFO_CNT << UART_TXFIFO_CNT_S));
-
-    UART_ConfigTypeDef uart;
-
-    uart.baut_rate    = BIT_RATE_74880;
-    uart.data_bits    = UART_WordLength_8b;
-    uart.flow_ctrl    = USART_HardwareFlowControl_None;
-    // uart.exist_parity = PARITY_DIS;
-    uart.parity       = USART_Parity_None;
-    uart.stop_bits    = USART_StopBits_1;
-
-    uart_config(UART0, &uart);
-    uart_config(UART1, &uart);
-
-    os_install_putc1(uart1_write_char);
-
-    _xt_isr_unmask(1 << ETS_UART_INUM);
-
-    xQueueUart = xQueueCreate(32, sizeof(os_event_t));
-
-    xTaskCreate(uart_task, (uint8 const *)"uTask", 512, NULL, tskIDLE_PRIORITY + 2, &xUartTaskHandle);
-}
-#endif
-
+*/
 //=================================================================
 
 void
@@ -408,11 +335,10 @@ uart0_rx_intr_handler(void *para)
     }
 }
 
+/*
 void
 uart_init_new(void)
 {
-    UART_WaitTxFifoEmpty(UART0);
-    UART_WaitTxFifoEmpty(UART1);
 
     UART_ConfigTypeDef uart_config;
     uart_config.baud_rate    = BIT_RATE_74880;
@@ -424,23 +350,5 @@ uart_init_new(void)
     uart_config.UART_InverseMask = UART_None_Inverse;
     UART_ParamConfig(UART0, &uart_config);
 
-    UART_IntrConfTypeDef uart_intr;
-    uart_intr.UART_IntrEnMask = UART_RXFIFO_TOUT_INT_ENA | UART_FRM_ERR_INT_ENA | UART_RXFIFO_FULL_INT_ENA | UART_TXFIFO_EMPTY_INT_ENA;
-    uart_intr.UART_RX_FifoFullIntrThresh = 10;
-    uart_intr.UART_RX_TimeOutIntrThresh = 2;
-    uart_intr.UART_TX_FifoEmptyIntrThresh = 20;
-    UART_IntrConfig(UART0, &uart_intr);
-
-    UART_SetPrintPort(UART0);
-    UART_intr_handler_register(uart0_rx_intr_handler, NULL);
-    ETS_UART_INTR_ENABLE();
-
-    /*
-    UART_SetWordLength(UART0,UART_WordLength_8b);
-    UART_SetStopBits(UART0,USART_StopBits_1);
-    UART_SetParity(UART0,USART_Parity_None);
-    UART_SetBaudrate(UART0,74880);
-    UART_SetFlowCtrl(UART0,USART_HardwareFlowControl_None,0);
-    */
-
 }
+*/
