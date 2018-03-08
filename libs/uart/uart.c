@@ -70,7 +70,7 @@ uart1_write_char(char c)
     }
 }
 
-LOCAL void
+void
 uart0_write_char(char c)
 {
     if (c == '\n') {

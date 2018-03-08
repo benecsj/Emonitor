@@ -63,6 +63,6 @@ extern uint8 remote_recBuffer[];
 extern uint8 DES_Cpi_RxSize;
 extern uint8* DES_Cpi_RxPointer;
 
-#define CPI_Receive(lenght,pointer) pointer = remote_recBuffer; lenght = remote_recLength; remote_recLength = 0
+#define CPI_Receive(lenght,pointer) pointer = remote_recBuffer; lenght = 0;
 
 #endif

@@ -91,6 +91,13 @@
 #define TEMP_MAX_RETRY_COUNT 	5
 #define MHZ14_INPUT_PIN			PULSE_INPUT0
 
+//Remote control
+#define REMOTE_PRINT_PROMPT		(OFF)
+#define REMOTE_MAX_COMMANDS		10
+#define REMOTE_MAX_INPUT		70
+#define REMOTE_MAX_COMMAND_ARGS 4
+#define REMOTE_MAX_OUTPUT		70
+
 //Web server
 #define HTTPD_MAX_HEAD_LEN					1024
 #define HTTPD_MAX_POST_LEN					256
@@ -112,13 +119,14 @@
 #define DEBUG_LIBS				(OFF)
 #define DEBUG_SENSOR_MANAGER 	(OFF)
 #define DEBUG_EMONITOR 			(OFF)
+#define DEBUG_REMOTE_CONTROL	(ON)
 #define DEBUG_HTTP_CLIENT 		(OFF)
 #define DEBUG_HTTP_SERVER 		(OFF)
 #define DEBUG_WIFI_MANAGER		(OFF)
 #define DEBUG_MHZ14				(OFF)
 #define DEBUG_SPIFFS 			(OFF)
 #define DEBUG_NVM				(OFF)
-#define DEBUG_MAIN				(OFF)
+#define DEBUG_MAIN				(ON)
 
 #endif
 

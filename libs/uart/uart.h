@@ -271,6 +271,8 @@ void UART_SetFlowCtrl(UART_Port uart_no, UART_HwFlowCtrl flow_ctrl, uint8 rx_thr
   */
 void UART_SetLineInverse(UART_Port uart_no, UART_LineLevelInverse inverse_mask) ;
 
+
+void uart0_write_char(char c);
 /**
   * @}
   */

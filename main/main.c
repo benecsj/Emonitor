@@ -221,6 +221,7 @@ TASK(task_10ms) {
 	do{
 		//------------------
 		Sensor_Manager_Fast();
+		Remote_Control_Main();
 		//------------------
 		sysTimeMS = system_get_time()/1000;
 		DELAY_MS(10-((sysTimeMS)%10));
@@ -235,7 +236,6 @@ TASK(task_1000ms) {
 	do{
 		//------------------
 		Emonitor_Main_1000ms();
-		Remote_Control_Main();
 		NVM_Main();
 		Sensor_Manager_Main();
 		Wifi_Manager_Main();
