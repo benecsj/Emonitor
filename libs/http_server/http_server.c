@@ -346,6 +346,10 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 			else if (strcmp(token, "st_bck")==0) {
 				len = sprintf(buff, "%d%", Emonitor_GetCpuUsage());
 			}
+			//SW version
+			else if (strcmp(token, "st_sw")==0) {
+				len = sprintf(buff, "%s", Emonitor_GetSWVersion());
+			}
 			//WIFI CONNECTION
 			else if (strcmp(token, "st_wifi")==0) {
 

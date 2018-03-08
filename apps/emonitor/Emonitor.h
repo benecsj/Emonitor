@@ -56,7 +56,7 @@ extern sint32 Emonitor_connectionCounter;
 extern uint32 Emonitor_freeRam;
 extern uint32 Emonitor_backgroundRuntime;
 extern uint32 Emonitor_resetReason;
-
+extern char Emonitor_version[20];
 /******************************************************************************
 * Defines
 \******************************************************************************/
@@ -79,6 +79,8 @@ extern uint32 Emonitor_resetReason;
 #define Emonitor_SetUrl(a)	Emonitor_url[sprintf(Emonitor_url,"%s",a)]=0;
 #define Emonitor_GetKey()	(Emonitor_key)
 #define Emonitor_SetKey(a)	Emonitor_key[sprintf(Emonitor_key,"%s",a)]=0;
+
+#define Emonitor_GetSWVersion() (Emonitor_version)
 
 #define Emonitor_Request(a)	Emonitor_requestState = a
 

@@ -55,7 +55,9 @@ window.location.reload();}else{pageloaded();}
       <div id="one">
         <h2>1. Device</h2>
         <div class="itembody-wrapper">
-          <p id="text_uptime"><b class="fixwidth">Uptime:</b> <t data-bind="text: status.st_uptime()||'%st_uptime%'">%st_uptime%</t> sec<br>
+          <p>
+          <b class="fixwidth">Version:</b> <t>%st_sw%</t><br>
+          <b class="fixwidth">Uptime:</b> <t data-bind="text: status.st_uptime()||'%st_uptime%'">%st_uptime%</t> sec<br>
           <b class="fixwidth">Timing:</b> <t data-bind="text: status.st_timing()||'%st_timing%'">%st_timing%</t><br>
           <b class="fixwidth">Connected:</b> <t data-bind="text: status.st_conn()||'%st_conn%'">%st_conn%</t><br>
           <b class="fixwidth">RAM:</b> <t data-bind="text: status.st_heap()||'%st_heap%'">%st_heap%</t><br>

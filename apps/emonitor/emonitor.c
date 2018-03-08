@@ -74,6 +74,7 @@ Emonitor_Request Emonitor_requestState = EMONITOR_REQ_NONE;
 uint32 Emonitor_nodeId = INVALID_ID;
 char Emonitor_url[100] = {0};
 char Emonitor_key[33] = {0xFF};
+char Emonitor_version[20] = {0};
 uint32 Emonitor_SendPeroid = 0;
 
 /******************************************************************************
@@ -83,6 +84,7 @@ extern void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_s
 extern uint32_t Emonitor_GetDefaultId(void);
 extern void task_1ms(void);
 extern uint32 Emonitor_GetBackgroundRuntime(void);
+extern void ICACHE_FLASH_ATTR Emonitor_UpdateVersion(char* version);
 /******************************************************************************
 * Implementations
 \******************************************************************************/
@@ -131,6 +133,8 @@ void ICACHE_FLASH_ATTR Emonitor_Init(void){
 	{
 		Emonitor_SendPeroid = DEFAULT_SEND_TIMING;
 	}
+	//Get SW version
+	Emonitor_UpdateVersion((char*)&Emonitor_version);
 	//Start with a send to update connection status right away
 	Emonitor_sendTimer = Emonitor_SendPeroid;
 }
@@ -502,3 +506,14 @@ uint32_t ICACHE_FLASH_ATTR Emonitor_GetDefaultId(void)
 	return(atoi(numStart));
 }
 
+void ICACHE_FLASH_ATTR Emonitor_UpdateVersion(char* version)
+{
+	spiffs* fs = spiffs_get_fs();
+	spiffs_file fd;
+	s32_t length = 0;
+	//Get sw version from filestorage
+	fd = SPIFFS_open(fs, "/version", SPIFFS_RDONLY, 0);
+	length = SPIFFS_read(fs, fd, (u8_t *)version, 20);
+	SPIFFS_close(fs, fd);
+	version[length] = 0;
+}
