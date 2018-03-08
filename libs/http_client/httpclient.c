@@ -23,7 +23,7 @@
 
 // Debug output.
 #if DEBUG_HTTP_CLIENT
-#define HC_DEBUG(...) HC_DEBUG(__VA_ARGS__)
+#define HC_DEBUG(...) prj_printf(__VA_ARGS__)
 #else
 #define HC_DEBUG(...)
 #endif
@@ -44,23 +44,39 @@ typedef struct {
 struct espconn client_connection;
 esp_tcp client_tcp;
 request_args client_request;
+char client_buffer[HTTPC_RESPONE_BUFFER_SIZE];
+char client_post_data[HTTPC_POST_DATA_BUFFER_SIZE];
+char client_host_name[HTTPC_HOST_NAME_MAX_SIZE];
+char client_path[HTTPC_PATH_MAX_SIZE];
+char client_headers[HTTPC_HEADERS_MAX_SIZE];
 
-static char * ICACHE_FLASH_ATTR esp_strdup(const char * str)
+static uint8 ICACHE_FLASH_ATTR esp_strdup(char * dst, const char * str, uint32_t limit)
 {
-	//New string pointer
-	char * new_str = NULL;
+	uint8 status = FAIL;
+	uint8 length = 0;
+
 	//Check if input parameter is valid
 	if (str != NULL) {
-		//Create a new buffer for the string
-		new_str = (char *)prj_malloc(strlen(str) + 1); // 1 for null character
-		//Check if malloc was successful
-		if (new_str != NULL) {
+		length = (strlen(str) + 1);
+		//Check if str fits into buffer
+		if (limit > length) {
 			//copy string to new buffer
-			strcpy(new_str, str);
+			strcpy(dst, str);
+			HC_DEBUG("(HC) Size ok %d < %d\n",length, limit);
+			status = OK;
+		}
+		else
+		{
+			HC_DEBUG("(HC) Size error %d > %d\n",length, limit);
 		}
 	}
-	//Return pointer of new string
-	return new_str;
+	else
+	{
+		dst[0] = 0; // Terminate the buffer string
+		status = OK;
+	}
+	//Return status
+	return status;
 }
 
 static int ICACHE_FLASH_ATTR esp_isupper(char c)
@@ -207,9 +223,8 @@ static void ICACHE_FLASH_ATTR receive_callback(void * arg, char * buf, unsigned 
 	if (req->buffer != NULL) {
 		// Let's do the equivalent of a realloc().
 		const int new_size = req->buffer_size + len;
-		char * new_buffer;
-		//Try to malloc a new buffer
-		if (new_size > BUFFER_SIZE_MAX || NULL == (new_buffer = (char *)prj_malloc(new_size))) {
+		//Check response size
+		if (new_size > HTTPC_RESPONE_BUFFER_SIZE) {
 			HC_DEBUG("(HC) HTTP Response too long (%d)\n", new_size);
 			req->buffer[0] = '\0'; // Discard the buffer to avoid using an incomplete response.
 			espconn_disconnect(conn);
@@ -217,11 +232,8 @@ static void ICACHE_FLASH_ATTR receive_callback(void * arg, char * buf, unsigned 
 		else
 		{
 			HC_DEBUG("(HC) HTTP Response received (%d)\n", new_size);
-			memcpy(new_buffer, req->buffer, req->buffer_size);
-			memcpy(new_buffer + req->buffer_size - 1 /*overwrite the null character*/, buf, len); // Append new data.
-			new_buffer[new_size - 1] = '\0'; // Make sure there is an end of string.
-			prj_free(req->buffer);
-			req->buffer = new_buffer;
+			memcpy(req->buffer + req->buffer_size - 1 /*overwrite the null character*/, buf, len); // Append new data.
+			req->buffer[new_size - 1] = '\0'; // Make sure there is an end of string.
 			req->buffer_size = new_size;
 		}
 	}
@@ -232,15 +244,15 @@ static void ICACHE_FLASH_ATTR sent_callback(void * arg)
 	struct espconn * conn = (struct espconn *)arg;
 	request_args * req = (request_args *)conn->reserve;
 
-	if (req->post_data == NULL) {
+	if (req->post_data[0] == 0) {
 		HC_DEBUG("(HC) HTTP All sent\n");
 	}
 	else {
 		// The headers were sent, now send the contents.
 		HC_DEBUG("(HC) HTTP Sending request body\n");
 		espconn_send(conn, (uint8 *)req->post_data, strlen(req->post_data));
-		prj_free(req->post_data);
-		req->post_data = NULL;
+		//Clear buffer content
+		req->post_data[0] = 0;
 	}
 }
 
@@ -256,7 +268,7 @@ static void ICACHE_FLASH_ATTR connect_callback(void * arg)
 	const char * method = "GET";
 	char post_headers[32] = "";
 
-	if (req->post_data != NULL) { // If there is data this is a POST request.
+	if (req->post_data[0] != 0) { // If there is data this is a POST request.
 		method = "POST";
 		prj_sprintf(post_headers, "Content-Length: %d\r\n", strlen(req->post_data));
 	}
@@ -274,8 +286,8 @@ static void ICACHE_FLASH_ATTR connect_callback(void * arg)
 						 method, req->path, req->hostname, req->port, req->headers, post_headers);
 
 	espconn_send(conn, (uint8 *)buf, len);
-	prj_free(req->headers);
-	req->headers = NULL;
+	//Terminate headers string
+	req->headers[0] = 0;
 }
 
 static void ICACHE_FLASH_ATTR disconnect_callback(void * arg)
@@ -325,10 +337,6 @@ static void ICACHE_FLASH_ATTR disconnect_callback(void * arg)
 			if (req->user_callback != NULL) {
 				req->user_callback(body, http_status, req->buffer, body_size);
 			}
-			//Free allocated ram
-			prj_free(req->buffer);
-			prj_free(req->hostname);
-			prj_free(req->path);
 			//Set user callback back to NULL
 			req->user_callback = NULL;
 		}
@@ -356,7 +364,6 @@ static void ICACHE_FLASH_ATTR dns_callback(const char * hostname, ip_addr_t * ad
 	{ // DNS found
 		HC_DEBUG("(HC) DNS found %s " IPSTR "\n", hostname, IP2STR(addr));
 		//Prepare esp connection
-		//Malloc connection struct
 		struct espconn * conn = (struct espconn *)&client_connection;
 		//Setup connection parameters
 		conn->type = ESPCONN_TCP;
@@ -379,12 +386,6 @@ static void ICACHE_FLASH_ATTR dns_callback(const char * hostname, ip_addr_t * ad
 	//Check if got valid connection
 	if(result != 0)
 	{
-		//Free allocated ram
-		prj_free(req->buffer);
-		prj_free(req->post_data);
-		prj_free(req->headers);
-		prj_free(req->path);
-		prj_free(req->hostname);
 		//Call user callback if registered
 		if (req->user_callback != NULL) {
 			req->user_callback("", -1, "", 0);
@@ -399,21 +400,24 @@ void ICACHE_FLASH_ATTR http_raw_request(const char * hostname, int port, const c
 	HC_DEBUG("(HC) DNS request\n");
 	request_args * req = (request_args *)&client_request;
 	ip_addr_t addr;
-	err_t error;
+	err_t error = OK;
 
 	//Setup request parameters
-	req->hostname = esp_strdup(hostname);
-	req->path = esp_strdup(path);
+	error |= esp_strdup(req->hostname,hostname,HTTPC_HOST_NAME_MAX_SIZE);
+	error |= esp_strdup(req->path,path,HTTPC_PATH_MAX_SIZE);
 	req->port = port;
-	req->headers = esp_strdup(headers);
-	req->post_data = esp_strdup(post_data);
+	error |= esp_strdup(req->headers,headers,HTTPC_HEADERS_MAX_SIZE);
+	error |= esp_strdup(req->post_data,post_data,HTTPC_POST_DATA_BUFFER_SIZE);
 	req->buffer_size = 1;
-	req->buffer = (char *)prj_malloc(1);
 	req->buffer[0] = '\0'; // Empty string.
 	req->user_callback = user_callback;
 
-	error = espconn_gethostbyname((struct espconn *)req, // It seems we don't need a real espconn pointer here.
-										hostname, &addr, dns_callback);
+	//If all ok then try to get dns
+	if(error == OK)
+	{
+		error = espconn_gethostbyname((struct espconn *)req, // It seems we don't need a real espconn pointer here.
+											hostname, &addr, dns_callback);
+	}
 	//Check dns request response
 	if (error == ESPCONN_INPROGRESS) {
 		HC_DEBUG("(HC) DNS pending\n");
@@ -423,6 +427,10 @@ void ICACHE_FLASH_ATTR http_raw_request(const char * hostname, int port, const c
 	{
 		// Already in the local names table (or hostname was an IP address), execute the callback ourselves.
 		dns_callback(hostname, &addr, req);
+	}
+	//PARAMETER SIZE ERROR
+	else if(error == FAIL){
+		HC_DEBUG("(HC) Buffer size error \n");
 	}
 	//DNS ERROR
 	else
@@ -535,6 +543,13 @@ void ICACHE_FLASH_ATTR httpclient_Init(void)
 	espconn_regist_connectcb(&client_connection, connect_callback);
 	espconn_regist_disconcb(&client_connection, disconnect_callback);
 	espconn_regist_reconcb(&client_connection, error_callback);
+
+	//Request buffers
+	client_request.buffer = (char *)&client_buffer;
+	client_request.post_data = (char *)&client_post_data;
+	client_request.hostname = (char *)&client_host_name;
+	client_request.path = (char *)&client_path;
+	client_request.headers = (char *)&client_headers;
 
 	//Callback used for status handling
 	client_request.user_callback = NULL;
