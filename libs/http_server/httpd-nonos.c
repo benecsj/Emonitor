@@ -12,11 +12,6 @@ ESP8266 web server - platform-dependent routines, nonos version
 static struct espconn httpdConn;
 static esp_tcp httpdTcp;
 
-//Set/clear global httpd lock.
-//Not needed on nonoos.
-void ICACHE_FLASH_ATTR httpdPlatLock() {}
-void ICACHE_FLASH_ATTR httpdPlatUnlock() {}
-
 static void ICACHE_FLASH_ATTR platReconCb(void *arg, sint8 err) {
 	//From ESP8266 SDK
 	//If still no response, considers it as TCP connection broke, goes into espconn_reconnect_callback.

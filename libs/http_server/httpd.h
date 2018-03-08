@@ -4,7 +4,7 @@
 #define HTTPDVER "0.4"
 
 //If some data can't be sent because the underlaying socket doesn't accept the data (like the nonos
-//layer is prone to do), we put it in a backlog that is dynamically malloc'ed. This defines the max
+//layer is prone to do), we put it in a backlog that is dynamically stored. This defines the max
 //size of the backlog.
 #define HTTPD_MAX_BACKLOG_SIZE	(4*256)
 

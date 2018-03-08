@@ -55,7 +55,3 @@ typedef struct espconn* ConnTypePtr;
 #endif
 #endif
 
-#define HTTPD_ALIGNMENT 4
-
-extern void* aligned_malloc(size_t required_bytes);
-extern void aligned_free(void *p);

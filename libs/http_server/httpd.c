@@ -326,7 +326,6 @@ int ICACHE_FLASH_ATTR cgiRedirectToHostname(HttpdConnData *connData) {
 	//Check hostname; pass on if the same
 	if (strcmp(connData->hostName, (char*)connData->cgiArg)==0) return HTTPD_CGI_NOTFOUND;
 	//Not the same. Redirect to real hostname.
-	//buff=aligned_prj_malloc(strlen((char*)connData->cgiArg)+sizeof(hostFmt));
 	uint8 buffer[HTTPD_REDIRECT_TO_HOSTNAME_BUFFER];
 	buff = (char*)&buffer;
 	if (buff==NULL) {
@@ -336,7 +335,6 @@ int ICACHE_FLASH_ATTR cgiRedirectToHostname(HttpdConnData *connData) {
 	sprintf(buff, hostFmt, (char*)connData->cgiArg);
 	DBG_HTTPS("(HS) Redirecting to hostname url %s\n", buff);
 	httpdRedirect(connData, buff);
-	//aligned_prj_free(buff);
 	return HTTPD_CGI_DONE;
 }
 
@@ -448,7 +446,6 @@ void ICACHE_FLASH_ATTR httpdCgiIsDone(HttpdConnData *conn) {
 		conn->priv->headPos=0;
 		conn->post->len=-1;
 		conn->priv->flags=0;
-		//if (conn->post->buff) aligned_prj_free(conn->post->buff);
 		conn->post->buff=NULL;
 		conn->post->buffLen=0;
 		conn->post->received=0;
@@ -659,7 +656,6 @@ static void ICACHE_FLASH_ATTR httpdParseHeader(char *h, HttpdConnData *conn) {
 
 //Make a connection 'live' so we can do all the things a cgi can do to it.
 //ToDo: Also make httpdRecvCb/httpdContinue use these?
-//ToDo: Fail if aligned_prj_malloc fails?
 void ICACHE_FLASH_ATTR httpdConnSendStart(HttpdConnData *conn) {
 	//DBG_HTTPS("(HS) httpdConnSendStart\n");
 	httpdPlatLock();
@@ -671,7 +667,6 @@ void ICACHE_FLASH_ATTR httpdConnSendStart(HttpdConnData *conn) {
 void ICACHE_FLASH_ATTR httpdConnSendFinish(HttpdConnData *conn) {
 	//DBG_HTTPS("(HS) httpdConnSendFinish\n");
 	if (conn->conn) httpdFlushSendBuffer(conn);
-	//aligned_prj_free(conn->priv->sendBuff);
 	httpdPlatUnlock();
 }
 
