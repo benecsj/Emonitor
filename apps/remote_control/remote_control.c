@@ -159,7 +159,7 @@ int ICACHE_FLASH_ATTR Command_PrintAll(int argc, char** argv) {
 }
 
 int ICACHE_FLASH_ATTR Command_Config(int argc, char** argv) {
-	char* text = "unknown parameter";
+	char* text = "error, use parameter: clear | save | reload";
 	char* parameter;
 
 	//Check argument count
@@ -191,7 +191,7 @@ int ICACHE_FLASH_ATTR Command_Config(int argc, char** argv) {
 }
 
 int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
-	char* text = "unknown parameter";
+	char* text = "error, use parameter: init | ip | hotspot";
 	char* parameter;
     uint8 temp[4];
 
@@ -231,6 +231,10 @@ int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
 					text="wifi hotspot disabled";
 				}
 			}
+			else
+			{
+				text = "error, missing parameter: on | off";
+			}
 		}
 	}
     //Generate response
@@ -260,6 +264,7 @@ int ICACHE_FLASH_ATTR Command_Dir(int argc, char** argv) {
 int ICACHE_FLASH_ATTR Command_Print(int argc, char** argv) {
 	char* fileName;
 	char buf[100] = {0};
+	char fileNameBuffer[50] = {0};
 	s32_t len;
 	spiffs* fs;
 
@@ -268,13 +273,22 @@ int ICACHE_FLASH_ATTR Command_Print(int argc, char** argv) {
 	{
 		// Process parameters
 		fileName = argv[1];
+		//Check if '/' is missing
+		if(fileName[0] != '/')
+		{
+			sprintf(fileNameBuffer,"/%s",fileName);
+		}
+		else
+		{
+			sprintf(fileNameBuffer,"%s",fileName);
+		}
 		//get filesystem
 		fs = spiffs_get_fs();
 		//Get file status
 		spiffs_stat status;
-		int32 result = SPIFFS_stat(fs, (char *)fileName, &status);
+		int32 result = SPIFFS_stat(fs, (char *)&fileNameBuffer, &status);
 		//Try to open file
-		spiffs_file fd = SPIFFS_open(fs, fileName, SPIFFS_RDONLY, 0);
+		spiffs_file fd = SPIFFS_open(fs, (const char *)&fileNameBuffer, SPIFFS_RDONLY, 0);
 		//Check if file is found
 		if(fd>= 0)
 		{
@@ -296,14 +310,14 @@ int ICACHE_FLASH_ATTR Command_Print(int argc, char** argv) {
 	}
 	else
 	{
-		prj_printf("missing parameter\n");
+		prj_printf("error, provide filename\n");
 	}
 
     return SHELL_RET_SUCCESS;
 }
 
 int ICACHE_FLASH_ATTR Command_Counter(int argc, char** argv) {
-	char* text = "unknown parameter";
+	char* text = "error, use parameter: reset";
 	char* parameter;
 
 	//Check argument count
