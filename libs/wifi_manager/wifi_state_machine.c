@@ -212,9 +212,6 @@ bool ICACHE_FLASH_ATTR start_wifi_station(const char * ssid, const char * pass){
             return false;
         }
     }
-
-    //wifi_station_set_reconnect_policy(true);
-
     return wifi_station_connect();
 }
 

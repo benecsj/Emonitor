@@ -159,7 +159,7 @@ int ICACHE_FLASH_ATTR Command_PrintAll(int argc, char** argv) {
 }
 
 int ICACHE_FLASH_ATTR Command_Config(int argc, char** argv) {
-	char* text = "error, use parameter: clear | save | reload";
+	char* text = "error, use parameter: clear | save | load";
 	char* parameter;
 
 	//Check argument count
@@ -179,7 +179,7 @@ int ICACHE_FLASH_ATTR Command_Config(int argc, char** argv) {
 			NvM_RequestSave();
 			text="config stored";
 		}
-		else if(strcmp(parameter,"reload")==0)
+		else if(strcmp(parameter,"load")==0)
 		{
 			NvM_RequestLoad();
 			text="config reloaded";
@@ -191,8 +191,9 @@ int ICACHE_FLASH_ATTR Command_Config(int argc, char** argv) {
 }
 
 int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
-	char* text = "error, use parameter: init | ip | hotspot";
+	char* text = "error, use parameter: init | ip | hotspot | connect";
 	char* parameter;
+	char* parameter2;
     uint8 temp[4];
 
 	//Check argument count
@@ -215,25 +216,174 @@ int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
 		}
 		else if(strcmp(parameter,"hotspot")==0)
 		{
+			parameter = argv[2];
 			//Check if second parameter received
 			if(argc == 3)
 			{
-				//Check if its 'on'
-				parameter = argv[2];
-				if(parameter[1] == 'n')
-				{
+				 if(strcmp(parameter,"on")==0)
+				 {
 					Wifi_Manager_EnableHotspot(TRUE);
 					text="wifi hotspot enabled";
+				 }
+				 else if(strcmp(parameter,"off")==0)
+				 {
+					Wifi_Manager_EnableHotspot(FALSE);
+					text="wifi hotspot disabled";
+				 }
+				 else
+				 {
+					Wifi_Manager_SetAP_SSID(parameter);
+					Wifi_Manager_SetAP_PASSWORD("");
+					printf("new SSID:[%s] PASS:[]\n",parameter);
+					text="wifi hotspot reconfigured";
+				 }
+			}
+			else if(argc == 4)
+			{
+				parameter = argv[2];
+				parameter2 = argv[3];
+				Wifi_Manager_SetAP_SSID(parameter);
+				Wifi_Manager_SetAP_PASSWORD(parameter2);
+				printf("new SSID:[%s] PASS:[%s]\n",parameter,parameter2);
+				text="wifi hotspot reconfigured";
+			}
+			else
+			{
+				printf("current SSID:[%s] PASS:[%s] Enable:",Wifi_Manager_GetAP_SSID(),Wifi_Manager_GetAP_PASSWORD());
+				if(Wifi_Manager_GetEnableHotspot())
+				{
+					printf("on");
 				}
 				else
 				{
-					Wifi_Manager_EnableHotspot(FALSE);
-					text="wifi hotspot disabled";
+					printf("off");
+				}
+				text = "";
+			}
+		}
+		else if(strcmp(parameter,"connect")==0)
+		{
+			parameter = argv[2];
+			//Check if second parameter received
+			if(argc == 3)
+			{
+				Wifi_Manager_SetSTA_SSID(parameter);
+				Wifi_Manager_SetSTA_PASSWORD("");
+				printf("new SSID:[%s] PASS:[]\n",parameter);
+				text="wifi connection reconfigured";
+			}
+			else if(argc == 4)
+			{
+				parameter2 = argv[3];
+				Wifi_Manager_SetSTA_SSID(parameter);
+				Wifi_Manager_SetSTA_PASSWORD(parameter2);
+				printf("new SSID:[%s] PASS:[%s]\n",parameter,parameter2);
+				text="wifi connection reconfigured";
+			}
+			else
+			{
+				printf("current SSID:[%s] PASS:[%s]",Wifi_Manager_GetSTA_SSID(),Wifi_Manager_GetSTA_PASSWORD());
+				text = "";
+			}
+		}
+	}
+    //Generate response
+	prj_printf("%s\n", text);
+    return SHELL_RET_SUCCESS;
+}
+
+int ICACHE_FLASH_ATTR Command_Emon(int argc, char** argv) {
+	char* text = "error, use parameter: key | url | nodeid | timing";
+	char* parameter;
+	char* parameter2;
+	int32_t number;
+    uint8 temp[4];
+
+	//Check argument count
+	if(argc >= 2)
+	{
+		// Process parameters
+		parameter = argv[1];
+
+		//Do stuff
+		if(strcmp(parameter,"key")==0)
+		{
+			parameter = argv[2];
+			//Check if second parameter received
+			if(argc == 3)
+			{
+				Emonitor_SetKey(parameter);
+				printf("new key:[%s]\n",parameter);
+				text="emoncms key reconfigured";
+			}
+			else
+			{
+				printf("current emoncms key:[%s]",Emonitor_GetKey());
+				text = "";
+			}
+		}
+		else if(strcmp(parameter,"url")==0)
+		{
+			parameter = argv[2];
+			//Check if second parameter received
+			if(argc == 3)
+			{
+				Emonitor_SetUrl(parameter);
+				printf("new url:[%s]\n",parameter);
+				text="emoncms url reconfigured";
+			}
+			else
+			{
+				printf("current emoncms url:[%s]",Emonitor_GetUrl());
+				text = "";
+			}
+		}
+		else if(strcmp(parameter,"nodeid")==0)
+		{
+			parameter = argv[2];
+			//Check if second parameter received
+			if(argc == 3)
+			{
+				number = strtol(parameter,NULL,10);
+				if((number > 0) && (number <=999999))
+				{
+					Emonitor_SetNodeId(number);
+					printf("new nodeid:[%d]\n",number);
+					text="emoncms nodeid reconfigured";
+				}
+				else
+				{
+					text="emoncms nodeid must be between 1 and 999999";
 				}
 			}
 			else
 			{
-				text = "error, missing parameter: on | off";
+				printf("current emoncms nodeid:[%d]",Emonitor_GetNodeId());
+				text = "";
+			}
+		}
+		else if(strcmp(parameter,"timing")==0)
+		{
+			parameter = argv[2];
+			//Check if second parameter received
+			if(argc == 3)
+			{
+				number = strtol(parameter,NULL,10);
+				if((number > 0) && (number <=3600))
+				{
+					Emonitor_SetSendPeriod(number);
+					printf("new timing:[%d]\n",number);
+					text="emoncms timing reconfigured";
+				}
+				else
+				{
+					text="emoncms timing must be between 1 and 3600";
+				}
+			}
+			else
+			{
+				printf("current emoncms timing:[%d]",Emonitor_GetSendPeriod());
+				text = "";
 			}
 		}
 	}
@@ -386,6 +536,7 @@ void Remote_RegisterCommands(void)
     shell_register(Command_Dir, "dir");
     shell_register(Command_Counter, "counter");
     shell_register(Command_Print, "print");
+    shell_register(Command_Emon, "emon");
 }
 
 void Remote_UnregisterCommands(void)

@@ -113,9 +113,6 @@ void ICACHE_FLASH_ATTR Wifi_Manager_Init(void)
    	{
    		Wifi_Manager_status = WIFI_STA_NOT_CONFIGURED;
    	}
-
-    ////stop_wifi_station();
-    ////stop_wifi_ap();
 }
 
 void ICACHE_FLASH_ATTR Wifi_Manager_Main(void)
