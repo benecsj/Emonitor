@@ -9,7 +9,6 @@
 #include "Sensor_Manager.h"
 #include "Emonitor.h"
 
-
 int Http_Server_TokenProcessor(HttpdConnData *connData, char *token, void **arg);
 uint16 Http_Server_FormId = 0;
 
@@ -35,6 +34,12 @@ void ICACHE_FLASH_ATTR Http_Server_Init(void)
 	httpdInit(builtInUrls, 80);
 	DBG_HTTPS("(HS) Http_Server_Init FINISH\n");
 	Http_Server_FormId = os_random();
+}
+
+void ICACHE_FLASH_ATTR Http_Server_Main(void)
+{
+	//Monitor connection status
+	httpdMonitorConnections();
 }
 
 //Template code for the counter on the index page.

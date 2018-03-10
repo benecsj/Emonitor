@@ -46,14 +46,20 @@ struct HttpdPriv {
 	int flags;
 };
 
-//Connection pool
-static HttpdConnData *connData[HTTPD_MAX_CONNECTIONS];
-
 //Struct to keep extension->mime data in
 typedef struct {
 	const char *ext;
 	const char *mimetype;
 } MimeMap;
+
+
+HttpdConnData httpdConnData[HTTPD_MAX_CONNECTIONS];
+HttpdPriv httpdPriv[HTTPD_MAX_CONNECTIONS];
+HttpdPostData httpdPostData[HTTPD_MAX_CONNECTIONS];
+uint8 privBuffer[HTTPD_MAX_SENDBUFF_LEN * HTTPD_MAX_CONNECTIONS];
+uint8 postBuffer[HTTPD_MAX_POSTBUFF_LEN * HTTPD_MAX_CONNECTIONS];
+
+uint8 ConnectionTimeOut[HTTPD_MAX_CONNECTIONS];
 
 //The mappings from file extensions to mime types. If you need an extra mime type,
 //add it here.
@@ -93,10 +99,10 @@ static HttpdConnData ICACHE_FLASH_ATTR *httpdFindConnData(ConnTypePtr conn, char
 
 	//Find connection with given port and ip
 	for (i=0; i<HTTPD_MAX_CONNECTIONS; i++) {
-		if (connData[i] && connData[i]->remote_port == remPort &&
-						memcmp(connData[i]->remote_ip, remIp, 4) == 0) {
-			connData[i]->conn=conn;
-			returnValue = connData[i];
+		if (httpdConnData[i].slot != HTTPD_MAX_CONNECTIONS && httpdConnData[i].remote_port == remPort &&
+						memcmp(httpdConnData[i].remote_ip, remIp, 4) == 0) {
+			httpdConnData[i].conn=conn;
+			returnValue = &httpdConnData[i];
 			break;
 		}
 	}
@@ -127,7 +133,7 @@ static void ICACHE_FLASH_ATTR httpdRetireConn(HttpdConnData *conn) {
 
 	//Release this connection and make it available for new access
 	for (i=0; i<HTTPD_MAX_CONNECTIONS; i++) {
-		if (connData[i]==conn) connData[i]=NULL;
+		if (&httpdConnData[i]==conn) httpdConnData[i].slot=HTTPD_MAX_CONNECTIONS;
 	}
 }
 
@@ -780,22 +786,15 @@ void ICACHE_FLASH_ATTR httpdDisconCb(ConnTypePtr rconn, char *remIp, int remPort
 	httpdPlatUnlock();
 }
 
-
-HttpdConnData httpdConnData[HTTPD_MAX_CONNECTIONS];
-HttpdPriv httpdPriv[HTTPD_MAX_CONNECTIONS];
-HttpdPostData httpdPostData[HTTPD_MAX_CONNECTIONS];
-uint8 privBuffer[HTTPD_MAX_SENDBUFF_LEN * HTTPD_MAX_CONNECTIONS];
-uint8 postBuffer[HTTPD_MAX_POSTBUFF_LEN * HTTPD_MAX_CONNECTIONS];
-
 int ICACHE_FLASH_ATTR httpdConnectCb(ConnTypePtr conn, char *remIp, int remPort) {
 	int i;
 	httpdPlatLock();
 	//Find empty conndata in pool
 	for (i=0; i<HTTPD_MAX_CONNECTIONS; i++)
 	{
-		if (connData[i]==NULL)
+		if (httpdConnData[i].slot==HTTPD_MAX_CONNECTIONS)
 		{
-			connData[i] = &httpdConnData[i];
+			httpdConnData[i].slot = i;
 			break;
 		}
 	}
@@ -808,28 +807,28 @@ int ICACHE_FLASH_ATTR httpdConnectCb(ConnTypePtr conn, char *remIp, int remPort)
 	}
 
 
-	memset(connData[i], 0, sizeof(HttpdConnData));
-	connData[i]->priv=(HttpdPriv *)&httpdPriv[i];
-	memset(connData[i]->priv, 0, sizeof(HttpdPriv));
-	connData[i]->post= (HttpdPostData *)&httpdPostData[i];
-	memset(connData[i]->post, 0, sizeof(HttpdPostData));
+	memset(&httpdConnData[i], 0, sizeof(HttpdConnData));
+	httpdConnData[i].priv=(HttpdPriv *)&httpdPriv[i];
+	memset(httpdConnData[i].priv, 0, sizeof(HttpdPriv));
+	httpdConnData[i].post= (HttpdPostData *)&httpdPostData[i];
+	memset(httpdConnData[i].post, 0, sizeof(HttpdPostData));
 
-	connData[i]->conn=conn;
-	connData[i]->slot=i;
-	connData[i]->priv->headPos=0;
-	connData[i]->post->buffLen=0;
-	connData[i]->post->received=0;
-	connData[i]->post->len=-1;
-	connData[i]->hostName=NULL;
-	connData[i]->priv->sendBacklog=NULL;
-	connData[i]->priv->sendBacklogSize=0;
-	connData[i]->file=-1;
-	connData[i]->remote_port=remPort;
-	memcpy(connData[i]->remote_ip, remIp, 4);
+	httpdConnData[i].conn=conn;
+	httpdConnData[i].slot=i;
+	httpdConnData[i].priv->headPos=0;
+	httpdConnData[i].post->buffLen=0;
+	httpdConnData[i].post->received=0;
+	httpdConnData[i].post->len=-1;
+	httpdConnData[i].hostName=NULL;
+	httpdConnData[i].priv->sendBacklog=NULL;
+	httpdConnData[i].priv->sendBacklogSize=0;
+	httpdConnData[i].file=-1;
+	httpdConnData[i].remote_port=remPort;
+	memcpy(httpdConnData[i].remote_ip, remIp, 4);
 
 	//Extra inits
-	connData[i]->post->buff= (char *)&postBuffer[i*HTTPD_MAX_POSTBUFF_LEN];
-	connData[i]->priv->sendBuff = (char *)&privBuffer[i*HTTPD_MAX_SENDBUFF_LEN];
+	httpdConnData[i].post->buff= (char *)&postBuffer[i*HTTPD_MAX_POSTBUFF_LEN];
+	httpdConnData[i].priv->sendBuff = (char *)&privBuffer[i*HTTPD_MAX_SENDBUFF_LEN];
 
 	httpdPlatUnlock();
 	return 1;
@@ -841,10 +840,21 @@ void ICACHE_FLASH_ATTR httpdInit(HttpdBuiltInUrl *fixedUrls, int port) {
 
 	//Clean all connection slots
 	for (i=0; i<HTTPD_MAX_CONNECTIONS; i++) {
-		connData[i]=NULL;
+		httpdConnData[i].slot = HTTPD_MAX_CONNECTIONS;
 	}
 	//Set url structure
 	builtInUrls=fixedUrls;
 	//Stack init
 	httpdPlatInit(port, HTTPD_MAX_CONNECTIONS);
+}
+
+
+
+void ICACHE_FLASH_ATTR httpdMonitorConnections(void)
+{
+	uint8 i;
+	for(i=0; i< HTTPD_MAX_CONNECTIONS; i++)
+	{
+
+	}
 }

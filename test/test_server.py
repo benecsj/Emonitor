@@ -21,6 +21,6 @@ while(counter <100):
 
     except requests.ConnectionError, e:
         print(e)
-
+        break
         
 print("Test 'End")

@@ -11,5 +11,6 @@
 #define HTTP_SERVER_H
 
 extern void Http_Server_Init(void);
+extern void ICACHE_FLASH_ATTR Http_Server_Main(void);
 
 #endif

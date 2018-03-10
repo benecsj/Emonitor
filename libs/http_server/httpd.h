@@ -72,6 +72,7 @@ void httpdRedirect(HttpdConnData *conn, char *newUrl);
 int httpdUrlDecode(char *val, int valLen, char *ret, int retLen);
 int httpdFindArg(char *line, char *arg, char *buff, int buffLen);
 void httpdInit(HttpdBuiltInUrl *fixedUrls, int port);
+void httpdMonitorConnections(void);
 const char *httpdGetMimetype(char *url);
 void httdSetTransferMode(HttpdConnData *conn, int mode);
 void httpdStartResponse(HttpdConnData *conn, int code);

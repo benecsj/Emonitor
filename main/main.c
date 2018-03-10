@@ -239,6 +239,7 @@ TASK(task_1000ms) {
 		NVM_Main();
 		Sensor_Manager_Main();
 		Wifi_Manager_Main();
+		Http_Server_Main();
 		//------------------
 		sysTimeMS = system_get_time()/1000;
 		DELAY_MS(1000-((sysTimeMS)%1000));
