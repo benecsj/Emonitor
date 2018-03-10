@@ -672,10 +672,11 @@ void ICACHE_FLASH_ATTR httpdConnSendFinish(HttpdConnData *conn) {
 
 //Callback called when there's data available on a socket.
 void ICACHE_FLASH_ATTR httpdRecvCb(ConnTypePtr rconn, char *remIp, int remPort, char *data, unsigned short len) {
-	//DBG_HTTPS("(HS) httpdRecvCb\n");
 	int x, r;
 	char *p, *e;
 	httpdPlatLock();
+
+	DBG_HTTPS("(HS) Received data from  %d.%d.%d.%d:%d\n", remIp[0]&0xff, remIp[1]&0xff, remIp[2]&0xff, remIp[3]&0xff, remPort);
 
 	HttpdConnData *conn=httpdFindConnData(rconn, remIp, remPort);
 	if (conn==NULL) {
