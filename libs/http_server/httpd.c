@@ -615,7 +615,7 @@ static void ICACHE_FLASH_ATTR httpdParseHeader(char *h, HttpdConnData *conn) {
 		if (conn->getArgs!=0) {
 			*conn->getArgs=0;
 			conn->getArgs++;
-			//DBG_HTTPS("(HS) GET args = %s\n", conn->getArgs);
+			DBG_HTTPS("(HS) GET args = %s\n", conn->getArgs);
 		} else {
 			conn->getArgs=NULL;
 		}
