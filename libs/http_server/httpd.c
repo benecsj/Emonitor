@@ -130,11 +130,8 @@ static void ICACHE_FLASH_ATTR httpdRetireConn(HttpdConnData *conn) {
 			if (j!=NULL) prj_free(j);
 		} while (i!=NULL);
 	}
-
 	//Release this connection and make it available for new access
-	for (i=0; i<HTTPD_MAX_CONNECTIONS; i++) {
-		if (&httpdConnData[i]==conn) httpdConnData[i].slot=HTTPD_MAX_CONNECTIONS;
-	}
+	conn->slot = HTTPD_MAX_CONNECTIONS;
 }
 
 //Stupid li'l helper function that returns the value of a hex char.
@@ -456,6 +453,7 @@ void ICACHE_FLASH_ATTR httpdCgiIsDone(HttpdConnData *conn) {
 		conn->post->buffLen=0;
 		conn->post->received=0;
 		conn->hostName=NULL;
+		conn->timeout = 0;
 	} else {
 		//Cannot re-use this connection. Mark to get it killed after all data is sent.
 		conn->priv->flags|=HFL_DISCONAFTERSENT;
@@ -824,6 +822,7 @@ int ICACHE_FLASH_ATTR httpdConnectCb(ConnTypePtr conn, char *remIp, int remPort)
 	httpdConnData[i].priv->sendBacklogSize=0;
 	httpdConnData[i].file=-1;
 	httpdConnData[i].remote_port=remPort;
+	httpdConnData[i].timeout=0;
 	memcpy(httpdConnData[i].remote_ip, remIp, 4);
 
 	//Extra inits
@@ -853,8 +852,21 @@ void ICACHE_FLASH_ATTR httpdInit(HttpdBuiltInUrl *fixedUrls, int port) {
 void ICACHE_FLASH_ATTR httpdMonitorConnections(void)
 {
 	uint8 i;
+	//Check all connections
 	for(i=0; i< HTTPD_MAX_CONNECTIONS; i++)
 	{
-
+		//Monitor longest request on active connection
+		if(httpdConnData[i].slot < HTTPD_MAX_CONNECTIONS)
+		{
+			httpdConnData[i].timeout++;
+			if(httpdConnData[i].timeout > 300)
+			{
+				//Clean up connection, something went wrong
+				DBG_HTTPS("(HS) Connection request timeout on slot %d.\n",httpdConnData[i].slot);
+				httpdCgiIsDone(&httpdConnData[i]);
+				httpdRetireConn(&httpdConnData[i]);
+				httpdPlatDisconnect(httpdConnData[i].conn);
+			}
+		}
 	}
 }

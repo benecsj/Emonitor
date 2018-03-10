@@ -18,7 +18,7 @@ while(counter <100):
         timeString = str(response.elapsed).split(":")[2].replace(".","")[:-3]
         timeInt = int(timeString)
         print("Id:"+str(counter)+" Resp:"+str(timeInt))
-        if(timeInt > 1000):
+        if(timeInt > 10000):
             break
 
     except requests.ConnectionError, e:

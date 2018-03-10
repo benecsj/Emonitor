@@ -60,8 +60,8 @@ void ICACHE_FLASH_ATTR httpdPlatDisconnect(ConnTypePtr conn) {
 }
 
 void ICACHE_FLASH_ATTR httpdPlatDisableTimeout(ConnTypePtr conn) {
-	//Can't disable timeout; set to 2 hours instead.
-	espconn_regist_time(conn, 7199, 1);
+	//Can't disable timeout; set to different value
+	espconn_regist_time(conn, HTTPD_TCP_TIMEOUT, 1);
 }
 
 //Initialize listening socket, do general initialization
