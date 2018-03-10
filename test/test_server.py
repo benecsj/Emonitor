@@ -1,11 +1,13 @@
-#import urllib2
 import requests
+import keyboard
 from time import sleep
 print("Test Start")
 
 counter = 0
 
 while(counter <100):
+    if keyboard.is_pressed('q'):
+        break
     #sleep(0)
     counter = counter +1
     try:

@@ -1,1 +1,1 @@
-python ./test_server.py
+sudo python ./test_server.py
