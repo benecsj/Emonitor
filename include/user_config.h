@@ -84,6 +84,7 @@
 #define LONG_PRESS_MIN			8000
 #define CPU_USAGE_AVERAGE		8
 #define RESPONSE_TIME_OUT		20
+#define STATUS_LED_INVERT		(OFF)
 
 //Sensor manager
 #define OWP_CHANNELS_COUNT 		2
@@ -123,7 +124,7 @@
 #define DEBUG_EMONITOR 			(OFF)
 #define DEBUG_REMOTE_CONTROL	(OFF)
 #define DEBUG_HTTP_CLIENT 		(OFF)
-#define DEBUG_HTTP_SERVER 		(ON)
+#define DEBUG_HTTP_SERVER 		(OFF)
 #define DEBUG_WIFI_MANAGER		(OFF)
 #define DEBUG_MHZ14				(OFF)
 #define DEBUG_SPIFFS 			(OFF)

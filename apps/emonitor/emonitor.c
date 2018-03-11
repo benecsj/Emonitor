@@ -186,7 +186,7 @@ void IRAM0 Emonitor_Main_1ms(void) {
 	ledValue = Emonitor_LEDCounter;
 #endif
 	//Toggle led
-	digitalWrite(LED_BUILTIN, (ledValue));
+	digitalWrite(LED_BUILTIN, (ledValue) == STATUS_LED_INVERT);
 
 	//Process flash button state
 	if(digitalRead(FLASH_BUTTON) == BUTTON_PRESSED)
