@@ -57,6 +57,8 @@
 #define CACHE_BUF_SIZE      (LOG_PAGE + 32)*8
 
 //Pins
+#define VARIANT			0
+#if VARIANT == 0
 #define LED_BUILTIN		D0
 #define ONEWIRE_BUS_0	D1
 #define ONEWIRE_BUS_1	D2
@@ -65,6 +67,16 @@
 #define PULSE_INPUT2    D5
 #define PULSE_INPUT3    D4
 #define FLASH_BUTTON    D3
+#else
+#define LED_BUILTIN		D4
+#define ONEWIRE_BUS_0	D1
+#define ONEWIRE_BUS_1	D2
+#define PULSE_INPUT0    D0
+#define PULSE_INPUT1    D5
+#define PULSE_INPUT2    D6
+#define PULSE_INPUT3    D7
+#define FLASH_BUTTON    D3
+#endif
 
 //Remote(Serial) Control
 #define REMOTE_CONTROL_ENABLE	(ON)
