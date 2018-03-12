@@ -34,9 +34,9 @@ static s32_t ICACHE_FLASH_ATTR esp_spiffs_readwrite(u32_t addr, u32_t size, u8_t
     u32_t aligned_addr = addr & (-FLASH_UNIT_SIZE);
     u32_t aligned_size =
         ((size + (FLASH_UNIT_SIZE - 1)) & -FLASH_UNIT_SIZE) + FLASH_UNIT_SIZE;
-
+    prj_ENTER_CRITICAL();
     int res = spi_flash_read(aligned_addr, (u32_t *) tmp_buf, aligned_size);
-
+    prj_EXIT_CRITICAL();
     if (res != 0) {
         SPIFFSM_DBG("spi_flash_read failed: %d (%d, %d)\n\r", res, (int) aligned_addr,
                (int) aligned_size);

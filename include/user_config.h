@@ -46,10 +46,8 @@
 
 //SPIFFS
 #define FS1_FLASH_SIZE      (256*1024)
-#define FS2_FLASH_SIZE      (256*1024)
 
-#define FS1_FLASH_ADDR      (1024*1024)
-#define FS2_FLASH_ADDR      (1280*1024)
+#define FS1_FLASH_ADDR      (0x100000)
 
 #define SECTOR_SIZE         (4*1024)
 #define LOG_BLOCK           (SECTOR_SIZE)
@@ -84,7 +82,7 @@
 #define LONG_PRESS_MIN			8000
 #define CPU_USAGE_AVERAGE		8
 #define RESPONSE_TIME_OUT		20
-#define STATUS_LED_INVERT		(OFF)
+#define STATUS_LED_INVERT		(ON)
 
 //Sensor manager
 #define OWP_CHANNELS_COUNT 		2
@@ -124,7 +122,7 @@
 #define DEBUG_EMONITOR 			(OFF)
 #define DEBUG_REMOTE_CONTROL	(OFF)
 #define DEBUG_HTTP_CLIENT 		(OFF)
-#define DEBUG_HTTP_SERVER 		(OFF)
+#define DEBUG_HTTP_SERVER 		(ON)
 #define DEBUG_WIFI_MANAGER		(OFF)
 #define DEBUG_MHZ14				(OFF)
 #define DEBUG_SPIFFS 			(OFF)
