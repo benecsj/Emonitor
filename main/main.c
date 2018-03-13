@@ -13,7 +13,7 @@
 #include "pins.h"
 #include "MHZ14.h"
 #include "uart.h"
-#include "spiffs_manager.h"
+#include "esp_fs.h"
 #include "NVM_NonVolatileMemory.h"
 #include "D18_DS18B20_Temp_Sensor.h"
 #include "OWP_One_Wire_Protocol_Driver.h"
@@ -159,8 +159,8 @@ void ICACHE_FLASH_ATTR task_InitA(void)
 	Emonitor_StartTimer();
 	//Init NvM
 	NVM_Init();
-	//Spiffs init
-	spiffs_init();
+	//Esp fs init
+	esp_fs_init();
 	//Emonitor
 	Emonitor_Init();
 	//Init application

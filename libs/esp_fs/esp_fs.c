@@ -12,9 +12,9 @@ void ICACHE_FLASH_ATTR esp_fs_init(void) {
 
 	//Init spiffs file system
     result = spiffs_init();
-
+#if DEBUG_SPIFFS	== ON
     esp_fs_status();
-
+#endif
 }
 
 void ICACHE_FLASH_ATTR esp_fs_status(void)

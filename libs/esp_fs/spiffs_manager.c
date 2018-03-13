@@ -133,17 +133,17 @@ void ICACHE_FLASH_ATTR spiffs_status(void)
 	uint8 result = 0;
 	uint32 total, used;
 
-	SPIFFSM_DBG("(SPIFFS) File system files:\n");
+	prj_printf("(SPIFFS) File system files:\n");
 	spiffs_DIR spiffsDir;
 	SPIFFS_opendir(&fs, "/", &spiffsDir);
 	struct spiffs_dirent spiffsDirEnt;
 	while(SPIFFS_readdir(&spiffsDir, &spiffsDirEnt) != 0) {
-		SPIFFSM_DBG("(SPIFFS) %s : %d \n", spiffsDirEnt.name, spiffsDirEnt.size);
+		prj_printf("(SPIFFS) %s : %d \n", spiffsDirEnt.name, spiffsDirEnt.size);
 	}
 	SPIFFS_closedir(&spiffsDir);
 
     SPIFFS_info(&fs, (u32_t *)&total, (u32_t*)&used);
-    SPIFFSM_DBG("(SPIFFS) Total: %d  Used: %d  Free: %d\n",total,used, total-used);
+    prj_printf("(SPIFFS) Total: %d  Used: %d  Free: %d\n",total,used, total-used);
 
 }
 
