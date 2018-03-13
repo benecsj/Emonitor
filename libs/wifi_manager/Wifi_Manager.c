@@ -1,6 +1,6 @@
 #include "project_config.h"
 #include "Wifi_Manager.h"
-#include "spiffs_manager.h"
+#include "esp_fs.h"
 #include "Emonitor.h"
 
 #if PRJ_ENV == OS
@@ -237,25 +237,25 @@ void ICACHE_FLASH_ATTR Wifi_Manager_EnableHotspot(uint8 enable)
 
 void ICACHE_FLASH_ATTR Wifi_Manager_GetDefaultId(char* id)
 {
-	spiffs* fs = spiffs_get_fs();
-	spiffs_file fd;
+	esp_fs_file file;
 	s32_t length = 0;
+
 	//Get id from filestorage
-	fd = SPIFFS_open(fs, "/id", SPIFFS_RDONLY, 0);
-	length = SPIFFS_read(fs, fd, (u8_t *)id, 32);
-	SPIFFS_close(fs, fd);
+	esp_fs_OpenFile(&file,"/id");
+	length = esp_fs_ReadFile(&file, (u8_t *)id, 32);
+	esp_fs_CloseFile(&file);
 	id[length-1] = 0;
 }
 
 void ICACHE_FLASH_ATTR Wifi_Manager_GetDefaultPassword(char * pass)
 {
-	spiffs* fs = spiffs_get_fs();
-	spiffs_file fd;
+	esp_fs_file file;
 	s32_t length = 0;
+
 	//Get password from filestorage
-	fd = SPIFFS_open(fs, "/pass", SPIFFS_RDONLY, 0);
-	length = SPIFFS_read(fs, fd, (u8_t *)pass, 64);
-	SPIFFS_close(fs, fd);
+	esp_fs_OpenFile(&file,"/pass");
+	length = esp_fs_ReadFile(&file, (u8_t *)pass, 64);
+	esp_fs_CloseFile(&file);
 	pass[length-1] = 0;
 }
 

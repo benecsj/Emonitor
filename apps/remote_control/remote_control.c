@@ -9,7 +9,7 @@
 #include "Shell.h"
 
 #include "NVM_NonVolatileMemory.h"
-#include "spiffs_manager.h"
+#include "esp_fs.h"
 #include "Wifi_Manager.h"
 #include "Sensor_Manager.h"
 #include "Emonitor.h"
@@ -393,20 +393,7 @@ int ICACHE_FLASH_ATTR Command_Emon(int argc, char** argv) {
 }
 
 int ICACHE_FLASH_ATTR Command_Dir(int argc, char** argv) {
-	uint8 result = 0;
-	uint32 total, used;
-
-	prj_printf("Files:\n");
-	spiffs_DIR spiffsDir;
-	SPIFFS_opendir(spiffs_get_fs(), "/", &spiffsDir);
-	struct spiffs_dirent spiffsDirEnt;
-	while(SPIFFS_readdir(&spiffsDir, &spiffsDirEnt) != 0) {
-		prj_printf("  %s : %d\n", spiffsDirEnt.name, spiffsDirEnt.size);
-	}
-	SPIFFS_closedir(&spiffsDir);
-
-    SPIFFS_info(spiffs_get_fs(), (u32_t *)&total, (u32_t*)&used);
-    prj_printf("Total: %d  Used: %d  Free: %d\n",total,used, total-used);
+	esp_fs_status();
 
     return SHELL_RET_SUCCESS;
 }
@@ -416,7 +403,6 @@ int ICACHE_FLASH_ATTR Command_Print(int argc, char** argv) {
 	char buf[100] = {0};
 	char fileNameBuffer[50] = {0};
 	s32_t len;
-	spiffs* fs;
 
 	//Check argument count
 	if(argc == 2)
@@ -432,26 +418,22 @@ int ICACHE_FLASH_ATTR Command_Print(int argc, char** argv) {
 		{
 			sprintf(fileNameBuffer,"%s",fileName);
 		}
-		//get filesystem
-		fs = spiffs_get_fs();
-		//Get file status
-		spiffs_stat status;
-		int32 result = SPIFFS_stat(fs, (char *)&fileNameBuffer, &status);
 		//Try to open file
-		spiffs_file fd = SPIFFS_open(fs, (const char *)&fileNameBuffer, SPIFFS_RDONLY, 0);
+		esp_fs_file file;
+		esp_fs_OpenFile(&file,(char *)&fileNameBuffer);
 		//Check if file is found
-		if(fd>= 0)
+		if(file>= 0)
 		{
-			prj_printf("found %s : %d :\n", status.name, status.size);
+			prj_printf("found %s : %d :\n", fileName, esp_fs_GetFileSize(fileName));
 			do{
 				//Read until the end
-				len = SPIFFS_read(fs, fd, (u8_t *)buf, sizeof(buf)-1);
+				len = esp_fs_ReadFile(&file,(u8_t *)buf, sizeof(buf)-1);
 				//Print out file content
 				buf[len] = 0;
 				prj_printf("%s",buf);
 			}while(len == sizeof(buf)-1);
 			//Close the file
-			SPIFFS_close(fs, fd);
+			esp_fs_CloseFile(&file);
 		}
 		else
 		{

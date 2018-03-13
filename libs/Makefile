@@ -17,7 +17,7 @@ GEN_LIBS = libs.a
 COMPONENTS_libs = hw_timer/hw_timer.a	\
                   wifi_manager/wifi_manager.a  \
                   memory_manager/memory_manager.a \
-                  spiffs_manager/spiffs_manager.a \
+                  esp_fs/esp_fs.a \
                   ds18b20/ds18b20.a \
                   pins/pins.a \
                   http_client/http_client.a \

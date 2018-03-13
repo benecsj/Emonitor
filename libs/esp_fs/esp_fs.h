@@ -25,31 +25,22 @@
 #ifndef __ESP_SPIFFS_H__
 #define __ESP_SPIFFS_H__
 
-#include "spiffs.h"
+#include "project_config.h"
+#include "spiffs_manager.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-/**
-  * @brief  Initialize spiffs
-  *
-  * @param  struct esp_spiffs_config *config : ESP8266 spiffs configuration
-  *
-  * @return 0         : succeed
-  * @return otherwise : fail
-  */
-s32_t esp_spiffs_init(void);
+typedef spiffs_file esp_fs_file;
 
-/**
-  * @brief  Deinitialize spiffs
-  *
-  * @param  uint8 format : 0, only deinit; otherwise, deinit spiffs and format.
-  *
-  * @return null
-  */
-void esp_spiffs_deinit(uint8 format);
+extern void esp_fs_init(void);
+extern void esp_fs_status(void);
+extern uint32_t esp_fs_GetFileSize(char * fileName);
+extern uint32_t esp_fs_OpenFile(esp_fs_file * file,char * fileName);
+extern void esp_fs_CloseFile(esp_fs_file* filePtr);
+extern s32_t esp_fs_ReadFile(esp_fs_file* filePtr,u8_t * buffer,uint32_t length);
 
 /**
   * @}

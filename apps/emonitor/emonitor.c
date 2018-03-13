@@ -15,7 +15,7 @@
 #include "httpclient.h"
 #include "Sensor_Manager.h"
 #include "Wifi_Manager.h"
-#include "spiffs_manager.h"
+#include "esp_fs.h"
 
 /******************************************************************************
 * Defines
@@ -482,14 +482,13 @@ uint32_t ICACHE_FLASH_ATTR Emonitor_GetDefaultId(void)
 {
 	char buffer[64] = {0};
 	char *numStart;
-	spiffs* fs;
-	spiffs_file fd;
+
+	esp_fs_file file;
 
 	//Get id string from filesystem storage
-	fs = spiffs_get_fs();
-	fd = SPIFFS_open(fs, "/id", SPIFFS_RDONLY, 0);
-	SPIFFS_read(fs, fd, (u8_t *)buffer, 64);
-	SPIFFS_close(fs, fd);
+	esp_fs_OpenFile(&file,"/id");
+	esp_fs_ReadFile(&file, (u8_t *)buffer, 64);
+	esp_fs_CloseFile(&file);
 
 	//Look for spec char if present
 	numStart = strchr((const char *)buffer, '_');
@@ -508,12 +507,13 @@ uint32_t ICACHE_FLASH_ATTR Emonitor_GetDefaultId(void)
 
 void ICACHE_FLASH_ATTR Emonitor_UpdateVersion(char* version)
 {
-	spiffs* fs = spiffs_get_fs();
-	spiffs_file fd;
+	esp_fs_file file;
 	s32_t length = 0;
+
 	//Get sw version from filestorage
-	fd = SPIFFS_open(fs, "/version", SPIFFS_RDONLY, 0);
-	length = SPIFFS_read(fs, fd, (u8_t *)version, 20);
-	SPIFFS_close(fs, fd);
+	esp_fs_OpenFile(&file,"/version");
+
+	length = esp_fs_ReadFile(&file, (u8_t *)version, 20);
+	esp_fs_CloseFile(&file);
 	version[length] = 0;
 }

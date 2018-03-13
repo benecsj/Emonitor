@@ -137,7 +137,7 @@
 #define DEBUG_HTTP_SERVER 		(ON)
 #define DEBUG_WIFI_MANAGER		(OFF)
 #define DEBUG_MHZ14				(OFF)
-#define DEBUG_SPIFFS 			(OFF)
+#define DEBUG_SPIFFS 			(ON)
 #define DEBUG_NVM				(OFF)
 #define DEBUG_MAIN				(ON)
 

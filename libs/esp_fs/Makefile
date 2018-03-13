@@ -12,7 +12,7 @@
 #     a generated lib/image xxx.a ()
 #
 ifndef PDIR
-GEN_LIBS = spiffs_manager.a
+GEN_LIBS = esp_fs.a
 endif
 
 

@@ -7,7 +7,7 @@
 \******************************************************************************/
 
 #include "project_config.h"
-#include "esp_spiffs.h"
+#include "spiffs.h"
 
 /******************************************************************************
 * Defines
@@ -25,13 +25,13 @@
 * Primitives
 \******************************************************************************/
 
-extern void spiffs_init(void);
+extern s32_t spiffs_init(void);
 extern void spiffs_format(void);
-extern void spiffs_test_read(void);
-extern void spiffs_test_write(void);
 extern void spiffs_status(void);
-
-extern spiffs* spiffs_get_fs(void);
+extern uint32_t spiffs_GetFileSize(char * fileName);
+extern uint32_t spiffs_OpenFile(spiffs_file* filePtr, char * fileName);
+extern void spiffs_CloseFile(spiffs_file fileHandler);
+extern s32_t ICACHE_FLASH_ATTR spiffs_ReadFile(spiffs_file file,u8_t * buffer,s32_t length);
 
 #endif
 
