@@ -23,21 +23,25 @@ static u8_t *spiffs_cache_buf;
 
 static u8_t spiffs_work_buffer[LOG_PAGE*2];
 static u8_t spiffs_fd_buffer[FD_BUF_SIZE * 2];
+#if CACHE_BUF_ENABLE == ON
 static u8_t spiffs_cache_buffer[CACHE_BUF_SIZE];
-
+#endif
 #define FLASH_UNIT_SIZE 4
 
 /******************************************************************************
 * Implementations
 \******************************************************************************/
-
-static s32_t ICACHE_FLASH_ATTR spiffs_readwrite(u32_t addr, u32_t size, u8_t *p, int write)
+static s32_t ICACHE_FLASH_ATTR spiffs_readblock(u32_t addr, u32_t size, u8_t *dst)
 {
 	s32_t status = SPIFFS_OK;
 
 	//Validate parameters
     if (size > LOG_PAGE) {
-        SPIFFSM_DBG("(SPIFFS) Invalid size provided to read/write (%d)\n\r", (int) size);
+        SPIFFSM_DBG("(SPIFFS) Invalid size provided to read/write (%d)\n", (int) size);
+        status = SPIFFS_ERR_NOT_CONFIGURED;
+    }
+    else if (addr > (FS1_FLASH_ADDR+FS1_FLASH_SIZE+LOG_PAGE)) {
+        SPIFFSM_DBG("(SPIFFS) Invalid address provided (%x)\n", (int) addr);
         status = SPIFFS_ERR_NOT_CONFIGURED;
     }
     else
@@ -55,57 +59,22 @@ static s32_t ICACHE_FLASH_ATTR spiffs_readwrite(u32_t addr, u32_t size, u8_t *p,
 		}
 		else
 		{
-			//Check if write was requested
-			if (!write) {
-				//Only read requested, just copy result
-				prj_memcpy(p, tmp_buf + (addr - aligned_addr), size);
-			}
-			else //Write requested
-			{
-				//Write data into buffer
-				prj_memcpy(tmp_buf + (addr - aligned_addr), p, size);
-				//Write black flash block
-				status = spi_flash_write(aligned_addr, (u32_t *) tmp_buf, aligned_size);
-				//Check write result
-				if (status != SPIFFS_OK) {
-					SPIFFSM_DBG("(SPIFFS) spi_flash_write failed: %d (%d, %d)\n\r", status,
-							  (int) aligned_addr, (int) aligned_size);
-				}
-			}
+			//Only read requested, just copy result
+			prj_memcpy(dst, tmp_buf + (addr - aligned_addr), size);
 		}
     }
 
     return status;
 }
 
-static s32_t ICACHE_FLASH_ATTR spiffs_readblock(u32_t addr, u32_t size, u8_t *dst)
-{
-    return spiffs_readwrite(addr, size, dst, 0);
-}
-
 static s32_t ICACHE_FLASH_ATTR spiffs_writeblock(u32_t addr, u32_t size, u8_t *src)
 {
-    return spiffs_readwrite(addr, size, src, 1);
+    return SPIFFS_ERR_NOT_CONFIGURED;
 }
 
 static s32_t ICACHE_FLASH_ATTR spiffs_eraseblock(u32_t addr, u32_t size)
 {
-	s32_t status = SPIFFS_OK;
-
-	//Validate parameters
-    if (size != SECTOR_SIZE || addr % SECTOR_SIZE != 0) {
-    	//Report error
-        SPIFFSM_DBG("(SPIFFS) Invalid size provided to esp_spiffs_erase (%d, %d)\n\r",
-               (int) addr, (int) size);
-        status = SPIFFS_ERR_NOT_CONFIGURED;
-    }
-    else
-    {
-    	//Perform erase
-    	status = spi_flash_erase_sector(addr / SECTOR_SIZE);
-    }
-
-    return status;
+	return SPIFFS_ERR_NOT_CONFIGURED;
 }
 
 s32_t ICACHE_FLASH_ATTR spiffs_init(void)
@@ -121,7 +90,13 @@ s32_t ICACHE_FLASH_ATTR spiffs_init(void)
         //Mount filesystem
         status =  SPIFFS_mount(&fs, &cfg, (u8_t*)&spiffs_work_buffer,
         					(u8_t*)&spiffs_fd_buffer, sizeof(spiffs_fd_buffer),
-        					(u8_t*)&spiffs_cache_buffer, sizeof(spiffs_cache_buffer),
+#if CACHE_BUF_ENABLE == ON
+        					(u8_t*)&spiffs_cache_buffer,
+           					sizeof(spiffs_cache_buffer),
+#else
+        					NULL_PTR,
+        					0,
+#endif
                             0);
     }
     //Return mount status

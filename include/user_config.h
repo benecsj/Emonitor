@@ -46,14 +46,12 @@
 
 //SPIFFS
 #define FS1_FLASH_SIZE      (256*1024)
-
 #define FS1_FLASH_ADDR      (0x100000)
-
 #define SECTOR_SIZE         (4*1024)
 #define LOG_BLOCK           (SECTOR_SIZE)
 #define LOG_PAGE            (128)
-
 #define FD_BUF_SIZE         32*4
+#define CACHE_BUF_ENABLE	(OFF)
 #define CACHE_BUF_SIZE      (LOG_PAGE + 32)*8
 
 //Pins

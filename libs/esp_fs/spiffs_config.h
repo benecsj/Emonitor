@@ -93,10 +93,10 @@ typedef signed __PTRDIFF_TYPE__ intptr_t;
 // Enables/disable memory read caching of nucleus file system operations.
 // If enabled, memory area must be provided for cache in SPIFFS_mount.
 #ifndef  SPIFFS_CACHE
-#define SPIFFS_CACHE                    1
+#define SPIFFS_CACHE                    CACHE_BUF_ENABLE
 #endif
 
-#if SPIFFS_CACHE
+
 // Enables memory write caching for file descriptors in hydrogen
 #ifndef  SPIFFS_CACHE_WR
 #define SPIFFS_CACHE_WR                 0
@@ -106,7 +106,7 @@ typedef signed __PTRDIFF_TYPE__ intptr_t;
 #ifndef  SPIFFS_CACHE_STATS
 #define SPIFFS_CACHE_STATS              0
 #endif
-#endif
+
 
 // Always check header of each accessed page to ensure consistent state.
 // If enabled it will increase number of reads, will increase flash.
@@ -116,7 +116,7 @@ typedef signed __PTRDIFF_TYPE__ intptr_t;
 
 // Define maximum number of gc runs to perform to reach desired free pages.
 #ifndef SPIFFS_GC_MAX_RUNS
-#define SPIFFS_GC_MAX_RUNS              5
+#define SPIFFS_GC_MAX_RUNS              1
 #endif
 
 // Enable/disable statistics on gc. Debug/test purpose only.
@@ -167,7 +167,7 @@ typedef signed __PTRDIFF_TYPE__ intptr_t;
 // Lower value generates more read/writes. No meaning having it bigger
 // than logical page size.
 #ifndef SPIFFS_COPY_BUFFER_STACK
-#define SPIFFS_COPY_BUFFER_STACK        (64)
+#define SPIFFS_COPY_BUFFER_STACK        (LOG_PAGE)
 #endif
 
 // Enable this to have an identifiable spiffs filesystem. This will look for
