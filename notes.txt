@@ -25,3 +25,13 @@ return 0;
 }
 
 Step 4: Comment out / remove printf statements from libmain source.
+
+
+
+git:
+
+git remote rm origin
+git remote add origin http://github.com/benecsj/Emonitor.git
+git remote add origin /home/jooo/git/Emonitor.git
+git push -u origin master
+
