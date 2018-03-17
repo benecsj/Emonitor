@@ -83,6 +83,7 @@ uint32 Emonitor_SendPeroid = 0;
 extern void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, char * response_headers, int body_size);
 extern uint32_t Emonitor_GetDefaultId(void);
 extern void task_1ms(void);
+extern void task_500us(void);
 extern uint32 Emonitor_GetBackgroundRuntime(void);
 extern void ICACHE_FLASH_ATTR Emonitor_UpdateVersion(char* version);
 /******************************************************************************
@@ -142,8 +143,8 @@ void ICACHE_FLASH_ATTR Emonitor_Init(void){
 void ICACHE_FLASH_ATTR Emonitor_StartTimer(void){
 	//Init timer for fast task
     hw_timer_init(FRC1_SOURCE,TRUE);
-    hw_timer_set_func(task_1ms);
-    hw_timer_arm(1000,1);
+    hw_timer_set_func(task_500us);
+    hw_timer_arm(500,1);
 }
 
 /******************************************************************************

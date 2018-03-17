@@ -53,28 +53,28 @@ uint8 OWP_Read_Bus(void)
 
 uint8 OWP_Reset(void)
 {
-     OWP_ENTER_CRITICAL();
+
 
 	uint8 err;
 
 	OWP_OUT_LOW(); // disable internal pull-up (maybe on from parasite)
 	OWP_DIR_OUT(); // pull OW-Pin low for 480us
 	OWP_Delay_us(480);
-
+    OWP_ENTER_CRITICAL();
 	// set Pin as input - wait for clients to pull low
 	OWP_DIR_IN(); // input
 
 	OWP_Delay_us(120);//66
 	err = OWP_GET_IN();		// no presence detect
 	// nobody pulled to low, still high
-
+	OWP_EXIT_CRITICAL();
 	// after a delay the clients should release the line
 	// and input-pin gets back to high due to pull-up-resistor
 	OWP_Delay_us(480-120);//66
 	if( OWP_GET_IN() == 0 )		// short circuit
 		err = 1;
 
-	OWP_EXIT_CRITICAL();
+
 	return err;
 }
 
