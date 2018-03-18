@@ -17,6 +17,8 @@
 
 
 #include "MHZ14.h"
+#include "pins.h"
+#include "project_config.h"
 /**********************************************************************************
  * Defines
  **********************************************************************************/
@@ -38,6 +40,10 @@ extern uint32 Sensor_Manager_GetPulseCount(uint8 id);
 extern uint32 Sensor_Manager_GetPulseLevel(uint8 id);
 extern void Sensor_Manager_ResetPulseCounters(void);
 extern uint16 Sensor_Manager_GetAnalogValue(void);
+
+#if PULSE_INPUT0 == D0
+extern void	Sensor_Manager_EdgeDetectD0(void);
+#endif
 
 extern uint32 Sensor_Manager_ErrorCounter;
 extern uint8 SENSOR_MANAGER_DS18B20Count;

@@ -65,7 +65,9 @@ uint32 Sensor_Manager_PulseCounters[SENSOR_MANAGER_PULSE_COUNTERS] = {};
 uint32 Sensor_Manager_ErrorCounter=0;
 
 uint8 Sensor_Manager_analogToPulseState = 1;
-
+#if (PULSE_INPUT0 == D0) || (PULSE_INPUT1 == D0) || (PULSE_INPUT2 == D0) || (PULSE_INPUT3 == D0)
+static uint8 Sensor_Manager_D0_lastLevel;
+#endif
 Sensor_Manager_Status Sensor_Manager_State = SENSOR_MANAGER_NORMAL;
 
 /**********************************************************************************
@@ -205,6 +207,28 @@ void ICACHE_FLASH_ATTR Sensor_Manager_Main() {
     }
 }
 
+#if (PULSE_INPUT0 == D0) || (PULSE_INPUT1 == D0) || (PULSE_INPUT2 == D0) || (PULSE_INPUT3 == D0)
+void IRAM0 Sensor_Manager_EdgeDetectD0(void)
+{
+	//Read current pin level
+	uint8 currentLevel = digitalRead(PULSE_INPUT0);
+	//Look for rising edge
+	if((currentLevel == 1) && (Sensor_Manager_D0_lastLevel ==0))
+	{
+#if   (PULSE_INPUT0 == D0)
+		Sensor_Manager_PulseCounters[0]++;
+#elif (PULSE_INPUT1 == D0)
+		Sensor_Manager_PulseCounters[1]++;
+#elif (PULSE_INPUT2 == D0)
+		Sensor_Manager_PulseCounters[2]++;
+#elif (PULSE_INPUT3 == D0)
+		Sensor_Manager_PulseCounters[3]++;
+#endif
+	}
+	//Store last level
+	Sensor_Manager_D0_lastLevel = currentLevel;
+}
+#endif
 #if (SENSOR_MANAGER_PULSE_COUNTERS > 0)
 void ICACHE_FLASH_ATTR Sensor_Manager_PulseCounter0(void)
 {
