@@ -211,14 +211,9 @@ TASK(task_Init){
 
 void IRAM0 task_500us(void){
 	//------------------
-#if (PULSE_INPUT0 == D0) || (PULSE_INPUT1 == D0) || (PULSE_INPUT2 == D0) || (PULSE_INPUT3 == D0)
-	Sensor_Manager_EdgeDetectD0();
-#endif
+	Sensor_Manager_EdgeDetect();
 	//------------------
-	if((task1msCounter++) % 2)
-	{
-		task_1ms();
-	}
+	if((task1msCounter++) % 2){task_1ms();}
 }
 /*
  * Very fast task
@@ -226,7 +221,7 @@ void IRAM0 task_500us(void){
 void IRAM0 task_1ms(void){
 	//------------------
 	Emonitor_Main_1ms();
-	Sensor_Manager_VeryFast();
+	Sensor_Manager_1ms();
 	//------------------
 }
 

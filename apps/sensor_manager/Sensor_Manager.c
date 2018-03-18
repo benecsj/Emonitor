@@ -44,8 +44,8 @@ typedef enum
 /**********************************************************************************
  * Defines
  **********************************************************************************/
-#define Sensor_Manager_Change_State(a) Sensor_Manager_State = a
-
+#define Sensor_Manager_Change_State(a) 	Sensor_Manager_State = a
+#define DIGITAL_PULSE_COUNTERS			(SENSOR_MANAGER_PULSE_COUNTERS - SENSOR_MANAGER_ANALOGCHANNELS_COUNT)
 /**********************************************************************************
  * Variables
  **********************************************************************************/
@@ -65,9 +65,8 @@ uint32 Sensor_Manager_PulseCounters[SENSOR_MANAGER_PULSE_COUNTERS] = {};
 uint32 Sensor_Manager_ErrorCounter=0;
 
 uint8 Sensor_Manager_analogToPulseState = 1;
-#if (PULSE_INPUT0 == D0) || (PULSE_INPUT1 == D0) || (PULSE_INPUT2 == D0) || (PULSE_INPUT3 == D0)
-static uint8 Sensor_Manager_D0_lastLevel;
-#endif
+uint8 Sensor_Manager_lastInputLevel[DIGITAL_PULSE_COUNTERS] = {1};
+
 Sensor_Manager_Status Sensor_Manager_State = SENSOR_MANAGER_NORMAL;
 
 /**********************************************************************************
@@ -77,19 +76,6 @@ uint8 SENSOR_MANAGER_DS18B20_Search(void);
 void SENSOR_MANAGER_DS18B20Measure(void);
 void Sensor_Manager_UpdateSensors(void);
 void SENSOR_MANAGER_DS18B20_StartMeasure(void);
-
-#if (SENSOR_MANAGER_PULSE_COUNTERS > 0)
-void Sensor_Manager_PulseCounter0(void);
-#endif
-#if (SENSOR_MANAGER_PULSE_COUNTERS > 1)
-void Sensor_Manager_PulseCounter1(void);
-#endif
-#if (SENSOR_MANAGER_PULSE_COUNTERS > 2)
-void Sensor_Manager_PulseCounter2(void);
-#endif
-#if (SENSOR_MANAGER_PULSE_COUNTERS > 3)
-void Sensor_Manager_PulseCounter3(void);
-#endif
 /**********************************************************************************
  * Functions
  **********************************************************************************/
@@ -98,21 +84,17 @@ void ICACHE_FLASH_ATTR Sensor_Manager_Init() {
     uint8 i;
 
 	//Pulse counter input
-#if (SENSOR_MANAGER_PULSE_COUNTERS > 0)
+#if (DIGITAL_PULSE_COUNTERS > 0)
 	pinMode(PULSE_INPUT0,INPUT);
-	attachInterrupt(PULSE_INPUT0,Sensor_Manager_PulseCounter0,RISING);
 #endif
-#if (SENSOR_MANAGER_PULSE_COUNTERS > 1)
+#if (DIGITAL_PULSE_COUNTERS > 1)
 	pinMode(PULSE_INPUT1,INPUT);
-	attachInterrupt(PULSE_INPUT1,Sensor_Manager_PulseCounter1,RISING);
 #endif
-#if (SENSOR_MANAGER_PULSE_COUNTERS > 2)
+#if (DIGITAL_PULSE_COUNTERS > 2)
 	pinMode(PULSE_INPUT2,INPUT);
-	attachInterrupt(PULSE_INPUT2,Sensor_Manager_PulseCounter2,RISING);
 #endif
-#if (SENSOR_MANAGER_PULSE_COUNTERS > 3)
+#if (DIGITAL_PULSE_COUNTERS > 3)
 	pinMode(PULSE_INPUT3,INPUT);
-	attachInterrupt(PULSE_INPUT3,Sensor_Manager_PulseCounter3,RISING);
 #endif
 
 	//Init pulse counters
@@ -129,10 +111,9 @@ void ICACHE_FLASH_ATTR Sensor_Manager_Init() {
     Sensor_Manager_UpdateSensors();
     //Init SW pulseCounter
     Sensor_Manager_analogToPulseState = (system_adc_read()>512);
-
 }
 
-void IRAM0 Sensor_Manager_VeryFast() {
+void IRAM0 Sensor_Manager_1ms() {
     //MHZ14 CO2 Sensor
     MHZ14_Feed(digitalRead(MHZ14_INPUT_PIN));
 }
@@ -207,60 +188,63 @@ void ICACHE_FLASH_ATTR Sensor_Manager_Main() {
     }
 }
 
-#if (PULSE_INPUT0 == D0) || (PULSE_INPUT1 == D0) || (PULSE_INPUT2 == D0) || (PULSE_INPUT3 == D0)
-void IRAM0 Sensor_Manager_EdgeDetectD0(void)
+
+void IRAM0 Sensor_Manager_EdgeDetect(void)
 {
+	uint8 currentLevel;
+#if (DIGITAL_PULSE_COUNTERS > 0)
 	//Read current pin level
-	uint8 currentLevel = digitalRead(PULSE_INPUT0);
+	currentLevel = digitalRead(PULSE_INPUT0);
 	//Look for rising edge
-	if((currentLevel == 1) && (Sensor_Manager_D0_lastLevel ==0))
+	if((currentLevel == 1) && (Sensor_Manager_lastInputLevel[0] ==0))
 	{
-#if   (PULSE_INPUT0 == D0)
+		prj_DisableInt();
 		Sensor_Manager_PulseCounters[0]++;
-#elif (PULSE_INPUT1 == D0)
-		Sensor_Manager_PulseCounters[1]++;
-#elif (PULSE_INPUT2 == D0)
-		Sensor_Manager_PulseCounters[2]++;
-#elif (PULSE_INPUT3 == D0)
-		Sensor_Manager_PulseCounters[3]++;
-#endif
+		prj_EnableInt();
 	}
 	//Store last level
-	Sensor_Manager_D0_lastLevel = currentLevel;
-}
+	Sensor_Manager_lastInputLevel[0] = currentLevel;
 #endif
-#if (SENSOR_MANAGER_PULSE_COUNTERS > 0)
-void ICACHE_FLASH_ATTR Sensor_Manager_PulseCounter0(void)
-{
-	prj_DisableInt();
-	Sensor_Manager_PulseCounters[0]++;
-	prj_EnableInt();
-}
+#if (DIGITAL_PULSE_COUNTERS > 1)
+	//Read current pin level
+	currentLevel = digitalRead(PULSE_INPUT1);
+	//Look for rising edge
+	if((currentLevel == 1) && (Sensor_Manager_lastInputLevel[1] ==0))
+	{
+		prj_DisableInt();
+		Sensor_Manager_PulseCounters[1]++;
+		prj_EnableInt();
+	}
+	//Store last level
+	Sensor_Manager_lastInputLevel[1] = currentLevel;
 #endif
-#if (SENSOR_MANAGER_PULSE_COUNTERS > 1)
-void ICACHE_FLASH_ATTR Sensor_Manager_PulseCounter1(void)
-{
-	prj_DisableInt();
-	Sensor_Manager_PulseCounters[1]++;
-	prj_EnableInt();
-}
+#if (DIGITAL_PULSE_COUNTERS > 2)
+	//Read current pin level
+	currentLevel = digitalRead(PULSE_INPUT2);
+	//Look for rising edge
+	if((currentLevel == 1) && (Sensor_Manager_lastInputLevel[2] ==0))
+	{
+		prj_DisableInt();
+		Sensor_Manager_PulseCounters[2]++;
+		prj_EnableInt();
+	}
+	//Store last level
+	Sensor_Manager_lastInputLevel[2] = currentLevel;
 #endif
-#if (SENSOR_MANAGER_PULSE_COUNTERS > 2)
-void ICACHE_FLASH_ATTR Sensor_Manager_PulseCounter2(void)
-{
-	prj_DisableInt();
-	Sensor_Manager_PulseCounters[2]++;
-	prj_EnableInt();
-}
+#if (DIGITAL_PULSE_COUNTERS > 3)
+	//Read current pin level
+	currentLevel = digitalRead(PULSE_INPUT3);
+	//Look for rising edge
+	if((currentLevel == 1) && (Sensor_Manager_lastInputLevel[3] ==0))
+	{
+		prj_DisableInt();
+		Sensor_Manager_PulseCounters[3]++;
+		prj_EnableInt();
+	}
+	//Store last level
+	Sensor_Manager_lastInputLevel[3] = currentLevel;
 #endif
-#if (SENSOR_MANAGER_PULSE_COUNTERS > 3)
-void ICACHE_FLASH_ATTR Sensor_Manager_PulseCounter3(void)
-{
-	prj_DisableInt();
-	Sensor_Manager_PulseCounters[3]++;
-	prj_EnableInt();
 }
-#endif
 
 uint32 ICACHE_FLASH_ATTR Sensor_Manager_GetPulseCount(uint8 id)
 {

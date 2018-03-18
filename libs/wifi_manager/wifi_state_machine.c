@@ -172,7 +172,7 @@ bool ICACHE_FLASH_ATTR wifi_set_mode(WIFI_MODE mode){
 
 WIFI_MODE ICACHE_FLASH_ATTR init_esp_wifi(){
     wifi_set_event_handler_cb(wifi_event_handler_cb);
-    WIFI_MODE mode = 0; //wifi_get_opmode_default();
+    WIFI_MODE mode = 0;
     wifi_set_mode(mode);
     //system_phy_set_max_tpw(82);
     return mode;
