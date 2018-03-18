@@ -58,7 +58,9 @@ uint8 Sensor_Manager_sensorIDsTEMP[SENSOR_MANAGER_DS18B20MAXCOUNT*OWP_CONST_ROMC
 uint8 Sensor_Manager_sensorChannelsTEMP[SENSOR_MANAGER_DS18B20MAXCOUNT];
 sint16 SENSOR_MANAGER_DS18B20TempList[SENSOR_MANAGER_DS18B20MAXCOUNT];
 
+#if SENSOR_MANAGER_ANALOGCHANNELS_COUNT > 0
 uint16 APP_PortMon_analogValues[SENSOR_MANAGER_ANALOGCHANNELS_COUNT];
+#endif
 
 uint32 Sensor_Manager_PulseCounters[SENSOR_MANAGER_PULSE_COUNTERS] = {};
 
@@ -122,12 +124,12 @@ void ICACHE_FLASH_ATTR Sensor_Manager_Fast() {
     //Local variables
     uint8 CS_i;
 
+#if SENSOR_MANAGER_ANALOGCHANNELS_COUNT > 0
     //Scan Adc channels
     for (CS_i = 0; CS_i < SENSOR_MANAGER_ANALOGCHANNELS_COUNT; CS_i++) {
         //Read Adc channel and store it in buffer
         APP_PortMon_analogValues[CS_i] = system_adc_read();
     }
-
     //SW pulse counter
     if((Sensor_Manager_analogToPulseState == 1) && (APP_PortMon_analogValues[0] < 300))
     {
@@ -137,9 +139,10 @@ void ICACHE_FLASH_ATTR Sensor_Manager_Fast() {
     {
        	Sensor_Manager_analogToPulseState = 1;
     	//Count rising edge
-       	Sensor_Manager_PulseCounters[4]++;
+       	Sensor_Manager_PulseCounters[DIGITAL_PULSE_COUNTERS]++;
 
     }
+#endif
 }
 
 void ICACHE_FLASH_ATTR Sensor_Manager_Main() {
@@ -288,11 +291,14 @@ uint32 ICACHE_FLASH_ATTR Sensor_Manager_GetPulseLevel(uint8 id)
 	return tempValue;
 }
 
+#if SENSOR_MANAGER_ANALOGCHANNELS_COUNT > 0
 uint16 ICACHE_FLASH_ATTR Sensor_Manager_GetAnalogValue(void)
 {
-	return APP_PortMon_analogValues[0];
-}
 
+	return APP_PortMon_analogValues[0];
+
+}
+#endif
 void ICACHE_FLASH_ATTR Sensor_Manager_ResetPulseCounters(void)
 {
 	uint8 i;

@@ -25,6 +25,9 @@
 #ifndef __USER_CONFIG_H__
 #define __USER_CONFIG_H__
 
+//HW VARIANT
+#define VARIANT		0
+
 //ENVIROMENT
 #define NOS			0
 #define OS			1
@@ -55,25 +58,24 @@
 #define CACHE_BUF_SIZE      (LOG_PAGE + 32)*8
 
 //Pins
-#define VARIANT			0
 #if VARIANT == 0
-#define LED_BUILTIN		D0
-#define ONEWIRE_BUS_0	D1
-#define ONEWIRE_BUS_1	D2
-#define PULSE_INPUT0    D7
-#define PULSE_INPUT1    D6
-#define PULSE_INPUT2    D5
-#define PULSE_INPUT3    D4
-#define FLASH_BUTTON    D3
+	#define LED_BUILTIN		D0
+	#define ONEWIRE_BUS_0	D1
+	#define ONEWIRE_BUS_1	D2
+	#define PULSE_INPUT0    D7
+	#define PULSE_INPUT1    D6
+	#define PULSE_INPUT2    D5
+	#define PULSE_INPUT3    D4
+	#define FLASH_BUTTON    D3
 #else
-#define LED_BUILTIN		D4
-#define ONEWIRE_BUS_0	D1
-#define ONEWIRE_BUS_1	D2
-#define PULSE_INPUT0    D0
-#define PULSE_INPUT1    D5
-#define PULSE_INPUT2    D6
-#define PULSE_INPUT3    D7
-#define FLASH_BUTTON    D3
+	#define LED_BUILTIN		D4
+	#define ONEWIRE_BUS_0	D1
+	#define ONEWIRE_BUS_1	D2
+	#define PULSE_INPUT0    D0
+	#define PULSE_INPUT1    D5
+	#define PULSE_INPUT2    D6
+	#define PULSE_INPUT3    D7
+	#define FLASH_BUTTON    D3
 #endif
 
 //Remote(Serial) Control
@@ -95,18 +97,23 @@
 #define STATUS_LED_INVERT		(ON)
 
 //Sensor manager
-#define OWP_CHANNELS_COUNT 		2
-#define TEMP_RESCAN_PERIOD		1
-#define TEMP_MAX_RETRY_COUNT 	5
-#define MHZ14_INPUT_PIN			PULSE_INPUT0
+#if VARIANT == 0
+	#define ANALOG_ENABLE			(ON)
+#else
+	#define ANALOG_ENABLE			(OFF)
+#endif
+#define OWP_CHANNELS_COUNT 			2
+#define TEMP_RESCAN_PERIOD			1
+#define TEMP_MAX_RETRY_COUNT 		5
+#define MHZ14_INPUT_PIN				PULSE_INPUT0
 
 //Remote control
-#define REMOTE_PRINT_PROMPT		(OFF)
-#define REMOTE_LOGIN_NEEDED		(OFF)
-#define REMOTE_MAX_COMMANDS		10
-#define REMOTE_MAX_INPUT		70
-#define REMOTE_MAX_COMMAND_ARGS 4
-#define REMOTE_MAX_OUTPUT		70
+#define REMOTE_PRINT_PROMPT			(OFF)
+#define REMOTE_LOGIN_NEEDED			(OFF)
+#define REMOTE_MAX_COMMANDS			10
+#define REMOTE_MAX_INPUT			70
+#define REMOTE_MAX_COMMAND_ARGS 	4
+#define REMOTE_MAX_OUTPUT			70
 
 //Web server
 #define HTTPD_MAX_HEAD_LEN					1024

@@ -35,7 +35,7 @@
 #include "esp_wifi.h"
 #include "esp_libc.h"
 #include "esp_fs.h"
-#include "user_config.h"
+#include "project_config.h"
 
 typedef struct espconn* ConnTypePtr;
 

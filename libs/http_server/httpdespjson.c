@@ -128,7 +128,7 @@ int ICACHE_FLASH_ATTR cgiEspJsonTemplate(HttpdConnData *connData) {
 			length += sprintf(&buffer[length],"\"meter_co2\":\"%d\",",Sensor_Manager_GetCO2());
 			//PULSE COUNTERS
 			uint32 id = 0;
-			for(id=0; id < 5; id++)
+			for(id=0; id < SENSOR_MANAGER_PULSE_COUNTERS; id++)
 			{
 				uint32 count = Sensor_Manager_GetPulseCount(id);
 				uint32 level = Sensor_Manager_GetPulseLevel(id);

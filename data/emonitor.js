@@ -23,7 +23,7 @@ function StatusViewModel() {
   BaseViewModel.call(self, {
 "st_uptime": null,"st_timing": null,"st_conn": null,"st_heap": null,"st_bck": null,"st_rst": null,
 "meter_co2": null,
-"pc_01": "0|0","pc_02": "0|0","pc_03": "0|0","pc_04": "0|0","pc_05": "0|0",
+"pc_01": "0|0","pc_02": "0|0","pc_03": "0|0","pc_04": "0|0","pc_05": " | ",
 "temp_health": null,"temp_count": 0,
 "ds18_01": "|.","ds18_02": "|.","ds18_03": "|.","ds18_04": "|.","ds18_05": "|.","ds18_06": "|.","ds18_07": "|.","ds18_08": "|.",
 "ds18_09": "|.","ds18_10": "|.","ds18_11": "|.","ds18_12": "|.","ds18_13": "|.","ds18_14": "|.","ds18_15": "|.","ds18_16": "|.",
@@ -117,10 +117,11 @@ case 16:temp = self.ds18_16();break;
   self.getPulseLevel = ko.pureComputed(function() {
     return self.pc_01().substr(self.pc_01().lastIndexOf("|")+1,10);
   }, self);
-
   self.hasMeterCO2 = ko.pureComputed(function() {
     if((self.meter_co2() != null) && (self.meter_co2() != 10000)) {
     return true;}return false;}, self);
+  self.hasAnalog = ko.pureComputed(function() {
+    return (self.pc_05() != " | ");}, self);
 }
 StatusViewModel.prototype = Object.create(BaseViewModel.prototype);
 StatusViewModel.prototype.constructor = StatusViewModel;

@@ -22,11 +22,15 @@
 /**********************************************************************************
  * Defines
  **********************************************************************************/
-#define SENSOR_MANAGER_ANALOGCHANNELS_COUNT 1
-#define SENSOR_MANAGER_DS18B20MAXCOUNT 16
-#define SENSOR_MANAGER_PULSE_COUNTERS 5
+#if ANALOG_ENABLE == ON
+#define SENSOR_MANAGER_ANALOGCHANNELS_COUNT 	1
+#else
+#define SENSOR_MANAGER_ANALOGCHANNELS_COUNT 	0
+#endif
+#define SENSOR_MANAGER_DS18B20MAXCOUNT 			16
+#define SENSOR_MANAGER_PULSE_COUNTERS 			(4 + SENSOR_MANAGER_ANALOGCHANNELS_COUNT)
 
-#define Sensor_Manager_INVALID_TEMP    10000
+#define Sensor_Manager_INVALID_TEMP    			10000
 
 /**********************************************************************************
  * Interfaces
