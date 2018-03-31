@@ -34,10 +34,10 @@
 #define PRJ_ENV		OS
 
 //WIFI
-#define DEFAULT_STA_SSID 		"BOCI"
-#define DEFAULT_STA_PASSWORD 	"fucking6"
+#define DEFAULT_STA_SSID 		""
+#define DEFAULT_STA_PASSWORD 	""
 #define DEFAULT_SERVER_ADDRESS 	"http://v9.emonitor.hu"
-#define DEFAULT_API_KEY 		"97d3e42a841ea6c219582211313d5051"
+#define DEFAULT_API_KEY 		""
 #define WIFI_SCAN_TIMING 		60
 
 //UART
@@ -139,12 +139,12 @@
 #define DEBUG_EMONITOR 			(OFF)
 #define DEBUG_REMOTE_CONTROL	(OFF)
 #define DEBUG_HTTP_CLIENT 		(OFF)
-#define DEBUG_HTTP_SERVER 		(ON)
+#define DEBUG_HTTP_SERVER 		(OFF)
 #define DEBUG_WIFI_MANAGER		(OFF)
 #define DEBUG_MHZ14				(OFF)
-#define DEBUG_SPIFFS 			(ON)
+#define DEBUG_SPIFFS 			(OFF)
 #define DEBUG_NVM				(OFF)
-#define DEBUG_MAIN				(ON)
+#define DEBUG_MAIN				(OFF)
 
 #endif
 
