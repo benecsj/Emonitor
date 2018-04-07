@@ -171,8 +171,8 @@ void IRAM0 Emonitor_Main_1ms(void) {
 	else
 	{
 		Emonitor_LEDCounter= (Emonitor_LEDCounter+1)%LED_TIMING_NORMAL;
-		ledValue = (Emonitor_LEDCounter <(LED_TIMING_NORMAL-2));
-		if((Emonitor_LEDCounter == (LED_TIMING_NORMAL-150)) && (Emonitor_connectionStatus == EMONITOR_CONNECTED))
+		ledValue = (Emonitor_LEDCounter <(LED_TIMING_NORMAL-LED_STRENGTH));
+		if((Emonitor_LEDCounter <= (LED_TIMING_NORMAL-150)) && (Emonitor_LEDCounter >= (LED_TIMING_NORMAL-150 - LED_STRENGTH)) && (Emonitor_connectionStatus == EMONITOR_CONNECTED))
 		{
 			ledValue = 0 ;
 		}

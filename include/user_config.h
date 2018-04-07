@@ -26,7 +26,7 @@
 #define __USER_CONFIG_H__
 
 //HW VARIANT
-#define VARIANT		0
+#define VARIANT		1
 
 //ENVIROMENT
 #define NOS			0
@@ -89,6 +89,7 @@
 #define TIMEOUT_TURNOFF_APP 	43200*2
 #define LED_TIMING_NORMAL		500
 #define LED_TIMING_RESET		100
+#define LED_STRENGTH			50
 #define DEFAULT_SEND_TIMING		10
 #define SHORT_PRESS_MIN			100
 #define LONG_PRESS_MIN			8000
@@ -142,9 +143,9 @@
 #define DEBUG_HTTP_SERVER 		(OFF)
 #define DEBUG_WIFI_MANAGER		(OFF)
 #define DEBUG_MHZ14				(OFF)
-#define DEBUG_SPIFFS 			(OFF)
-#define DEBUG_NVM				(OFF)
-#define DEBUG_MAIN				(OFF)
+#define DEBUG_SPIFFS 			(ON)
+#define DEBUG_NVM				(ON)
+#define DEBUG_MAIN				(ON)
 
 #endif
 
