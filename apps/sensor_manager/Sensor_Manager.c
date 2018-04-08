@@ -306,6 +306,7 @@ void ICACHE_FLASH_ATTR Sensor_Manager_ResetPulseCounters(void)
 	for(i=0;i<SENSOR_MANAGER_PULSE_COUNTERS;i++)
 	{
 		Sensor_Manager_PulseCounters[i] = 0;
+		Sensor_Manager_lastInputLevel[i] = Sensor_Manager_GetPulseLevel(i);
 	}
 }
 

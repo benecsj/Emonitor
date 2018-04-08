@@ -106,7 +106,7 @@
 #define OWP_CHANNELS_COUNT 			2
 #define TEMP_RESCAN_PERIOD			1
 #define TEMP_MAX_RETRY_COUNT 		5
-#define MHZ14_INPUT_PIN				PULSE_INPUT0
+#define MHZ14_INPUT_PIN				PULSE_INPUT3
 
 //Remote control
 #define REMOTE_PRINT_PROMPT			(OFF)

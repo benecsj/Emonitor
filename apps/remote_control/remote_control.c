@@ -449,9 +449,9 @@ int ICACHE_FLASH_ATTR Command_Print(int argc, char** argv) {
 }
 
 int ICACHE_FLASH_ATTR Command_Counter(int argc, char** argv) {
-	char* text = "error, use parameter: reset";
+	char* text = "error, use parameter: reset, read, level";
 	char* parameter;
-
+	int i;
 	//Check argument count
 	if(argc == 2)
 	{
@@ -464,6 +464,21 @@ int ICACHE_FLASH_ATTR Command_Counter(int argc, char** argv) {
 			Sensor_Manager_ResetPulseCounters();
 			text="counters reseted";
 		}
+		else if(strcmp(parameter,"read")==0)
+		{
+			for(i = 0 ; i < SENSOR_MANAGER_PULSE_COUNTERS ; i++ ){
+				prj_printf("%02X:%d ",(i+1),Sensor_Manager_GetPulseCount(i));
+			}
+			prj_printf("\n");
+		}
+		else if(strcmp(parameter,"level")==0)
+		{
+			for(i = 0 ; i < SENSOR_MANAGER_PULSE_COUNTERS ; i++ ){
+				prj_printf("%02X:%d ",(i+1),Sensor_Manager_GetPulseLevel(i));
+			}
+			prj_printf("\n");
+		}
+
 	}
     //Generate response
 	prj_printf("%s\n", text);
