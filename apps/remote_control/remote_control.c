@@ -17,7 +17,10 @@
 /******************************************************************************
 * Defines
 \******************************************************************************/
-
+#define PRINT_TEMPID "%02X%02X%02X%02X%02X"
+#define PRINT_TEMP	 "%c%d.%d"
+#define READ_ID		 ids[(i*8)+1],ids[(i*8)+2],ids[(i*8)+3],ids[(i*8)+4],ids[(i*8)+7]
+#define READ_TEMP	 sign,abs(temperatures[i]/10),abs(temperatures[i]%10)
 /******************************************************************************
 * Variables
 \******************************************************************************/
@@ -286,6 +289,12 @@ int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
 				text = "";
 			}
 		}
+		else if(strcmp(parameter,"level")==0)
+		{
+			printf("rssi: %d",Wifi_Manager_GetSignalLevel());
+			text = "";
+			Wifi_Manager_UpdateLevel();
+		}
 	}
     //Generate response
 	prj_printf("%s\n", text);
@@ -469,16 +478,71 @@ int ICACHE_FLASH_ATTR Command_Counter(int argc, char** argv) {
 			for(i = 0 ; i < SENSOR_MANAGER_PULSE_COUNTERS ; i++ ){
 				prj_printf("%02X:%d ",(i+1),Sensor_Manager_GetPulseCount(i));
 			}
-			prj_printf("\n");
+			text="";
 		}
 		else if(strcmp(parameter,"level")==0)
 		{
 			for(i = 0 ; i < SENSOR_MANAGER_PULSE_COUNTERS ; i++ ){
 				prj_printf("%02X:%d ",(i+1),Sensor_Manager_GetPulseLevel(i));
 			}
-			prj_printf("\n");
+			text="";
 		}
 
+	}
+    //Generate response
+	prj_printf("%s\n", text);
+    return SHELL_RET_SUCCESS;
+}
+
+int ICACHE_FLASH_ATTR Command_Sensor(int argc, char** argv) {
+	char* text = "error, use parameter: co2, temp";
+	char* parameter;
+	int i;
+	uint8 tempCount;
+	uint8* ids;
+	sint16* temperatures;
+	sint16 temperature;
+	char sign;
+	//Check argument count
+	if(argc == 2)
+	{
+		// Process parameters
+		parameter = argv[1];
+
+		//Do stuff
+		if(strcmp(parameter,"co2")==0)
+		{
+			if(Sensor_Manager_HasCO2Sensor())
+			{
+				prj_printf("CO2: %d ppm",Sensor_Manager_GetCO2());
+				text="";
+			}
+			else
+			{
+				text="CO2 sensor not found";
+			}
+		}
+		else if(strcmp(parameter,"temp")==0)
+		{
+			Sensor_Manager_Get_TempSensorData(&tempCount,&ids,&temperatures);
+
+			if(tempCount ==0)
+			{
+				text="No temp sensors found";
+			}
+			else
+			{
+				prj_printf("Temp sensor count: %d\n",tempCount);
+				for(i = 0 ; i < tempCount ; i++ ){
+					temperature = temperatures[i];
+					if(Sensor_Manager_IsTempValid(temperature)) {
+						sign = (temperature<0 ? '-':'+');
+						prj_printf("   " PRINT_TEMPID " : " PRINT_TEMP "C\n",READ_ID, READ_TEMP);
+					}
+				}
+				text="";
+			}
+		}
 	}
     //Generate response
 	prj_printf("%s\n", text);
@@ -534,6 +598,7 @@ void Remote_RegisterCommands(void)
     shell_register(Command_Counter, "counter");
     shell_register(Command_Print, "print");
     shell_register(Command_Emon, "emon");
+    shell_register(Command_Sensor, "sensor");
 }
 
 void Remote_UnregisterCommands(void)
