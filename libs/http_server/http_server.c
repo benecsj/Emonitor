@@ -39,7 +39,7 @@ void ICACHE_FLASH_ATTR Http_Server_Init(void)
 void ICACHE_FLASH_ATTR Http_Server_Main(void)
 {
 	//Monitor connection status
-	//httpdMonitorConnections();
+	httpdMonitorConnections();
 }
 
 //Template code for the counter on the index page.

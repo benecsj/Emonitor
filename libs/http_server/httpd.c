@@ -852,21 +852,27 @@ void ICACHE_FLASH_ATTR httpdInit(HttpdBuiltInUrl *fixedUrls, int port) {
 void ICACHE_FLASH_ATTR httpdMonitorConnections(void)
 {
 	uint8 i;
+	DBG2_HTTPS("(HS)------\n");
 	//Check all connections
 	for(i=0; i< HTTPD_MAX_CONNECTIONS; i++)
 	{
+		DBG2_HTTPS("(HS) Slot:%d Con:%d TimeOut:%d\n",i,httpdConnData[i].slot,httpdConnData[i].timeout );
+
 		//Monitor longest request on active connection
 		if(httpdConnData[i].slot < HTTPD_MAX_CONNECTIONS)
 		{
 			httpdConnData[i].timeout++;
-			if(httpdConnData[i].timeout > 300)
+			if(httpdConnData[i].timeout > HTTPD_TCP_IDLE_TIMEOUT)
 			{
 				//Clean up connection, something went wrong
-				DBG_HTTPS("(HS) Connection request timeout on slot %d.\n",httpdConnData[i].slot);
+				DBG2_HTTPS("(HS) Connection request timeout on slot %d.\n",httpdConnData[i].slot);
+				httpdConnData[i].priv->flags=HFL_CHUNKED; // Add flag to trigger full clean up
 				httpdCgiIsDone(&httpdConnData[i]);
 				httpdRetireConn(&httpdConnData[i]);
 				httpdPlatDisconnect(httpdConnData[i].conn);
+
 			}
 		}
+
 	}
 }
