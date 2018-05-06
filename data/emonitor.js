@@ -1,5 +1,7 @@
 var ref = window.location.href ;
 var host = ref.substr(0,ref.lastIndexOf("/"));
+var refOnly = ref.substr(0,ref.lastIndexOf("?"));
+function langChange(){window.location=refOnly+"?lang=1&t="+Date.now()}
 function BaseViewModel(defaults, remoteUrl, mappings) {
   if(mappings === undefined){mappings = {};}
   var self = this;
@@ -126,7 +128,7 @@ case 16:temp = self.ds18_16();break;
 StatusViewModel.prototype = Object.create(BaseViewModel.prototype);
 StatusViewModel.prototype.constructor = StatusViewModel;
 
-function factoryReset(){if(confirm("Are you sure?")){window.location.replace("wait.html?reset=1");}}
+function factoryReset(){if(confirm(resetText)){window.location.replace("wait.html?reset=1");}}
 function restart(){window.location.replace("wait.html?restart=1");}
 
 function EmonitorViewModel() {
