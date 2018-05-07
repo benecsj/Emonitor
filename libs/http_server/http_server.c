@@ -8,9 +8,12 @@
 #include "Wifi_Manager.h"
 #include "Sensor_Manager.h"
 #include "Emonitor.h"
+#include "http_server.h"
 
 int Http_Server_TokenProcessor(HttpdConnData *connData, char *token, void **arg);
+uint8 Http_Server_GetDefaultLanguage();
 uint16 Http_Server_FormId = 0;
+uint8 Http_Language = SERVER_LANG_UNDEFINED;
 
 HttpdBuiltInUrl builtInUrls[]={
 	{"*", cgiRedirectApClientToHostname, "esp8266.nonet"},
@@ -32,8 +35,13 @@ void ICACHE_FLASH_ATTR Http_Server_Init(void)
 {
 	DBG_HTTPS("(HS) Http_Server_Init START\n");
 	httpdInit(builtInUrls, 80);
-	DBG_HTTPS("(HS) Http_Server_Init FINISH\n");
 	Http_Server_FormId = os_random();
+	//Load default language if not config found
+	if(Http_Language == SERVER_LANG_UNDEFINED)
+	{
+		Http_Language = Http_Server_GetDefaultLanguage();
+	}
+	DBG_HTTPS("(HS) Http_Server_Init FINISH (Lang:%d)\n",Http_Language);
 }
 
 void ICACHE_FLASH_ATTR Http_Server_Main(void)
@@ -41,6 +49,33 @@ void ICACHE_FLASH_ATTR Http_Server_Main(void)
 	//Monitor connection status
 	httpdMonitorConnections();
 }
+
+uint8 ICACHE_FLASH_ATTR Http_Server_GetDefaultLanguage()
+{
+	esp_fs_file file;
+	uint8 langText[3];
+	uint8 returnValue = SERVER_LANG_EN;
+
+	//Get language from filestorage
+	esp_fs_OpenFile(&file,"/lang");
+
+	esp_fs_ReadFile(&file, (u8_t *)&langText[0], 2);
+	esp_fs_CloseFile(&file);
+	//Close string
+	langText[2] = 0;
+	//Convert language string
+	if(strcmp((char *)&langText[0],"hu")==0)
+	{
+		returnValue = SERVER_LANG_HU;
+	}
+	else if(strcmp((char *)&langText[0],"en")==0)
+	{
+		returnValue = SERVER_LANG_EN;
+	}
+
+	return returnValue;
+}
+
 
 //Template code for the counter on the index page.
 int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *token, void **arg) {
@@ -234,6 +269,20 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 						//RESET REQUEST
 						else if (strcmp(name, "reset")==0) {
 							Emonitor_Request(EMONITOR_REQ_CLEAR);
+						}
+						//LANGUAGE CHANGE REQUEST
+						else if (strcmp(name, "lang")==0) {
+							//Toggle language
+							if(Http_Server_GetLanguage() == SERVER_LANG_HU)
+							{
+								Http_Server_SetLanguage(SERVER_LANG_EN);
+							}
+							else
+							{
+								Http_Server_SetLanguage(SERVER_LANG_HU);
+							}
+							//Save config
+							saveNeeded = TRUE;
 						}
 					}
 				}

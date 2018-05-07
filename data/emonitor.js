@@ -1,7 +1,7 @@
 var ref = window.location.href ;
 var host = ref.substr(0,ref.lastIndexOf("/"));
 var refOnly = ref.substr(0,ref.lastIndexOf("?"));
-function langChange(){window.location=refOnly+"?lang=1&t="+Date.now()}
+function langChange(){window.location=host+"/wait.html"+"?lang=1&t="+Date.now()}
 function BaseViewModel(defaults, remoteUrl, mappings) {
   if(mappings === undefined){mappings = {};}
   var self = this;

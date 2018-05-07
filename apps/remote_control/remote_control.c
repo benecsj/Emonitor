@@ -13,6 +13,7 @@
 #include "Wifi_Manager.h"
 #include "Sensor_Manager.h"
 #include "Emonitor.h"
+#include "http_server.h"
 
 /******************************************************************************
 * Defines
@@ -302,7 +303,7 @@ int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
 }
 
 int ICACHE_FLASH_ATTR Command_Emon(int argc, char** argv) {
-	char* text = "error, use parameter: key | url | nodeid | timing";
+	char* text = "error, use parameter: key | url | nodeid | timing | lang";
 	char* parameter;
 	char* parameter2;
 	int32_t number;
@@ -392,6 +393,31 @@ int ICACHE_FLASH_ATTR Command_Emon(int argc, char** argv) {
 			else
 			{
 				printf("current emoncms timing:[%d]",Emonitor_GetSendPeriod());
+				text = "";
+			}
+		}
+		else if(strcmp(parameter,"lang")==0)
+		{
+			parameter = argv[2];
+			//Check if second parameter received
+			if(argc == 3)
+			{
+				number = strtol(parameter,NULL,10);
+
+				if((number >= 0) && (number <=1))
+				{
+					Http_Server_SetLanguage(number);
+					printf("new language:[%d]\n",parameter);
+					text="imre language reconfigured";
+				}
+				else
+				{
+					text="language id must be between 0 and 1";
+				}
+			}
+			else
+			{
+				printf("current language [%d]",Http_Server_GetLanguage());
 				text = "";
 			}
 		}

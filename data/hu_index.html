@@ -1,0 +1,129 @@
+<html>
+<head>
+<title>IMRe_%emon_id%</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+<meta name="description" content="IMRe">
+<meta name="author" content="IMRe">
+<meta name="theme-color" content="#000000" />
+<meta charset="UTF-8" />
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<script>
+function loadScript(u,s,d,c){if(s){console.log("Alreadyloaded "+u);c(true);return;}
+var ts = true;var t = setTimeout(function(){ts = false;c(false);}, d*100);var s = document.createElement("script");s.type = "text/javascript";
+if (s.readyState){s.onreadystatechange = function(){
+if (s.readyState == "loaded" || s.readyState == "complete"){
+s.onreadystatechange = null;if(ts){clearTimeout(t);c(true);}}};
+}else {s.onload = function(){if(ts){clearTimeout(t);c(true);}};}
+s.src=u;document.getElementsByTagName("head")[0].appendChild(s);}
+function loadCheck() {
+loadScript("https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js",false,2,function(j){
+loadScript("https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js",false,2,function(k){
+loadScript("https://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min.js",(window.ko == null),2,function(m){
+loadScript("emonitor.js",false,50,function(){
+loadScript("jquery.min.js",(window.jQuery != null),100,function(){
+loadScript("knockout-min.js",(window.ko != null),50,function(){
+loadScript("knockout.mapping.min.js",((window.ko == null)||(window.ko.mapping != null)),50,function(){
+if ((window.getComputedStyle(document.getElementById('body')).color !== 'rgb(85, 85, 85)')||(typeof pageloaded !== 'function') || (window.ko == null) || (window.ko.mapping == null)) {
+window.location.reload();}else{pageloaded();}
+});});});});});});});}
+var resetText="Biztos benne?";
+</script>
+<body id="body" onLoad="loadCheck();">
+  <div id="page">
+
+    <ul>
+      <li><a href="/index.html">Kezdő</a></li>
+      <li class="dropdown">
+        <a href="javascript:void(0)" class="dropbtn">Navigáció</a>
+        <div class="dropdown-content">
+          <a href="/status.html">Státusz</a>
+        </div>
+      </li>
+       <li style="float: right"><a onclick="langChange()">HU/EN</a></li> 
+    </ul>
+
+    <div class="box">
+      <h1><span>I</span>MRe_%emon_id%</h1>
+      <h3>Intelligens Mérő Rendszer</h3>
+    </div>
+
+      <div id="center-container" data-bind="visible: !initialised()">
+        <h3 class="fadeIn">Töltődik, kérem várjon...</h3>
+      </div> 
+
+    <div  data-bind="visible: initialised()" style="display: none">
+        <div style="  display: flex;align-items: center;justify-content: center;">
+            <button type="submit" onclick="restart()">Újraindítás</button>
+            <button type="submit" onclick="factoryReset()">Gyári reset</button>
+        </div>
+    </div>
+
+    <form action="/wait.html" data-bind="visible: initialised()" style="display: none">
+
+    <div id="center-container" style="display">
+
+      <div id="ten">
+         <input type="text" id="pass" name="form_id"  value="%form_id%" style="display: none;">
+        <div style="text-align: left;"><h2>1. Wifi kapcsolat</h2></div>
+        <div id="left-hand-inner-container" class="itembody-wrapper">
+          <b>SSID</b><br>
+          <input type="text" id="ssid" name="sta_ssid" value="%sta_ssid%">
+          <p>
+          <b>Jelszó</b><br>
+          <input type="text" id="pass" name="sta_pass"  value="%sta_pass%">
+          </p>
+        </div>
+      </div> 
+
+      <div id="ten">
+        <div style="text-align: left;"><h2>2. Emoncms</h2></div>
+        <div id="left-hand-inner-container" class="itembody-wrapper">
+          <b>Kulcs</b><br>
+          <textarea id="key" name="emon_key">%emon_key%</textarea>
+          <p>
+          <b>URL</b><br>
+          <input type="text" id="url" name="emon_url" value="%emon_url%">
+          </p>
+          <p>
+          <b>Modul azonosító</b><br>
+          <input type="number" id="node" name="emon_id"  value="%emon_id%">
+          </p>
+          <p>
+          <b>Időzítés</b><br>
+          <input type="number" id="node" name="emon_send"  value="%emon_send%">
+          </p>
+        </div>
+      </div> 
+
+      <div id="ten">
+        <div style="text-align: left;"><h2>3. Modul hozzáférés</h2></div>
+        <div id="left-hand-inner-container" class="itembody-wrapper">
+          <b>SSID</b><br>
+          <input type="text" id="ssid" name="ap_ssid" value="%ap_ssid%">
+          <p>
+          <b>Jelszó</b><br>
+          <input type="text" id="pass" name="ap_pass"  value="%ap_pass%">
+          </p>
+          <p>
+          <b>Állapot</b><br>
+            <select name="ap_en" id="power">
+            <option value ="off" %ap_off%>Ki</option>
+            <option value ="on" %ap_on%>Be</option>
+            </select> 
+          </p>
+        </div>
+      </div> 
+
+            <div style="  display: flex;align-items: center;justify-content: center;">
+               <button type="submit">Mentés</button>
+            </div>
+    </form>
+  </div>  
+</div>
+</body>
+</html>

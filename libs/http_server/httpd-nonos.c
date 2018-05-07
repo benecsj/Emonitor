@@ -9,7 +9,7 @@ ESP8266 web server - platform-dependent routines, nonos version
 #ifndef FREERTOS
 
 //Listening connection data
-static struct espconn httpdConn;
+struct espconn httpdConn;
 static esp_tcp httpdTcp;
 
 static void ICACHE_FLASH_ATTR platReconCb(void *arg, sint8 err) {

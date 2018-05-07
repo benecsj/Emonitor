@@ -1,0 +1,166 @@
+<html>
+<head>
+<title>IMRe_%emon_id%</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+<meta name="description" content="IMRe">
+<meta name="author" content="IMRe">
+<meta name="theme-color" content="#000000" />
+<meta charset="UTF-8" />
+<link rel="stylesheet" type="text/css" href="style.css">
+</head> 
+<script>
+function loadScript(u,s,d,c){if(s){console.log("Alreadyloaded "+u);c(true);return;}
+var ts = true;var t = setTimeout(function(){ts = false;c(false);}, d*100);var s = document.createElement("script");s.type = "text/javascript";
+if (s.readyState){s.onreadystatechange = function(){
+if (s.readyState == "loaded" || s.readyState == "complete"){
+s.onreadystatechange = null;if(ts){clearTimeout(t);c(true);}}};
+}else {s.onload = function(){if(ts){clearTimeout(t);c(true);}};}
+s.src=u;document.getElementsByTagName("head")[0].appendChild(s);}
+function loadCheck() {
+loadScript("https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js",false,2,function(j){
+loadScript("https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js",false,2,function(k){
+loadScript("https://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min.js",(window.ko == null),2,function(m){
+loadScript("emonitor.js",false,50,function(){
+loadScript("jquery.min.js",(window.jQuery != null),100,function(){
+loadScript("knockout-min.js",(window.ko != null),50,function(){
+loadScript("knockout.mapping.min.js",((window.ko == null)||(window.ko.mapping != null)),50,function(){
+if ((window.getComputedStyle(document.getElementById('body')).color !== 'rgb(85, 85, 85)')||(typeof pageloaded !== 'function') || (window.ko == null) || (window.ko.mapping == null)) {
+window.location.reload();}else{pageloaded();}
+});});});});});});});}
+</script>
+<body id="body" onLoad="loadCheck();">
+  <div id="page">
+
+    <ul>
+      <li><a href="/index.html">Kezdő</a></li>
+      <li class="dropdown">
+        <a href="javascript:void(0)" class="dropbtn">Navigáció</a>
+        <div class="dropdown-content">
+          <a href="/status.html">Státusz</a>
+        </div>
+      </li>
+       <li style="float: right"><a onclick="langChange()">HU/EN</a></li> 
+    </ul>
+
+    <div class="box">
+      <h1><span>I</span>MRe_%emon_id%</h1>
+      <h3>Intelligens Mérő Rendszer</h3>
+    </div>
+
+    <div id="left-hand-container" data-bind="visible: initialised()" style="display: none">
+
+      <div id="one">
+        <h2>1. Eszköz</h2>
+        <div class="itembody-wrapper">
+          <p>
+          <b class="fixwidth">Verzió:</b> <t>%st_sw%</t><br>
+          <b class="fixwidth">Rendsz.idő:</b> <t data-bind="text: status.st_uptime()||'%st_uptime%'">%st_uptime%</t> sec<br>
+          <b class="fixwidth">Időzítés:</b> <t data-bind="text: status.st_timing()||'%st_timing%'">%st_timing%</t><br>
+          <b class="fixwidth">Kapcsolat:</b> <t data-bind="text: status.st_conn()||'%st_conn%'">%st_conn%</t><br>
+          <b class="fixwidth">RAM:</b> <t data-bind="text: status.st_heap()||'%st_heap%'">%st_heap%</t><br>
+          <b class="fixwidth">CPU:</b> <t data-bind="text: status.st_bck()||'%st_bck%'">%st_bck%</t>%%<br>
+          <b class="fixwidth">Reset:</b> <t data-bind="text: status.st_rst()||'%st_rst%'">%st_rst%</t></p>
+        </div>
+      </div>
+
+      <div id="two">
+        <h2>2. WiFi hálózat</h2>
+        <div class="itembody-wrapper">
+          <p><b class="fixwidth">Kapcsolat:</b> <span id="mode"></span></p>
+
+          <div id="client-view">
+            <table>
+              <tr>
+                <th>Hálózat</th>
+                <th>RSSI</th>
+              </tr>
+                <tbody id="sta-ssid">
+                  <tr>
+                    <td data-bind="text: status.st_wifi()||'%st_wifi%'">%st_wifi%</td>
+                    <td data-bind="text: status.st_signal()||'%st_signal%'">%st_signal%</td>
+                  </tr>
+                </tbody>
+            </table>
+            <p><b class="fixwidth">IP cím:</b> <t data-bind="text: status.st_ip()||'%st_ip%'">%st_ip%</t></p>
+          </div>
+        </div>
+      </div>       
+
+      <div id="three">
+        <h2>3. Impulzus számlálók</h2>
+        <div class="itembody-wrapper">
+          <table>
+            <tr>
+              <th>Index</th>
+              <th>Érték</th>
+              <th>Bemenet</th>
+            </tr>
+            <tbody>
+<tr><td>1<td data-bind="text: status.getCounter.count(1)"></td><td data-bind="text: status.getCounter.level(1)"></td></tr>
+<tr><td>2<td data-bind="text: status.getCounter.count(2)"></td><td data-bind="text: status.getCounter.level(2)"></td></tr>
+<tr><td>3<td data-bind="text: status.getCounter.count(3)"></td><td data-bind="text: status.getCounter.level(3)"></td></tr>
+<tr><td>4<td data-bind="text: status.getCounter.count(4)"></td><td data-bind="text: status.getCounter.level(4)"></td></tr>
+<tr data-bind="visible: status.hasAnalog()"><td>5<td data-bind="text: status.getCounter.count(5)"></td><td data-bind="text: status.getCounter.level(5)"></td></tr>
+            </tbody>
+          </table><br>
+        </div>
+      </div>
+
+    </div>
+
+   <div id="right-hand-container" data-bind="visible: initialised()" style="display: none">
+
+      <div id="four">
+        <h2>4. Hőmérők</h2>
+        <div class="itembody-wrapper">
+          <p><b class="fixwidthLong">Kommunikáció:</b> <span id="count"></span> <t data-bind="text: status.temp_health()||'%temp_health%'">%temp_health%</t><br>
+          <b class="fixwidthLong">Darab:</b> <span id="count"></span> <t data-bind="text: status.temp_count()||'%temp_count%'">%temp_count%</t></p>
+          <table>
+            <tr>
+              <th>Azonosító</th>
+              <th>Hőm.</th>
+            </tr>
+            <tbody>
+<tr data-bind="visible: status.getTemp.visible(1)"><td data-bind="text: status.getTemp.id(1)"></td><td><t data-bind="text: status.getTemp.value(1)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(2)"><td data-bind="text: status.getTemp.id(2)"></td><td><t data-bind="text: status.getTemp.value(2)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(3)"><td data-bind="text: status.getTemp.id(3)"></td><td><t data-bind="text: status.getTemp.value(3)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(4)"><td data-bind="text: status.getTemp.id(4)"></td><td><t data-bind="text: status.getTemp.value(4)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(5)"><td data-bind="text: status.getTemp.id(5)"></td><td><t data-bind="text: status.getTemp.value(5)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(6)"><td data-bind="text: status.getTemp.id(6)"></td><td><t data-bind="text: status.getTemp.value(6)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(7)"><td data-bind="text: status.getTemp.id(7)"></td><td><t data-bind="text: status.getTemp.value(7)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(8)"><td data-bind="text: status.getTemp.id(8)"></td><td><t data-bind="text: status.getTemp.value(8)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(9)"><td data-bind="text: status.getTemp.id(9)"></td><td><t data-bind="text: status.getTemp.value(9)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(10)"><td data-bind="text: status.getTemp.id(10)"></td><td><t data-bind="text: status.getTemp.value(10)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(11)"><td data-bind="text: status.getTemp.id(11)"></td><td><t data-bind="text: status.getTemp.value(11)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(12)"><td data-bind="text: status.getTemp.id(12)"></td><td><t data-bind="text: status.getTemp.value(12)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(13)"><td data-bind="text: status.getTemp.id(13)"></td><td><t data-bind="text: status.getTemp.value(13)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(14)"><td data-bind="text: status.getTemp.id(14)"></td><td><t data-bind="text: status.getTemp.value(14)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(15)"><td data-bind="text: status.getTemp.id(15)"></td><td><t data-bind="text: status.getTemp.value(15)"></t>C</td></tr>
+<tr data-bind="visible: status.getTemp.visible(16)"><td data-bind="text: status.getTemp.id(16)"></td><td><t data-bind="text: status.getTemp.value(16)"></t>C</td></tr>
+            </tbody>
+          </table><br>
+        </div>
+   </div>
+
+      <div id="five">
+        <h2>5. Extra szenzorok</h2>
+        <div class="itembody-wrapper">
+          <table>
+            <tr>
+              <th>Név</th>
+              <th>Érték</th>
+            </tr>
+            <tbody>
+<tr data-bind="visible: status.hasMeterCO2()" style="display: none"><td>Meter_CO2</td><td><t data-bind="text: status.meter_co2"></t> PPM</td></tr>
+            </tbody>
+          </table><br>
+        </div>
+   </div>
+
+</div>
+</body>
+</html>

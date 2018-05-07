@@ -58,8 +58,10 @@ HttpdPriv httpdPriv[HTTPD_MAX_CONNECTIONS];
 HttpdPostData httpdPostData[HTTPD_MAX_CONNECTIONS];
 uint8 privBuffer[HTTPD_MAX_SENDBUFF_LEN * HTTPD_MAX_CONNECTIONS];
 uint8 postBuffer[HTTPD_MAX_POSTBUFF_LEN * HTTPD_MAX_CONNECTIONS];
+uint8 Httpd_port = 80;
 
 uint8 ConnectionTimeOut[HTTPD_MAX_CONNECTIONS];
+uint32 idleTimeOut;
 
 //The mappings from file extensions to mime types. If you need an extra mime type,
 //add it here.
@@ -836,7 +838,8 @@ int ICACHE_FLASH_ATTR httpdConnectCb(ConnTypePtr conn, char *remIp, int remPort)
 //Httpd initialization routine. Call this to kick off webserver functionality.
 void ICACHE_FLASH_ATTR httpdInit(HttpdBuiltInUrl *fixedUrls, int port) {
 	int i;
-
+	//Store port for reinit
+	Httpd_port = port;
 	//Clean all connection slots
 	for (i=0; i<HTTPD_MAX_CONNECTIONS; i++) {
 		httpdConnData[i].slot = HTTPD_MAX_CONNECTIONS;
@@ -845,14 +848,18 @@ void ICACHE_FLASH_ATTR httpdInit(HttpdBuiltInUrl *fixedUrls, int port) {
 	builtInUrls=fixedUrls;
 	//Stack init
 	httpdPlatInit(port, HTTPD_MAX_CONNECTIONS);
+	//Reset idle timeout
+	idleTimeOut = 0;
 }
 
 
-
+extern struct espconn httpdConn;
 void ICACHE_FLASH_ATTR httpdMonitorConnections(void)
 {
 	uint8 i;
-	DBG2_HTTPS("(HS)------\n");
+	DBG2_HTTPS("(HS)------ Idle:%d\n",idleTimeOut);
+	//Increment idle timeout
+	idleTimeOut++;
 	//Check all connections
 	for(i=0; i< HTTPD_MAX_CONNECTIONS; i++)
 	{
@@ -861,6 +868,8 @@ void ICACHE_FLASH_ATTR httpdMonitorConnections(void)
 		//Monitor longest request on active connection
 		if(httpdConnData[i].slot < HTTPD_MAX_CONNECTIONS)
 		{
+			//There is an active connection clear idle timeout
+			idleTimeOut = 0;
 			httpdConnData[i].timeout++;
 			if(httpdConnData[i].timeout > HTTPD_TCP_IDLE_TIMEOUT)
 			{
@@ -874,5 +883,15 @@ void ICACHE_FLASH_ATTR httpdMonitorConnections(void)
 			}
 		}
 
+	}
+	//Check if idle timeout reached
+	if(idleTimeOut > HTTPD_TCP_NO_CONNECTION_TIMEOUT)
+	{
+		DBG2_HTTPS("(HS)Reinit TCP Server\n");
+		//TCP Server stack reinit
+		espconn_delete(&httpdConn);
+		httpdPlatInit(Httpd_port, HTTPD_MAX_CONNECTIONS);
+		//Reset idle timeout
+		idleTimeOut = 0;
 	}
 }

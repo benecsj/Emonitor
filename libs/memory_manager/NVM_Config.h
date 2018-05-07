@@ -22,20 +22,22 @@ extern char WifiManager_STA_SSID[33];
 extern char WifiManager_STA_PASSWORD[65];
 extern char WifiManager_AP_SSID[33];
 extern char WifiManager_AP_PASSWORD[65];
+extern uint8 Http_Language;
 
 
 /*DATA BLOCKS*/
 #define NVM_CFG_STORAGE	\
 	/*	Variable                    Size	   */\
 	NVM_DATA(WifiManager_enableHotspot,       sizeof(WifiManager_enableHotspot))\
-	NVM_DATA(Emonitor_nodeId,       sizeof(Emonitor_nodeId))\
-	NVM_DATA(Emonitor_SendPeroid,       sizeof(Emonitor_SendPeroid))\
-	NVM_DATA(Emonitor_url,       100)\
-	NVM_DATA(Emonitor_key,       33)\
 	NVM_DATA(WifiManager_STA_SSID,       33)\
 	NVM_DATA(WifiManager_STA_PASSWORD,       65)\
 	NVM_DATA(WifiManager_AP_SSID,       33)\
 	NVM_DATA(WifiManager_AP_PASSWORD,       65)\
+	NVM_DATA(Emonitor_nodeId,       sizeof(Emonitor_nodeId))\
+	NVM_DATA(Emonitor_SendPeroid,       sizeof(Emonitor_SendPeroid))\
+	NVM_DATA(Emonitor_url,       100)\
+	NVM_DATA(Emonitor_key,       33)\
+	NVM_DATA(Http_Language,       sizeof(Http_Language))\
 
 #define NVM_DATA_POS_DATA_START 16
 

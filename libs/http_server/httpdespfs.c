@@ -119,6 +119,7 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 	int x, sp=0;
 	char *e=NULL;
 	char buff[1025];
+	char fileNameBuff[64];
 
 	if (connData->conn==NULL) {
 		//Connection aborted. Clean up.
@@ -137,7 +138,24 @@ int ICACHE_FLASH_ATTR cgiEspFsTemplate(HttpdConnData *connData) {
 			}
 			else
 			{
-				esp_fs_OpenFile(&tpd->file,(char*)connData->url);
+				//Language handling
+				//Copy file name with offset
+				strcpy((char*)&fileNameBuff[3],(char*)connData->url);
+				//Add "/"
+				fileNameBuff[0]=fileNameBuff[3];
+				//Language
+				if(Http_Language == SERVER_LANG_HU)
+				{
+					fileNameBuff[1] = 'h';
+					fileNameBuff[2] = 'u';
+					fileNameBuff[3] = '_';
+				}
+				else // Default language (ENG)
+				{
+					strcpy((char*)fileNameBuff,(char*)connData->url);
+				}
+				DBG_HTTPS("(HS) Open file: [%s]\n",fileNameBuff);
+				esp_fs_OpenFile(&tpd->file,(char*)fileNameBuff);
 				//DBG_HTTPS("(HS) SPIFFS_open [%d][%s]\n",tpd->file,(char*)connData->url);
 				tpd->tplArg=NULL;
 				tpd->tokenPos=-1;
