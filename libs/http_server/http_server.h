@@ -13,6 +13,9 @@
 extern void Http_Server_Init(void);
 extern void ICACHE_FLASH_ATTR Http_Server_Main(void);
 
+extern void Http_Server_Language_IdToText(int id, char* langText);
+extern int  Http_Server_Language_TextToId(char* langText);
+
 extern uint8 Http_Language;
 
 #define Http_Server_GetLanguage()	(Http_Language)

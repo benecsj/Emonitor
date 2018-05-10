@@ -402,22 +402,16 @@ int ICACHE_FLASH_ATTR Command_Emon(int argc, char** argv) {
 			//Check if second parameter received
 			if(argc == 3)
 			{
-				number = strtol(parameter,NULL,10);
+				Http_Server_SetLanguage(Http_Server_Language_TextToId(parameter));
+				Http_Server_Language_IdToText(Http_Server_GetLanguage(),(char*)temp);
+				printf("new language:[%s]\n",temp);
+				text="imre language reconfigured";
 
-				if((number >= 0) && (number <=1))
-				{
-					Http_Server_SetLanguage(number);
-					printf("new language:[%d]\n",parameter);
-					text="imre language reconfigured";
-				}
-				else
-				{
-					text="language id must be between 0 and 1";
-				}
 			}
 			else
 			{
-				printf("current language [%d]",Http_Server_GetLanguage());
+				Http_Server_Language_IdToText(Http_Server_GetLanguage(),(char*)temp);
+				printf("current language [%s]",(char*)temp);
 				text = "";
 			}
 		}

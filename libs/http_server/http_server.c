@@ -63,7 +63,32 @@ uint8 ICACHE_FLASH_ATTR Http_Server_GetDefaultLanguage()
 	esp_fs_CloseFile(&file);
 	//Close string
 	langText[2] = 0;
-	//Convert language string
+	//Convert language string to id
+	return Http_Server_Language_TextToId(langText);
+}
+
+
+void ICACHE_FLASH_ATTR Http_Server_Language_IdToText(int id, char* langText)
+{
+	//Based on id output proper text
+	switch(id)
+	{
+	case SERVER_LANG_HU:
+		langText[0]='h';langText[1]='u';
+		break;
+	case SERVER_LANG_EN:
+		langText[0]='e';langText[1]='n';
+		break;
+	default: langText[0]=0;
+	}
+	langText[2]=0;
+}
+
+int ICACHE_FLASH_ATTR Http_Server_Language_TextToId(char* langText)
+{
+	//Init with default language
+	int returnValue = SERVER_LANG_EN;
+	//Process text
 	if(strcmp((char *)&langText[0],"hu")==0)
 	{
 		returnValue = SERVER_LANG_HU;
@@ -72,10 +97,9 @@ uint8 ICACHE_FLASH_ATTR Http_Server_GetDefaultLanguage()
 	{
 		returnValue = SERVER_LANG_EN;
 	}
-
+	//Return id
 	return returnValue;
 }
-
 
 //Template code for the counter on the index page.
 int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *token, void **arg) {
