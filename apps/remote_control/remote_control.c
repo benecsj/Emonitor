@@ -195,7 +195,7 @@ int ICACHE_FLASH_ATTR Command_Config(int argc, char** argv) {
 }
 
 int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
-	char* text = "error, use parameter: init | ip | hotspot | connect";
+	char* text = "error, use parameter: init | ip | hotspot | connect | level";
 	char* parameter;
 	char* parameter2;
     uint8 temp[4];
