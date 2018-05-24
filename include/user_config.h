@@ -36,7 +36,6 @@
 //WIFI
 #define DEFAULT_STA_SSID 		""
 #define DEFAULT_STA_PASSWORD 	""
-#define DEFAULT_SERVER_ADDRESS 	"http://v9.emonitor.hu"
 #define DEFAULT_API_KEY 		""
 #define WIFI_SCAN_TIMING 		60
 
@@ -145,7 +144,7 @@
 #define DEBUG_HTTP_SERVER 		(OFF)
 #define DEBUG_WIFI_MANAGER		(OFF)
 #define DEBUG_MHZ14				(OFF)
-#define DEBUG_SPIFFS 			(ON)
+#define DEBUG_SPIFFS 			(OFF)
 #define DEBUG_NVM				(ON)
 #define DEBUG_MAIN				(ON)
 

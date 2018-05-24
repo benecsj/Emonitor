@@ -514,6 +514,18 @@ int ICACHE_FLASH_ATTR Command_Counter(int argc, char** argv) {
     return SHELL_RET_SUCCESS;
 }
 
+int ICACHE_FLASH_ATTR Command_Status(int argc, char** argv) {
+	char text[1025] = {0};
+	char* parameter;
+	int length;
+
+	length = Http_Server_ReportJson(text);
+
+    //Generate response
+	prj_printf("%s\n", text);
+    return SHELL_RET_SUCCESS;
+}
+
 int ICACHE_FLASH_ATTR Command_Sensor(int argc, char** argv) {
 	char* text = "error, use parameter: co2, temp";
 	char* parameter;
@@ -619,6 +631,7 @@ void Remote_RegisterCommands(void)
     shell_register(Command_Print, "print");
     shell_register(Command_Emon, "emon");
     shell_register(Command_Sensor, "sensor");
+    shell_register(Command_Status, "status");
 }
 
 void Remote_UnregisterCommands(void)

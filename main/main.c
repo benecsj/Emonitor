@@ -190,8 +190,8 @@ void ICACHE_FLASH_ATTR task_InitB(void)
 	DBG_MAIN("(M) Init finished!!!\n-------------------------\n");
 	//--------------------------------
 	//Start cyclic tasks
-	prj_createTask(task_1000ms, "1000ms", 1024, NULL, 1, &t);
-	prj_createTask(task_10ms, "10ms", 512, NULL, (configMAX_PRIORITIES-2), &t);
+	prj_createTask(task_1000ms, "1000ms", 1200, NULL, 1, &t);
+	prj_createTask(task_10ms, "10ms", 1200, NULL, (configMAX_PRIORITIES-2), &t);
 	prj_createTask(task_background, "bgnd", 512, NULL, 0, &t);
 }
 TASK(task_Init){

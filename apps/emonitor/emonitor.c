@@ -82,6 +82,7 @@ uint32 Emonitor_SendPeroid = 0;
 \******************************************************************************/
 extern void ICACHE_FLASH_ATTR Emonitor_callback(char * response_body, int http_status, char * response_headers, int body_size);
 extern uint32_t Emonitor_GetDefaultId(void);
+extern void Emonitor_GetDefaultUrl(char* buffer);
 extern void task_1ms(void);
 extern void task_500us(void);
 extern uint32 Emonitor_GetBackgroundRuntime(void);
@@ -120,7 +121,7 @@ void ICACHE_FLASH_ATTR Emonitor_Init(void){
 	uint8 apiKeyLength = strlen(Emonitor_key);
 	if ((urlLength <= URL_MIN_LENGTH) || (urlLength == URL_MAX_LENGTH))
 	{
-		sprintf(Emonitor_url,"%s",DEFAULT_SERVER_ADDRESS);
+		Emonitor_GetDefaultUrl(Emonitor_url);
 	}
 	if (apiKeyLength > API_KEY_LENGTH || Emonitor_key[0] == 0xFF )
 	{
@@ -504,6 +505,31 @@ uint32_t ICACHE_FLASH_ATTR Emonitor_GetDefaultId(void)
     }
     //Return number
 	return(atoi(numStart));
+}
+
+void ICACHE_FLASH_ATTR Emonitor_GetDefaultUrl(char* url)
+{
+	char buffer[100] = {0};
+	int bufferLength = 0;
+
+	esp_fs_file file;
+
+	//Get url string from filesystem storage
+	esp_fs_OpenFile(&file,"/server");
+	esp_fs_ReadFile(&file, (u8_t *)buffer, 100);
+	esp_fs_CloseFile(&file);
+	//get url length
+	bufferLength = strlen(buffer);
+	//Check if valid url was extracted
+	if ((bufferLength >= URL_MIN_LENGTH) || (bufferLength <= URL_MAX_LENGTH))
+	{
+		sprintf(url,"%s",buffer);
+	}
+	else // No valid default url found
+	{
+		sprintf(url,"http://");
+	}
+
 }
 
 void ICACHE_FLASH_ATTR Emonitor_UpdateVersion(char* version)
