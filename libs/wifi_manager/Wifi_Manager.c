@@ -244,7 +244,7 @@ void ICACHE_FLASH_ATTR Wifi_Manager_GetDefaultId(char* id)
 	esp_fs_OpenFile(&file,"/id");
 	length = esp_fs_ReadFile(&file, (u8_t *)id, 32);
 	esp_fs_CloseFile(&file);
-	id[length-1] = 0;
+	id[length] = 0;
 }
 
 void ICACHE_FLASH_ATTR Wifi_Manager_GetDefaultPassword(char * pass)
@@ -256,6 +256,6 @@ void ICACHE_FLASH_ATTR Wifi_Manager_GetDefaultPassword(char * pass)
 	esp_fs_OpenFile(&file,"/pass");
 	length = esp_fs_ReadFile(&file, (u8_t *)pass, 64);
 	esp_fs_CloseFile(&file);
-	pass[length-1] = 0;
+	pass[length] = 0;
 }
 
