@@ -215,7 +215,7 @@ int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
 		else if(strcmp(parameter,"ip")==0)
 		{
 			Wifi_Manager_GetIp(temp,IP);
-			printf("ip:%d.%d.%d.%d",temp[0],temp[1],temp[2],temp[3]);
+			printf("ip:[%d.%d.%d.%d]",temp[0],temp[1],temp[2],temp[3]);
 			text="";
 		}
 		else if(strcmp(parameter,"hotspot")==0)
@@ -256,11 +256,11 @@ int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
 				printf("current SSID:[%s] PASS:[%s] Enable:",Wifi_Manager_GetAP_SSID(),Wifi_Manager_GetAP_PASSWORD());
 				if(Wifi_Manager_GetEnableHotspot())
 				{
-					printf("on");
+					printf("[on]");
 				}
 				else
 				{
-					printf("off");
+					printf("[off]");
 				}
 				text = "";
 			}
@@ -292,7 +292,7 @@ int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
 		}
 		else if(strcmp(parameter,"level")==0)
 		{
-			printf("rssi: %d",Wifi_Manager_GetSignalLevel());
+			printf("RSSI:[%d]",Wifi_Manager_GetSignalLevel());
 			text = "";
 			Wifi_Manager_UpdateLevel();
 		}
@@ -411,7 +411,7 @@ int ICACHE_FLASH_ATTR Command_Emon(int argc, char** argv) {
 			else
 			{
 				Http_Server_Language_IdToText(Http_Server_GetLanguage(),(char*)temp);
-				printf("current language [%s]",(char*)temp);
+				printf("current language:[%s]",(char*)temp);
 				text = "";
 			}
 		}
