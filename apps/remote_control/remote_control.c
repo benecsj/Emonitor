@@ -236,20 +236,34 @@ int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
 				 }
 				 else
 				 {
-					Wifi_Manager_SetAP_SSID(parameter);
-					Wifi_Manager_SetAP_PASSWORD("");
-					printf("new SSID:[%s] PASS:[]\n",parameter);
-					text="wifi hotspot reconfigured";
+					if(strlen(parameter)<=32)
+					{
+						Wifi_Manager_SetAP_SSID(parameter);
+						Wifi_Manager_SetAP_PASSWORD("");
+						printf("new SSID:[%s] PASS:[]\n",parameter);
+						text="wifi hotspot reconfigured";
+					}
+					else
+					{
+						text="Error: too long SSID must be smaller than 33 character";
+					}
 				 }
 			}
 			else if(argc == 4)
 			{
 				parameter = argv[2];
 				parameter2 = argv[3];
-				Wifi_Manager_SetAP_SSID(parameter);
-				Wifi_Manager_SetAP_PASSWORD(parameter2);
-				printf("new SSID:[%s] PASS:[%s]\n",parameter,parameter2);
-				text="wifi hotspot reconfigured";
+				if((strlen(parameter2)<=64) && (strlen(parameter)<=32))
+				{
+					Wifi_Manager_SetAP_SSID(parameter);
+					Wifi_Manager_SetAP_PASSWORD(parameter2);
+					printf("new SSID:[%s] PASS:[%s]\n",parameter,parameter2);
+					text="wifi hotspot reconfigured";
+				}
+				else
+				{
+					text="Error: too long parameter";
+				}
 			}
 			else
 			{
@@ -271,18 +285,33 @@ int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
 			//Check if second parameter received
 			if(argc == 3)
 			{
-				Wifi_Manager_SetSTA_SSID(parameter);
-				Wifi_Manager_SetSTA_PASSWORD("");
-				printf("new SSID:[%s] PASS:[]\n",parameter);
-				text="wifi connection reconfigured";
+				if(strlen(parameter)<=32)
+				{
+					Wifi_Manager_SetSTA_SSID(parameter);
+					Wifi_Manager_SetSTA_PASSWORD("");
+					printf("new SSID:[%s] PASS:[]\n",parameter);
+					text="wifi connection reconfigured";
+				}
+				else
+				{
+					text="Error: too long SSID muss be smaller than 33 character";
+				}
 			}
 			else if(argc == 4)
 			{
 				parameter2 = argv[3];
-				Wifi_Manager_SetSTA_SSID(parameter);
-				Wifi_Manager_SetSTA_PASSWORD(parameter2);
-				printf("new SSID:[%s] PASS:[%s]\n",parameter,parameter2);
-				text="wifi connection reconfigured";
+				if((strlen(parameter2)<=64) && (strlen(parameter)<=32))
+				{
+
+					Wifi_Manager_SetSTA_SSID(parameter);
+					Wifi_Manager_SetSTA_PASSWORD(parameter2);
+					printf("new SSID:[%s] PASS:[%s]\n",parameter,parameter2);
+					text="wifi connection reconfigured";
+				}
+				else
+				{
+					text="Error: too long parameter";
+				}
 			}
 			else
 			{
@@ -322,9 +351,16 @@ int ICACHE_FLASH_ATTR Command_Emon(int argc, char** argv) {
 			//Check if second parameter received
 			if(argc == 3)
 			{
-				Emonitor_SetKey(parameter);
-				printf("new key:[%s]\n",parameter);
-				text="emoncms key reconfigured";
+				if(strlen(parameter)<=32)
+				{
+					Emonitor_SetKey(parameter);
+					printf("new key:[%s]\n",parameter);
+					text="emoncms key reconfigured";
+				}
+				else
+				{
+					text="Error: too long key must be 32 character";
+				}
 			}
 			else
 			{
@@ -338,9 +374,16 @@ int ICACHE_FLASH_ATTR Command_Emon(int argc, char** argv) {
 			//Check if second parameter received
 			if(argc == 3)
 			{
-				Emonitor_SetUrl(parameter);
-				printf("new url:[%s]\n",parameter);
-				text="emoncms url reconfigured";
+				if(strlen(parameter)<=100)
+				{
+					Emonitor_SetUrl(parameter);
+					printf("new url:[%s]\n",parameter);
+					text="emoncms url reconfigured";
+				}
+				else
+				{
+					text="Error: too long key must be smaller than 100 character";
+				}
 			}
 			else
 			{
@@ -363,7 +406,7 @@ int ICACHE_FLASH_ATTR Command_Emon(int argc, char** argv) {
 				}
 				else
 				{
-					text="emoncms nodeid must be between 1 and 999999";
+					text="Error: emoncms nodeid must be between 1 and 999999";
 				}
 			}
 			else
@@ -387,7 +430,7 @@ int ICACHE_FLASH_ATTR Command_Emon(int argc, char** argv) {
 				}
 				else
 				{
-					text="emoncms timing must be between 1 and 3600";
+					text="Error: emoncms timing must be between 1 and 3600";
 				}
 			}
 			else

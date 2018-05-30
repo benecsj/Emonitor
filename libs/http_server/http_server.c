@@ -526,6 +526,10 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 					break;
 				}
 			}
+			//FORM ID
+			else if (strcmp(token, "form_id")==0) {
+				len = sprintf(buff, "%d",Http_Server_FormId);
+			}
 		}
 
 		//-----------------------------------------------------------------
