@@ -103,7 +103,7 @@ int ICACHE_FLASH_ATTR Http_Server_Language_TextToId(char* langText)
 
 //Template code for the counter on the index page.
 int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *token, void **arg) {
-	char buff[64];
+	char buff[80];
 	int len = 0;
 	int i,j,k,temp;
 	uint8 tokenizer;
