@@ -278,7 +278,10 @@ void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 					//\\\\\\\\\\\\\\\\\\\\\\\\\\\
 					//Add pulse counters
 					for(i = 0 ; i < SENSOR_MANAGER_PULSE_COUNTERS ; i++ ){
-						APPEND("Pulse_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetPulseCount(i));}
+						APPEND("Pulse_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetPulseCount(i));
+						APPEND("Level_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetPulseLevel(i));}
+
+
 					//Add temperatures
 					for(i = 0 ; i < tempCount ; i++ ){
 						temperature = temperatures[i];
