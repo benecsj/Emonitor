@@ -312,6 +312,7 @@ void ICACHE_FLASH_ATTR Sensor_Manager_ResetPulseCounters(void)
 
 void ICACHE_FLASH_ATTR Sensor_Manager_UpdateSensors(void) {
     uint16 i;
+    uint8 checkOk = OK;
     /*Search for sensors*/
     uint8 Sensor_Manager_Count = SENSOR_MANAGER_DS18B20_Search();
     if (Sensor_Manager_Count > SENSOR_MANAGER_DS18B20Count) {
@@ -321,9 +322,27 @@ void ICACHE_FLASH_ATTR Sensor_Manager_UpdateSensors(void) {
         //Less sensor found so retry
         Sensor_Manager_RetryCount++;
     } else {
-        //Same sensor count found OK
-        Sensor_Manager_RetryCount = 0;
-        APP_REPORT_PASS();
+        //Same sensor count found check if ids are the same
+        for (i = 0; i < OWP_CONST_ROMCODE_SIZE*SENSOR_MANAGER_DS18B20Count; i++) {
+        	//Check each byte of the ids
+        	if(Sensor_Manager_sensorChannels[i] != Sensor_Manager_sensorChannelsTEMP[i])
+        	{
+        		checkOk = FAIL;
+        		break;
+        	}
+        }
+        //Check if error found
+        if(OK == checkOk)
+        {
+        	//Clear retry count all is ok
+			Sensor_Manager_RetryCount = 0;
+			APP_REPORT_PASS();
+        }
+        else
+        {
+        	//there is a change in ids report so retry
+            Sensor_Manager_RetryCount++;
+        }
     }
 
     //Check if needs to update temp count

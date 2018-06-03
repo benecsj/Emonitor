@@ -177,6 +177,21 @@ uint8 ICACHE_FLASH_ATTR D18_DS18B20_ReadMeasure(uint8 id[], uint8 *subzero,
     if (CRC_crc8(&sp[0], D18_DS18B20_SP_SIZE, 0))
         return D18_DS18B20_ERROR_CRC;
 
+    //Check if all zeros received
+    for (i = 0; i < D18_DS18B20_SP_SIZE; i++)
+	{
+    	//There was a none zero stop checking
+    	if(sp[i] != 0)
+    	{
+    		break;
+    	}
+    	//All was zero
+    	else if(i == D18_DS18B20_SP_SIZE-1)
+    	{
+    		return D18_DS18B20_ERROR;
+    	}
+	}
+
     for (i = 0; i < D18_DS18B20_SP_SIZE; i++)
         if (sp[i] != 0xff) break;
     if (i == D18_DS18B20_SP_SIZE)
