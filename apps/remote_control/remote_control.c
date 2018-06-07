@@ -253,7 +253,7 @@ int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
 			{
 				parameter = argv[2];
 				parameter2 = argv[3];
-				if((strlen(parameter2)<=64) && (strlen(parameter)<=32))
+				if((strlen(parameter2)<=63) && (strlen(parameter)<=32))
 				{
 					Wifi_Manager_SetAP_SSID(parameter);
 					Wifi_Manager_SetAP_PASSWORD(parameter2);
@@ -300,7 +300,7 @@ int ICACHE_FLASH_ATTR Command_Wifi(int argc, char** argv) {
 			else if(argc == 4)
 			{
 				parameter2 = argv[3];
-				if((strlen(parameter2)<=64) && (strlen(parameter)<=32))
+				if((strlen(parameter2)<=63) && (strlen(parameter)<=32))
 				{
 
 					Wifi_Manager_SetSTA_SSID(parameter);

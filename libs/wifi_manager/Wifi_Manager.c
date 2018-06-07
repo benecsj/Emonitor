@@ -66,7 +66,7 @@ void ICACHE_FLASH_ATTR Wifi_Manager_Init(void)
 		Wifi_Manager_SetSTA_SSID(DEFAULT_STA_SSID);
 	}
 	textLength = strlen(WifiManager_STA_PASSWORD);
-	if(textLength>64 || WifiManager_STA_PASSWORD[0]== 0xFF)
+	if(textLength>63 || WifiManager_STA_PASSWORD[0]== 0xFF)
 	{
 		Wifi_Manager_SetSTA_PASSWORD(DEFAULT_STA_PASSWORD);
 	}
@@ -77,7 +77,7 @@ void ICACHE_FLASH_ATTR Wifi_Manager_Init(void)
 
 	}
 	textLength = strlen(WifiManager_AP_PASSWORD);
-	if(textLength>64 || WifiManager_AP_PASSWORD[0]== 0xFF )
+	if(textLength>63 || WifiManager_AP_PASSWORD[0]== 0xFF )
 	{
 		Wifi_Manager_GetDefaultPassword(WifiManager_AP_PASSWORD);
 

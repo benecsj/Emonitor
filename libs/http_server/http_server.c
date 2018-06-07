@@ -200,7 +200,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 						//STA PASSWORD
 						else if (strcmp(name, "sta_pass")==0) {
 							//Check length
-							if(strlen(buff)<=64)
+							if(strlen(buff)<=63)
 							{
 								//Check if it not dumy string
 								if(buff[0] != '*')
@@ -260,7 +260,7 @@ int ICACHE_FLASH_ATTR Http_Server_TokenProcessor(HttpdConnData *connData, char *
 						//ACCESS POINT PASSWORD
 						else if (strcmp(name, "ap_pass")==0) {
 							//Check length
-							if(strlen(buff)<=64)
+							if(strlen(buff)<=63)
 							{
 								Wifi_Manager_SetAP_PASSWORD(buff);
 							}
