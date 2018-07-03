@@ -181,7 +181,7 @@ function EmonitorViewModel() {
             clockReceived();})
         clockUpdate();
     }
-    console.log("Cycle:"+cycleCount);cycleCount++;
+    //console.log("Cycle:"+cycleCount);cycleCount++;
     updateTimer = setTimeout(self.update, updateTime);
     self.updating(false);
     self.initialised(true);

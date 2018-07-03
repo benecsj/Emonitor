@@ -145,8 +145,8 @@
 #define DEBUG_WIFI_MANAGER		(OFF)
 #define DEBUG_MHZ14				(OFF)
 #define DEBUG_SPIFFS 			(OFF)
-#define DEBUG_NVM				(ON)
-#define DEBUG_MAIN				(ON)
+#define DEBUG_NVM				(OFF)
+#define DEBUG_MAIN				(OFF)
 
 #endif
 
