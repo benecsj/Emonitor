@@ -570,7 +570,11 @@ int ICACHE_FLASH_ATTR Command_Status(int argc, char** argv) {
 }
 
 int ICACHE_FLASH_ATTR Command_Sensor(int argc, char** argv) {
+#if (ANALOG_ENABLE == ON)
+	char* text = "error, use parameter: co2, temp, analog";
+#else
 	char* text = "error, use parameter: co2, temp";
+#endif
 	char* parameter;
 	int i;
 	uint8 tempCount;
@@ -618,6 +622,22 @@ int ICACHE_FLASH_ATTR Command_Sensor(int argc, char** argv) {
 				text="";
 			}
 		}
+#if (ANALOG_ENABLE == ON)
+		else if(strcmp(parameter,"analog")==0)
+		{
+			Sensor_Manager_Get_TempSensorData(&tempCount,&ids,&temperatures);
+
+			if(tempCount ==0)
+			{
+				text="No temp sensors found";
+			}
+			else
+			{
+				prj_printf("Analog_01:[%d]\n",Sensor_Manager_GetAnalogValue());
+				text="";
+			}
+		}
+#endif
 	}
     //Generate response
 	prj_printf("%s\n", text);

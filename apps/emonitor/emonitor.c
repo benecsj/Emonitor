@@ -413,6 +413,13 @@ void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 		DBG_EMON("(EM) COMM TIMEOUT RESET\n");
 		Emonitor_Request(EMONITOR_REQ_RESTART);
 		break;
+	// other case limit max
+	default:
+		if(TIMEOUT_TURNOFF_APP < Emonitor_connectionCounter)
+		{
+			Emonitor_connectionCounter = (TIMEOUT_TURNOFF_APP);
+		}
+		break;
 	}
 }
 

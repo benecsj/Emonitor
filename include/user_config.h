@@ -83,9 +83,9 @@
 #define REMOTE_RX_SIZE			50
 
 //Emonitor
-#define TIMEOUT_TURNON_AP 		3600
-#define TIMEOUT_RESET_NO_COMM 	3600*2
-#define TIMEOUT_TURNOFF_APP 	43200*2
+#define TIMEOUT_TURNON_AP 		1800
+#define TIMEOUT_RESET_NO_COMM 	1800*2
+#define TIMEOUT_TURNOFF_APP 	1800
 #define LED_TIMING_NORMAL		500
 #define LED_TIMING_RESET		100
 #define LED_STRENGTH			50
@@ -100,7 +100,7 @@
 #if VARIANT == 0
 	#define ANALOG_ENABLE			(ON)
 #else
-	#define ANALOG_ENABLE			(OFF)
+	#define ANALOG_ENABLE			(ON)
 #endif
 #define OWP_CHANNELS_COUNT 			2
 #define TEMP_RESCAN_PERIOD			1
