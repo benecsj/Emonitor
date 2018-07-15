@@ -571,7 +571,7 @@ int ICACHE_FLASH_ATTR Command_Status(int argc, char** argv) {
 
 int ICACHE_FLASH_ATTR Command_Sensor(int argc, char** argv) {
 #if (ANALOG_ENABLE == ON)
-	char* text = "error, use parameter: co2, temp, analog";
+	char* text = "error, use parameter: co2, temp, analog, max, average";
 #else
 	char* text = "error, use parameter: co2, temp";
 #endif
@@ -625,17 +625,18 @@ int ICACHE_FLASH_ATTR Command_Sensor(int argc, char** argv) {
 #if (ANALOG_ENABLE == ON)
 		else if(strcmp(parameter,"analog")==0)
 		{
-			Sensor_Manager_Get_TempSensorData(&tempCount,&ids,&temperatures);
-
-			if(tempCount ==0)
-			{
-				text="No temp sensors found";
-			}
-			else
-			{
-				prj_printf("Analog_01:[%d]\n",Sensor_Manager_GetAnalogValue());
-				text="";
-			}
+			prj_printf("Analog_01:[%d]\n",Sensor_Manager_GetAnalogValue());
+			text="";
+		}
+		else if(strcmp(parameter,"average")==0)
+		{
+			prj_printf("AnalogAverage_01:[%d]\n",Sensor_Manager_GetAnalogAverage());
+			text="";
+		}
+		else if(strcmp(parameter,"max")==0)
+		{
+			prj_printf("AnalogMax_01:[%d]\n",Sensor_Manager_GetAnalogMax());
+			text="";
 		}
 #endif
 	}

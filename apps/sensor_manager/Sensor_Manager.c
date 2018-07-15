@@ -60,6 +60,10 @@ sint16 SENSOR_MANAGER_DS18B20TempList[SENSOR_MANAGER_DS18B20MAXCOUNT];
 
 #if SENSOR_MANAGER_ANALOGCHANNELS_COUNT > 0
 uint16 APP_PortMon_analogValues[SENSOR_MANAGER_ANALOGCHANNELS_COUNT];
+uint16 APP_PortMon_analogWindow[ANALOG_WINDOW] = {0};
+uint16 APP_PortMon_analogWindowIndex = 0;
+uint16 APP_PortMon_analogAverage = 0;
+uint16 APP_PortMon_analogMax = 0;
 #endif
 
 uint32 Sensor_Manager_PulseCounters[SENSOR_MANAGER_PULSE_COUNTERS] = {};
@@ -78,6 +82,7 @@ uint8 SENSOR_MANAGER_DS18B20_Search(void);
 void SENSOR_MANAGER_DS18B20Measure(void);
 void Sensor_Manager_UpdateSensors(void);
 void SENSOR_MANAGER_DS18B20_StartMeasure(void);
+void Sensor_Manager_ProcessAnalog(void);
 /**********************************************************************************
  * Functions
  **********************************************************************************/
@@ -129,6 +134,12 @@ void ICACHE_FLASH_ATTR Sensor_Manager_Fast() {
     for (CS_i = 0; CS_i < SENSOR_MANAGER_ANALOGCHANNELS_COUNT; CS_i++) {
         //Read Adc channel and store it in buffer
         APP_PortMon_analogValues[CS_i] = system_adc_read();
+        //Filtering for first adc channel
+        if(CS_i == 0)
+        {
+        	APP_PortMon_analogWindow[APP_PortMon_analogWindowIndex] = APP_PortMon_analogValues[CS_i];
+        	APP_PortMon_analogWindowIndex = (APP_PortMon_analogWindowIndex +1)%ANALOG_WINDOW;
+        }
     }
     //SW pulse counter
     if((Sensor_Manager_analogToPulseState == 1) && (APP_PortMon_analogValues[0] < 300))
@@ -175,6 +186,11 @@ void ICACHE_FLASH_ATTR Sensor_Manager_Main() {
     // MHZ14 CO2 Sensor
     MHZ14_Main();
 
+    //Analog processing
+#if SENSOR_MANAGER_ANALOGCHANNELS_COUNT > 0
+    Sensor_Manager_ProcessAnalog();
+#endif
+
     //Debug info
     DBG_SENSOR("(SensMan)");
     for(i=0;i<SENSOR_MANAGER_DS18B20Count;i++)
@@ -184,7 +200,9 @@ void ICACHE_FLASH_ATTR Sensor_Manager_Main() {
     	//DBG_SENSOR("(SensMan)(%d)%d- %d.%dC - %x%x%x%x%x%x%x%x\n",i,Sensor_Manager_sensorChannels[i],SENSOR_MANAGER_DS18B20TempList[i]/10,abs(SENSOR_MANAGER_DS18B20TempList[i]%10),Sensor_Manager_sensorIDs[(i*8)+0],Sensor_Manager_sensorIDs[(i*8)+1],Sensor_Manager_sensorIDs[(i*8)+2],Sensor_Manager_sensorIDs[(i*8)+3],Sensor_Manager_sensorIDs[(i*8)+4],Sensor_Manager_sensorIDs[(i*8)+5],Sensor_Manager_sensorIDs[(i*8)+6],Sensor_Manager_sensorIDs[(i*8)+7]);
     }
     DBG_SENSOR("\n");
-    DBG_SENSOR("(SensMan)I0:%d I1:%d I2:%d I3:%d  A:%d\n",digitalRead(PULSE_INPUT0),digitalRead(PULSE_INPUT1),digitalRead(PULSE_INPUT2),digitalRead(PULSE_INPUT3),APP_PortMon_analogValues[0]);
+    DBG_SENSOR("(SensMan)I0:%d I1:%d I2:%d I3:%d  A:%d V:%d M:%d\n",digitalRead(PULSE_INPUT0),digitalRead(PULSE_INPUT1),digitalRead(PULSE_INPUT2),digitalRead(PULSE_INPUT3),APP_PortMon_analogValues[0],APP_PortMon_analogAverage,APP_PortMon_analogMax);
+
+
     if(MHZ14_IsValid())
     {
     	DBG_SENSOR("(SensMan)CO2: %d ppm\n",MHZ14_GetMeasurement());
@@ -297,6 +315,25 @@ uint16 ICACHE_FLASH_ATTR Sensor_Manager_GetAnalogValue(void)
 
 	return APP_PortMon_analogValues[0];
 
+}
+void ICACHE_FLASH_ATTR Sensor_Manager_ProcessAnalog(void)
+{
+	uint16 analogMax = 0;
+	uint32 analogAverage = 0;
+	uint16 i;
+	//Get max and average values
+	for(i=0; i < ANALOG_WINDOW; i++)
+	{
+		if(analogMax < APP_PortMon_analogWindow[i])
+		{
+			analogMax = APP_PortMon_analogWindow[i];
+		}
+		analogAverage = analogAverage + APP_PortMon_analogWindow[i];
+	}
+	analogAverage = analogAverage / ANALOG_WINDOW;
+	//Update average and max
+	APP_PortMon_analogAverage = (uint16)analogAverage;
+	APP_PortMon_analogMax = analogMax;
 }
 #endif
 void ICACHE_FLASH_ATTR Sensor_Manager_ResetPulseCounters(void)

@@ -102,6 +102,7 @@
 #else
 	#define ANALOG_ENABLE			(ON)
 #endif
+#define ANALOG_WINDOW				1000
 #define OWP_CHANNELS_COUNT 			2
 #define TEMP_RESCAN_PERIOD			1
 #define TEMP_MAX_RETRY_COUNT 		5

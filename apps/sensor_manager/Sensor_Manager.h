@@ -52,6 +52,11 @@ extern void	Sensor_Manager_EdgeDetectD0(void);
 extern uint32 Sensor_Manager_ErrorCounter;
 extern uint8 SENSOR_MANAGER_DS18B20Count;
 extern sint16 APP_SensMan_DS18B20TempList[];
+extern uint16 APP_PortMon_analogAverage;
+extern uint16 APP_PortMon_analogMax;
+
+#define Sensor_Manager_GetAnalogAverage()	(APP_PortMon_analogAverage)
+#define Sensor_Manager_GetAnalogMax()	    (APP_PortMon_analogMax)
 
 #define Sensor_Manager_GetTempHealth()	(Sensor_Manager_ErrorCounter)
 #define Sensor_Manager_GetTempCount()	(SENSOR_MANAGER_DS18B20Count)

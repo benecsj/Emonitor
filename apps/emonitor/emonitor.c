@@ -293,6 +293,10 @@ void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 					//Add analog reads
 					for(i = 0 ; i < SENSOR_MANAGER_ANALOGCHANNELS_COUNT ; i++ ){
 						APPEND("Analog_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetAnalogValue());}
+					//Add analog average and max
+					if(SENSOR_MANAGER_ANALOGCHANNELS_COUNT > 0){i=0;
+						APPEND("AnalogAverage_%02X" 		JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetAnalogAverage());
+					    APPEND("AnalogMax_%02X" 	     	JSON_DIV 	"%d" 		JSON_NEXT	,(i+1),Sensor_Manager_GetAnalogMax());}
 					//MHZ14 CO2 Sensor
 					if(Sensor_Manager_HasCO2Sensor()){
 						APPEND("Meter_C02" 			JSON_DIV 	"%d" 		JSON_NEXT	,Sensor_Manager_GetCO2());}
