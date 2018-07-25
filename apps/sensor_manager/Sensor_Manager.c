@@ -20,8 +20,8 @@
  * Defines
  **********************************************************************************/
 
-#define APP_REPORT_FAIL() (Sensor_Manager_ErrorCounter++)
-#define APP_REPORT_PASS() Sensor_Manager_ErrorCounter = 0
+#define APP_REPORT_FAIL() (Sensor_Manager_ErrorCounters[Sensor_Manager_ErrorCounter_index]++)
+#define APP_REPORT_PASS() Sensor_Manager_ErrorCounters[Sensor_Manager_ErrorCounter_index] = 0
 
 #if DEBUG_SENSOR_MANAGER
 #define DBG_SENSOR(...) printf(__VA_ARGS__)
@@ -44,6 +44,7 @@ typedef enum
 /**********************************************************************************
  * Defines
  **********************************************************************************/
+#define ERROR_AVERAGES 5
 #define Sensor_Manager_Change_State(a) 	Sensor_Manager_State = a
 #define DIGITAL_PULSE_COUNTERS			(SENSOR_MANAGER_PULSE_COUNTERS - SENSOR_MANAGER_ANALOGCHANNELS_COUNT)
 /**********************************************************************************
@@ -69,6 +70,8 @@ uint16 APP_PortMon_analogMax = 0;
 uint32 Sensor_Manager_PulseCounters[SENSOR_MANAGER_PULSE_COUNTERS] = {};
 
 uint32 Sensor_Manager_ErrorCounter=0;
+uint32 Sensor_Manager_ErrorCounters[ERROR_AVERAGES];
+uint8 Sensor_Manager_ErrorCounter_index = 0;
 
 uint8 Sensor_Manager_analogToPulseState = 1;
 uint8 Sensor_Manager_lastInputLevel[DIGITAL_PULSE_COUNTERS] = {1};
@@ -158,6 +161,7 @@ void ICACHE_FLASH_ATTR Sensor_Manager_Fast() {
 
 void ICACHE_FLASH_ATTR Sensor_Manager_Main() {
 	uint8 i;
+	uint32 temp;
 
 	//Based on state do stuff
 	switch(Sensor_Manager_State)
@@ -181,6 +185,18 @@ void ICACHE_FLASH_ATTR Sensor_Manager_Main() {
     if (Sensor_Manager_Timing == 0) {
         //Search for sensors again
         Sensor_Manager_UpdateSensors();
+        //Store error counts
+        temp = 0;
+		for(i=0;i<ERROR_AVERAGES;i++)
+		{
+			temp = temp + Sensor_Manager_ErrorCounters[i];
+		}
+		Sensor_Manager_ErrorCounter = temp;
+		// Increment index
+		Sensor_Manager_ErrorCounter_index = (Sensor_Manager_ErrorCounter_index +1) % ERROR_AVERAGES;
+		//Start new error count segment
+        Sensor_Manager_ErrorCounters[Sensor_Manager_ErrorCounter_index] = 0;
+
     }
 
     // MHZ14 CO2 Sensor
