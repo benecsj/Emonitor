@@ -378,7 +378,7 @@ void ICACHE_FLASH_ATTR Sensor_Manager_UpdateSensors(void) {
         //Same sensor count found check if ids are the same
         for (i = 0; i < OWP_CONST_ROMCODE_SIZE*SENSOR_MANAGER_DS18B20Count; i++) {
         	//Check each byte of the ids
-        	if(Sensor_Manager_sensorChannels[i] != Sensor_Manager_sensorChannelsTEMP[i])
+        	if(Sensor_Manager_sensorIDs[i] != Sensor_Manager_sensorIDsTEMP[i])
         	{
         		checkOk = FAIL;
         		break;
