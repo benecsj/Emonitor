@@ -302,7 +302,10 @@ void ICACHE_FLASH_ATTR Emonitor_Main_1000ms(void) {
 						APPEND("Meter_C02" 			JSON_DIV 	"%d" 		JSON_NEXT	,Sensor_Manager_GetCO2());}
 					//Add ip (only single time per connection)
 					if (Emonitor_connectionStatus == EMONITOR_NOT_CONNECTED) {
+						//Add wifi state
 						APPEND("Sys_Ip" 			JSON_DIV 	"%d" 		JSON_NEXT	,ip[3]);}
+					//Add wifi state
+						APPEND("Sys_RSSI" 			JSON_DIV 	"%d" 		JSON_NEXT	,Wifi_Manager_GetSignalLevel());
 					//Add ram usage
 						APPEND("Sys_Ram" 			JSON_DIV 	"%d"		JSON_NEXT	,Emonitor_GetRAMUsage());
 					//Add cpu usage
