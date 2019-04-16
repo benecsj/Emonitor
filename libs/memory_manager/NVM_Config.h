@@ -17,6 +17,8 @@ extern uint8 WifiManager_enableHotspot;
 extern uint32 Emonitor_nodeId;
 extern uint32 Emonitor_SendPeroid;
 extern char Emonitor_url[100];
+extern char Emonitor_url2[100];
+extern char Emonitor_url3[100];
 extern char Emonitor_key[33];
 extern char WifiManager_STA_SSID[33];
 extern char WifiManager_STA_PASSWORD[65];
@@ -36,6 +38,8 @@ extern uint8 Http_Language;
 	NVM_DATA(Emonitor_nodeId,       sizeof(Emonitor_nodeId))\
 	NVM_DATA(Emonitor_SendPeroid,       sizeof(Emonitor_SendPeroid))\
 	NVM_DATA(Emonitor_url,       100)\
+	NVM_DATA(Emonitor_url2,      100)\
+	NVM_DATA(Emonitor_url3,      100)\
 	NVM_DATA(Emonitor_key,       33)\
 	NVM_DATA(Http_Language,       sizeof(Http_Language))\
 

@@ -73,6 +73,8 @@ Emonitor_Request Emonitor_requestState = EMONITOR_REQ_NONE;
 // Emonitor user parameters
 uint32 Emonitor_nodeId = INVALID_ID;
 char Emonitor_url[100] = {0};
+char Emonitor_url2[100] = {0};
+char Emonitor_url3[100] = {0};
 char Emonitor_key[33] = {0xFF};
 char Emonitor_version[20] = {0};
 uint32 Emonitor_SendPeroid = 0;
@@ -118,8 +120,30 @@ void ICACHE_FLASH_ATTR Emonitor_Init(void){
 	DBG2_EMON("(EM) Emonitor_Init\n");
     //Check if has valid url and key
 	uint8 urlLength = strlen(Emonitor_url);
+	uint8 urlLength2 = strlen(Emonitor_url2);
+	uint8 urlLength3 = strlen(Emonitor_url3);
 	uint8 apiKeyLength = strlen(Emonitor_key);
-	if ((urlLength <= URL_MIN_LENGTH) || (urlLength == URL_MAX_LENGTH))
+	//Url sanity check
+	if((urlLength != urlLength2) || (urlLength != urlLength3) )
+	{
+		if(urlLength == urlLength2)
+		{
+			Emonitor_url3[sprintf(Emonitor_url3,"%s",Emonitor_url)]=0;
+		}
+		else if(urlLength == urlLength3)
+		{
+			Emonitor_url2[sprintf(Emonitor_url2,"%s",Emonitor_url)]=0;
+		}
+		else if(urlLength2 == urlLength3)
+		{
+			Emonitor_url[sprintf(Emonitor_url,"%s",Emonitor_url2)]=0;
+		}
+		//Recalculates lengths
+		urlLength = strlen(Emonitor_url);
+		urlLength2 = strlen(Emonitor_url2);
+		urlLength3 = strlen(Emonitor_url3);
+	}
+	if ((urlLength <= URL_MIN_LENGTH) || (urlLength >= URL_MAX_LENGTH))
 	{
 		Emonitor_GetDefaultUrl(Emonitor_url);
 	}

@@ -48,6 +48,8 @@ extern uint32_t Emonitor_GetRAMUsage(void);
 extern uint32 Emonitor_nodeId;
 extern uint32 Emonitor_SendPeroid;
 extern char Emonitor_url[100];
+extern char Emonitor_url2[100];
+extern char Emonitor_url3[100];
 extern char Emonitor_key[33];
 extern Emonitor_Request Emonitor_requestState;
 extern uint32 Emonitor_uptime;
@@ -76,7 +78,7 @@ extern char Emonitor_version[20];
 #define Emonitor_SetSendPeriod(a)  (Emonitor_SendPeroid = a)
 
 #define Emonitor_GetUrl()	(Emonitor_url)
-#define Emonitor_SetUrl(a)	Emonitor_url[sprintf(Emonitor_url,"%s",a)]=0;
+#define Emonitor_SetUrl(a)	Emonitor_url[sprintf(Emonitor_url,"%s",a)]=0;Emonitor_url2[sprintf(Emonitor_url2,"%s",a)]=0;Emonitor_url3[sprintf(Emonitor_url3,"%s",a)]=0;
 #define Emonitor_GetKey()	(Emonitor_key)
 #define Emonitor_SetKey(a)	Emonitor_key[sprintf(Emonitor_key,"%s",a)]=0;
 

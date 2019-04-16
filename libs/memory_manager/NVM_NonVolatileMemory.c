@@ -191,7 +191,8 @@ void ICACHE_FLASH_ATTR NvM_Store(void)
 	MD5_Update(&mdContext, (unsigned char *)&NVM_FrameBuffer[NVM_DATA_POS_DATA_START], sizeof(NVM_FrameBuffer)-NVM_DATA_POS_DATA_START);
 	MD5_Final( (unsigned char*) &NVM_FrameBuffer[0], &mdContext);
 
-	//Store complete datablock
+	//Store complete datablock for two times
+	system_param_save_with_protect(EMONITOR_PARAM_START_SEC, (void*)&NVM_FrameBuffer, sizeof(NVM_FrameBuffer));
 	system_param_save_with_protect(EMONITOR_PARAM_START_SEC, (void*)&NVM_FrameBuffer, sizeof(NVM_FrameBuffer));
 }
 
